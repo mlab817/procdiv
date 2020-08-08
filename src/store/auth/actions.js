@@ -1,14 +1,16 @@
 import { firebaseAuth } from 'boot/firebase'
 import { Loading, LocalStorage } from 'quasar'
+import { showSuccessMessage, showErrorMessage } from 'src/functions/show-messages'
 
 export function login({}, payload) {
 	Loading.show()
 	firebaseAuth.signInWithEmailAndPassword(payload.email, payload.password)
 		.then(res => {
-			console.log(res)
+			showSuccessMessage()
 		})
 		.catch(err => {
-			console.log(err.message)
+			showErrorMessage()
+			Loading.hide()
 		})
 }
 
