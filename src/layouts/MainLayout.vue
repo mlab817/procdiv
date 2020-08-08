@@ -24,15 +24,13 @@
 
     <q-drawer
       v-model="leftDrawerOpen"
-      show-if-above
+      :breakpoint="767"
+      :width="250"
       bordered
-      content-class="bg-grey-1"
+      content-class="bg-primary"
     >
-      <q-list>
-        <q-item-label
-          header
-          class="text-grey-8"
-        >
+      <q-list dark>
+        <q-item-label header>
           Navigation
         </q-item-label>
         <EssentialLink
@@ -46,6 +44,17 @@
     <q-page-container>
       <router-view />
     </q-page-container>
+
+    <q-footer>
+      <q-tabs>
+        <q-route-tab
+          v-for="nav in essentialLinks"
+          :key="nav.label"
+          :to="nav.link"
+          :icon="nav.icon"
+          :label="nav.label" />
+      </q-tabs>
+    </q-footer>
   </q-layout>
 </template>
 
@@ -104,3 +113,17 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+  @media screen and (min-width: 768px) {
+    .q-footer {
+      display: none;
+    }
+  }
+  
+  .q-drawer {
+    .q-router-link--exact-active {
+      color: white !important;
+    }
+  }
+</style>

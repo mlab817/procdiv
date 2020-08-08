@@ -23,3 +23,11 @@ export function SET_DOWNLOADED(state, payload) {
 export function CLEAR_ASSIGNMENTS(state) {
 	state.assignments = {}
 }
+
+export function SET_SORT_BY(state, payload) {
+	state.sortBy = payload
+}
+
+export function SET_SORT_DIR(state, payload) {
+	state.sortDir = payload
+}

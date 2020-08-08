@@ -6,7 +6,7 @@ export function completed(state, getters) {
 
 	Object.keys(filteredAssignments).forEach(key => {
 		let assignment = filteredAssignments[key]
-		if (typeof assignment.dateCompleted !== 'undefined' && assignment.dateCompleted !== null && assignment.dateCompleted !== '') {
+		if (assignment.completed !== undefined && assignment.completed) {
 			completedAssignments[key] = assignment
 		}
 	})
@@ -20,7 +20,7 @@ export function ongoing(state, getters) {
 
 	Object.keys(filteredAssignments).forEach(key => {
 		const assignment = filteredAssignments[key]
-		if (typeof assignment.dateCompleted === 'undefined' || assignment.dateCompleted === null || assignment.dateCompleted === '') {
+		if (assignment.completed === undefined || !assignment.completed) {
 			ongoingAssignments[key] = assignment
 		}
 	})
@@ -63,13 +63,29 @@ export function sorted(state, getters) {
 	let sortedAssignments = {},
 			keysOrdered = Object.keys(state.assignments)
 
-	keysOrdered.sort((a,b) => {
-		const assignmentAProp = state.assignments[a][state.sortBy] && state.assignments[a][state.sortBy].toLowerCase(),
-				assignmentBProp = state.assignments[b][state.sortBy] && state.assignments[b][state.sortBy].toLowerCase()
+	const sortBy = state.sortBy, sortDir = state.sortDir
 
-		if (assignmentAProp > assignmentBProp) return 1
-		else if (assignmentAProp < assignmentBProp) return -1
-		else return 0
+	keysOrdered.sort((a,b) => {
+		let assignmentAProp = null,
+			assignmentBProp = null
+		if (sortBy === 'dateAssigned' || sortBy === 'dateDue') {
+			assignmentAProp = state.assignments[a][sortBy] && new Date(state.assignments[a][sortBy])
+			assignmentBProp = state.assignments[b][sortBy] && new Date(state.assignments[b][sortBy])	
+		} else {
+			assignmentAProp = state.assignments[a][sortBy] && state.assignments[a][sortBy].toLowerCase()
+			assignmentBProp = state.assignments[b][sortBy] && state.assignments[b][sortBy].toLowerCase()	
+		}
+
+		if (sortDir === 'asc') {
+			if (assignmentAProp > assignmentBProp) return 1
+			else if (assignmentAProp < assignmentBProp) return -1
+			else return 0
+		} else {
+			if (assignmentAProp > assignmentBProp) return -1
+			else if (assignmentAProp < assignmentBProp) return 1
+			else return 0
+		}
+			
 	})
 
 	keysOrdered.forEach((key) => {

@@ -1,6 +1,13 @@
+import Vue from 'vue'
+
 export function ADD_STAFF(state, payload) {
-	state.staff.push({
-		label: payload,
-		value: payload
-	})
+	Vue.set(state.staff, payload.id, payload.staff)
+}
+
+export function DELETE_STAFF(state, payload) {
+	Vue.delete(state.staff, id)
+}
+
+export function SET_DOWNLOADED(state, payload) {
+	state.downloaded = payload
 }

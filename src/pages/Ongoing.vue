@@ -1,15 +1,19 @@
 <template>
   <q-page padding>
-    <div class="row justify-end q-mb-md">
-      <q-input outlined placeholder="Search assignments..." dense class="q-mr-sm" v-model="searchField">
-        <template v-slot:append>
-          <q-icon name="search"/>
-        </template>
-      </q-input>
+  	<div class="row q-my-sm" v-if="$q.screen.lt.md">
+  		<search class="col" />
+  	</div>
 
-      <q-btn icon="filter_list" :label="$q.screen.gt.sm ? 'Filter': void 0" class="q-mr-sm" color="positive" disabled></q-btn>
+    <div class="row justify-between q-mb-md">
+    	<div class="row">
+    		<q-btn icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment"></q-btn>
+    	</div>	
 
-      <q-btn icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment"></q-btn>
+    	<div class="row">
+	      <sort />
+	      <search class="q-ml-sm" v-if="$q.screen.gt.sm"/>
+      </div>
+
     </div>
     
     <q-dialog v-model="addAssignmentDialog" full-width persistent transition-show="slide-up" transition-hide="slide-down">
@@ -23,18 +27,24 @@
             <q-btn icon="close" v-close-popup flat round dense></q-btn>
           </div>
         </q-card-section>
+
         <q-card-section class="q-pa-sm">
           <q-form greedy class="q-gutter-sm">
             <q-input v-model="document" outlined label="Document" stack-label></q-input>
+
             <q-input v-model="particulars" outlined label="Particulars" stack-label></q-input>
+
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
               <q-select v-model="enduser" use-input @filter="filterEndusers" :options="enduserOptions" outlined label="Enduser" stack-label class="col" emit-value map-options></q-select>
               <div>
                 <q-btn flat round icon="edit" @click="addEnduser" color="primary"></q-btn>
               </div>
             </div>
+
             <q-input v-model="referenceNo" outlined label="Reference No" stack-label></q-input>
+
             <q-input v-model="actionTaken" outlined label="Action Taken" stack-label></q-input>
+
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
               <q-select v-model="assignedTo" :options="staff" outlined label="Assigned To" stack-label class="col" emit-value map-options></q-select>
               <div>
@@ -42,6 +52,7 @@
               </div>
             </div>
             <q-input v-model="remarks" outlined label="Remarks" stack-label></q-input>
+
             <q-input v-model="dateDue" outlined label="Due Date/Time" stack-label>
               <template v-slot:prepend>
                 <q-icon name="event" class="cursor-pointer">
@@ -138,6 +149,11 @@ import { uid, date } from 'quasar'
 export default {
   name: 'PageIndex',
 
+  components: {
+  	'sort': () => import('../components/shared/Sort.vue'),
+  	'search': () => import('../components/shared/Search.vue')
+  },
+
   computed: {
     ongoing() {
       // return this.$store.state.assignment.assignments
@@ -145,21 +161,17 @@ export default {
       return this.$store.getters['assignment/ongoing']
     },
 
-    searchField: {
-      get() {
-        return this.$store.state.assignment.search
-      },
-      set(val) {
-        this.$store.dispatch('assignment/setSearch', val)
-      }
-    },
-
     staff() {
-      return this.$store.state.staff.staff
+      // return this.$store.state.staff.staff
+      return this.$store.getters['staff/options']
     },
 
     endusers() {
       return this.$store.state.enduser.endusers
+    },
+
+    searchField() {
+      return this.$store.state.assignment.search
     }
   },
 
@@ -206,7 +218,7 @@ export default {
       this.actionTaken = ''
       this.assignedTo = ''
       this.remarks = ''
-      this.dateDue = ''
+      this.dateDue = date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
 
       this.addAssignmentDialog = true
     },
@@ -275,8 +287,6 @@ export default {
       }
 
       this.$store.dispatch('assignment/update', payload)
-
-      console.log(payload)
 
       this.addAssignmentDialog = false
 
@@ -366,6 +376,7 @@ export default {
 
   created() {
     this.$store.dispatch('assignment/fbReadData')
+    this.$store.dispatch('staff/fbReadData')
   }
 }
 </script>

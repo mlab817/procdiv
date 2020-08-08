@@ -31,8 +31,6 @@ export function update({ dispatch }, payload) {
 export function fbUpdate({}, payload) {
 	const ref = firebaseDb.ref('assignments/' + payload.id)
 
-	console.log(payload.updates)
-
 	ref.update(payload.updates, error => {
 		if (error) {
 			showErrorMessage()
@@ -96,6 +94,14 @@ export function fbUndoMarkAsCompleted({}, id) {
 			showSuccessMessage()
 		}
 	})
+}
+
+export function setSortBy({ commit }, payload) {
+	commit('SET_SORT_BY', payload)
+}
+
+export function setSortDir({ commit }, payload) {
+	commit('SET_SORT_DIR', payload)
 }
 
 export function setSearch({ commit }, payload) {

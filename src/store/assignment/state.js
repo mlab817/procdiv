@@ -3,7 +3,7 @@ export default function () {
     assignments: {},
     search: '',
     sortBy: 'dateAssigned',
-    sortDir: 'asc',
+    sortDir: 'desc',
     filters: null,
     downloaded: false
   }
