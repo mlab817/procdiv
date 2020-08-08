@@ -1,13 +1,14 @@
 <template>
   <q-page padding>
-    <div class="row justify-end q-mb-md">
-      <q-input outlined placeholder="Search assignments..." dense class="q-mr-sm" v-model="searchField">
-        <template v-slot:append>
-          <q-icon name="search"/>
-        </template>
-      </q-input>
+  	<div class="row q-my-sm" v-if="$q.screen.lt.md">
+  		<search class="col" />
+  	</div>
 
-      <q-btn icon="filter_list" :label="$q.screen.gt.sm ? 'Filter': void 0" color="positive" disabled></q-btn>
+    <div class="row justify-end q-mb-md">
+      <div class="row">
+      	<sort />
+      	<search class="q-ml-sm" v-if="$q.screen.gt.sm" />
+      </div>
     </div>
 
     <q-toolbar class="bg-positive text-white q-mt-md text-center">
@@ -78,19 +79,19 @@ import { date } from 'quasar'
 export default {
   name: 'PageCompleted',
 
+  components: {
+  	'sort': () => import('../components/shared/Sort.vue'),
+  	'search': () => import('../components/shared/Search.vue'),
+  },
+
   computed: {
 
     completed() {
       return this.$store.getters['assignment/completed']
     },
 
-    searchField: {
-      get() {
-        return this.$store.state.assignment.search
-      },
-      set(val) {
-        this.$store.dispatch('assignment/setSearch', val)
-      }
+    searchField() {
+     	return this.$store.state.assignment.search
     }
 
   },
