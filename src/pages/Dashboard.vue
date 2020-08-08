@@ -39,17 +39,13 @@ export default {
   // name: 'PageName',
   data() {
   	return {
-  		gdp: [
-        { country: "USA", value: 20.5 },
-        { country: "China", value: 13.4 },
-        { country: "Germany", value: 4.0 },
-        { country: "Japan", value: 4.9 },
-        { country: "France", value: 2.8 }
-      ],
       filterDialog: true
   	}
   },
   computed: {
+    documents() {
+      return this.$store.state.document.documents
+    },
   	groupedAssignments() {
   		const assignments = this.$store.getters['assignment/ongoing']
 

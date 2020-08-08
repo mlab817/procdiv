@@ -144,10 +144,6 @@ export default {
       }
       return ''
     }
-  },
-
-  created() {
-    this.$store.dispatch('assignment/fbReadData')
   }
 }
 </script>

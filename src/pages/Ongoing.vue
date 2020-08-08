@@ -30,14 +30,19 @@
 
         <q-card-section class="q-pa-sm">
           <q-form greedy class="q-gutter-sm">
-            <q-input v-model="document" outlined label="Document" stack-label></q-input>
+            <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
+              <q-select v-model="document" :options="documents" outlined label="Document" stack-label class="col" emit-value map-options />
+              <div>
+                <q-btn flat round icon="edit" @click="addDocument" color="primary"></q-btn>
+              </div>
+            </div>
 
             <q-input v-model="particulars" outlined label="Particulars" stack-label></q-input>
 
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
               <q-select v-model="enduser" use-input @filter="filterEndusers" :options="enduserOptions" outlined label="Enduser" stack-label class="col" emit-value map-options></q-select>
               <div>
-                <q-btn flat round icon="edit" @click="addEnduser" color="primary"></q-btn>
+                <q-btn flat round icon="edit" @click="addEnduserDialog = true" color="primary"></q-btn>
               </div>
             </div>
 
@@ -51,6 +56,7 @@
                 <q-btn flat round icon="edit" @click="addStaff" color="primary"></q-btn>
               </div>
             </div>
+
             <q-input v-model="remarks" outlined label="Remarks" stack-label></q-input>
 
             <q-input v-model="dateDue" outlined label="Due Date/Time" stack-label>
@@ -75,6 +81,26 @@
         <q-card-actions align="right">
           <q-btn flat label="Cancel" v-close-popup></q-btn>
           <q-btn unelevated label="OK" color="primary" @click="handleSubmit"></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="addEnduserDialog" persistent>
+      <q-card style="min-width: 400px;">
+        <q-card-section class="row justify-between">
+          <div class="text-h6">Add Enduser</div>
+          <q-space/>
+          <q-btn flat round dense v-close-popup icon="close"></q-btn>
+        </q-card-section>
+        <q-card-section>
+          <q-form class="q-gutter-md">
+            <q-input v-model="newEnduser.label" label="Label" stack-label outlined />
+            <q-input v-model="newEnduser.value" label="Value" stack-label outlined />
+          </q-form>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
+          <q-btn flat label="OK" color="primary" :disabled="!newEnduser.label || !newEnduser.value" @click="addEnduser"></q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -156,8 +182,6 @@ export default {
 
   computed: {
     ongoing() {
-      // return this.$store.state.assignment.assignments
-      // 
       return this.$store.getters['assignment/ongoing']
     },
 
@@ -167,7 +191,11 @@ export default {
     },
 
     endusers() {
-      return this.$store.state.enduser.endusers
+      return this.$store.getters['enduser/options']
+    },
+
+    documents() {
+      return this.$store.getters['document/options']
     },
 
     searchField() {
@@ -187,8 +215,13 @@ export default {
       remarks: '',
       dateDue: '',
       id: '',
+      toolbarTitle: 'Add Assignment',
+      addEnduserDialog: false,
       enduserOptions: [],
-      toolbarTitle: 'Add Assignment'
+      newEnduser: {
+        label: '',
+        value: ''
+      }
     }
   },
 
@@ -324,8 +357,17 @@ export default {
     },
 
     addEnduser() {
+      this.$store.dispatch('enduser/add', this.newEnduser)
+      this.newEnduser = {
+        label: '',
+        value: ''
+      }
+      this.addEnduserDialog = false
+    },
+
+    addDocument() {
       this.$q.dialog({
-        title: 'Add Enduser',
+        title: 'Add Document',
         prompt: {
           model: '',
           type: 'text',
@@ -333,7 +375,7 @@ export default {
         },
         cancel: true
       })
-      .onOk(data => this.$store.dispatch('enduser/add', data))
+      .onOk(data => this.$store.dispatch('document/add', data))
     },
 
     overdue(assignment) {
@@ -372,11 +414,6 @@ export default {
       }
       return ''
     }
-  },
-
-  created() {
-    this.$store.dispatch('assignment/fbReadData')
-    this.$store.dispatch('staff/fbReadData')
   }
 }
 </script>
