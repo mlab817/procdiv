@@ -1,5 +1,13 @@
 <template>
   <q-page padding>
+    <div class="text-h6">By Status</div>
+
+    <bar-chart :data="groupedAssignments"></bar-chart>
+    
+    <div class="text-h6">By Date</div>
+    <div class="text-h6">By Staff</div>
+    <div class="text-h6">By Staff and by Deadline</div>
+    <div class="text-h6">Dynamic Filter</div>
   	{{groupedAssignments}}
     <div class="d3-graph" ref="graph" id="arc"></div>
   </q-page>

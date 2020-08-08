@@ -5,7 +5,9 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Dashboard.vue') },
-      { path: 'assignments', component: () => import('pages/Index.vue') },
+      { path: 'auth', component: () => import('pages/Auth.vue') },
+      { path: 'ongoing', component: () => import('pages/Ongoing.vue') },
+      { path: 'completed', component: () => import('pages/Completed.vue') },
       { path: 'settings', component: () => import('pages/Index.vue') },
     ]
   },

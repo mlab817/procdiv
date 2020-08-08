@@ -31,7 +31,7 @@ export function update({ dispatch }, payload) {
 export function fbUpdate({}, payload) {
 	const ref = firebaseDb.ref('assignments/' + payload.id)
 
-	console.log(ref)
+	console.log(payload.updates)
 
 	ref.update(payload.updates, error => {
 		if (error) {

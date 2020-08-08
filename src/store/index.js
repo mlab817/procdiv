@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 // import example from './module-example'
 import assignment from './assignment'
+import auth from './auth'
 import enduser from './enduser'
 import staff from './staff'
 
@@ -20,8 +21,8 @@ Vue.use(Vuex)
 export default function (/* { ssrContext } */) {
   const Store = new Vuex.Store({
     modules: {
-      // example
       assignment,
+      auth,
       enduser,
       staff
     },

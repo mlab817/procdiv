@@ -17,7 +17,8 @@
 
         <q-space/>
 
-        <q-btn icon="person" label="Login" outline></q-btn>
+        <q-btn flat stretch icon="person" label="Login" to="/auth" v-if="!loggedIn"></q-btn>
+        <q-btn flat stretch icon-right="exit_to_app" label="Logout" v-else @click="confirmLogout"></q-btn>
       </q-toolbar>
     </q-header>
 
@@ -58,9 +59,14 @@ const linksData = [
     link: '/'
   },
   {
-    title: 'Assignments',
+    title: 'Ongoing',
     icon: 'code',
-    link: '/assignments'
+    link: '/ongoing'
+  },
+  {
+    title: 'Completed',
+    icon: 'done_outline',
+    link: '/completed'
   },
   {
     title: 'Settings',
@@ -72,10 +78,28 @@ const linksData = [
 export default {
   name: 'MainLayout',
   components: { EssentialLink },
+  computed: {
+    loggedIn() {
+      return this.$store.state.auth.loggedIn
+    }
+  },
   data () {
     return {
       leftDrawerOpen: false,
       essentialLinks: linksData
+    }
+  },
+  methods: {
+    confirmLogout() {
+      this.$q.dialog({
+        title: 'Confirm Logout',
+        message: 'Are you sure you want to logout?',
+        cancel: true
+      })
+      .onOk(() => this.logout())
+    },
+    logout() {
+      this.$store.dispatch('auth/logout')
     }
   }
 }

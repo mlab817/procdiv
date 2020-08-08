@@ -1,5 +1,7 @@
+import { LocalStorage } from 'quasar'
+
 export default function () {
   return {
-    user: null
+    loggedIn: LocalStorage.getItem('loggedIn') || false
   }
 }

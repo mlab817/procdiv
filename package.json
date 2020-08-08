@@ -12,12 +12,16 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "chart": "^0.1.2",
+    "chart.js": "^2.9.3",
     "core-js": "^3.6.5",
     "d3": "^5.16.0",
     "firebase": "^7.17.2",
     "google-api-javascript-client": "google/google-api-javascript-client",
     "quasar": "^1.0.0",
     "underscore": "^1.10.2",
+    "vue-chartjs": "^3.5.0",
+    "vue-chartkick": "^0.6.1",
     "vue-gapi": "^0.3.1"
   },
   "devDependencies": {

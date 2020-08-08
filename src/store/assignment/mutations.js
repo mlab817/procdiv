@@ -19,3 +19,7 @@ export function SET_SEARCH(state, payload) {
 export function SET_DOWNLOADED(state, payload) {
 	state.downloaded = payload
 }
+
+export function CLEAR_ASSIGNMENTS(state) {
+	state.assignments = {}
+}
