@@ -3,6 +3,7 @@
     <q-header>
       <q-toolbar>
         <q-btn
+          v-if="loggedIn"
           flat
           dense
           round
@@ -28,6 +29,7 @@
       :width="250"
       bordered
       content-class="bg-primary"
+      v-if="loggedIn"
     >
       <q-list dark>
         <q-item-label header>
