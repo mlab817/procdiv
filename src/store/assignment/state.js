@@ -5,6 +5,8 @@ export default function () {
     sortBy: 'dateAssigned',
     sortDir: 'desc',
     filters: null,
-    downloaded: false
+    downloaded: false,
+    start: '',
+    end: ''
   }
 }

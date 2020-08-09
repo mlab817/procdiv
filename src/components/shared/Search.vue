@@ -1,5 +1,5 @@
 <template>
-	<q-input outlined placeholder="Search assignments..." dense v-model="searchField" debounce="300">
+	<q-input outlined placeholder="Search assignments..." dense v-model="searchField" debounce="300" clearable>
     <template v-slot:append>
       <q-icon name="search"/>
     </template>

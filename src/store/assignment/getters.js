@@ -29,7 +29,7 @@ export function ongoing(state, getters) {
 }
 
 export function filtered(state, getters) {
-	const sortedAssignments = getters.sorted
+	const sortedAssignments = getters.filteredByDate
 	let filteredAssignments = []
 
 	const search = state.search && state.search.toLowerCase()
@@ -57,6 +57,39 @@ export function filtered(state, getters) {
 		return filteredAssignments
 	}
 	return sortedAssignments
+}
+
+export function filteredByDate(state, getters) {
+	const start = state.start, end = state.end
+	let filteredByDate = {}
+
+	const assignments = getters.sorted
+
+	console.log(Object.keys(assignments).length)
+
+	if (!start && !end) {
+		console.log('no dates selected')
+		return  assignments
+	} else if (start && !end) {
+		Object.keys(assignments).forEach(key => {
+			const assignment = assignments[key]
+
+			if (assignment.dateAssigned && date.isSameDate(assignment.dateAssigned, start, 'day')) {
+				filteredByDate[key] = assignment
+			}
+		})
+		return filteredByDate
+	} else {
+		Object.keys(assignments).forEach(key => {
+			const assignment = assignments[key]
+
+			if (assignment.dateAssigned && date.isBetweenDates(assignment.dateAssigned, start, end, { onlyDate: true, inclusiveFrom: true, inclusiveTo: true })) {
+				filteredByDate[key] = assignment
+			}
+		})
+		return filteredByDate
+	}
+	
 }
 
 export function sorted(state, getters) {

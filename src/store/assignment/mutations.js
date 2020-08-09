@@ -31,3 +31,11 @@ export function SET_SORT_BY(state, payload) {
 export function SET_SORT_DIR(state, payload) {
 	state.sortDir = payload
 }
+
+export function SET_START(state, payload) {
+	state.start = payload
+}
+
+export function SET_END(state, payload) {
+	state.end = payload
+}

@@ -4,6 +4,7 @@
     	<q-card-section class="bg-primary text-white">
     		<div class="text-h6">Login</div>
     	</q-card-section>
+      
     	<q-card-section>
     		<q-form greedy class="q-gutter-md" ref="login-form" @submit.prevent="handleSubmit" @reset="handleReset">
     			<q-input 
@@ -31,7 +32,7 @@
 	    				<q-btn
 		    				type="reset"
 		    				class="full-width"
-		    				flat
+		    				outline
 		    				color="primary">
 	    					Reset
 	    				</q-btn>
@@ -48,6 +49,15 @@
     			</div>
     			
     		</q-form>
+
+        <q-separator spaced />
+
+        <q-btn 
+          icon="img:https://www.gstatic.com/mobilesdk/160512_mobilesdk/auth_service_google.svg" 
+          class="full-width" 
+          color="red" 
+          label="Log in with Google" 
+          @click="googleSignIn" />
     	</q-card-section>
     </q-card>
   </q-page>
@@ -72,7 +82,10 @@ export default {
   	handleReset() {
   		this.email = ''
   		this.password = ''
-  	}
+  	},
+    googleSignIn() {
+      this.$store.dispatch('auth/googleSignIn')
+    }
   }
 }
 </script>

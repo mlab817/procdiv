@@ -4,7 +4,7 @@
   		<search class="col" />
   	</div>
 
-    <div class="row justify-between q-mb-md">
+    <div class="row justify-between q-mb-sm">
     	<div class="row items-stretch">
     		<q-btn icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment">
           <q-tooltip>Add new assignment</q-tooltip>  
@@ -19,6 +19,9 @@
 
     	<div class="row">
 	      <sort />
+
+        <filter-date class="q-ml-sm" />
+
 	      <search class="q-ml-sm" v-if="$q.screen.gt.sm"/>
       </div>
 
@@ -138,27 +141,44 @@
         <template v-if="Object.keys(ongoing).length">
           <tr v-for="(assignment, key) in ongoing" :key="key" :class="overdue(assignment) ? 'bg-red-2': ''">
             <td>{{assignment.dateAssigned | showDate }}</td>
-            <td v-html="$options.filters.searchHighlight(assignment.document, searchField)"></td>
+            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.document, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.particulars, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.referenceNo, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.actionTaken, searchField)"></td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.assignedTo, searchField)"></td>
+            <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.assignedTo, searchField)" @click="setSearch(assignment.assignedTo)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.remarks, searchField)"></td>
             <td class="text-right">
-              <div class="row justify-end items-center">
+              <div class="row justify-end items-center no-wrap">
                 {{assignment.dateDue | showDate }}    
                 <q-icon name="event" class="text-grey-8" v-if="assignment.dateDue"></q-icon>
               </div>
-              <div class="row justify-end items-center">
+              <div class="row justify-end items-center no-wrap">
                 {{assignment.dateDue | showTime }}  
                 <q-icon name="alarm" class="text-grey-8" v-if="assignment.dateDue"></q-icon>  
               </div>
             </td>
-            <td class="text-center items-center q-gutter-sm">
-              <q-btn outlined dense icon="done_outline" color="positive" @click="confirmCompleted(assignment)"></q-btn>
-              <q-btn outlined dense icon="edit" color="primary" @click="editAssignment(assignment)"></q-btn>
-              <q-btn outlined dense icon="delete" color="negative" @click="confirmDelete(assignment)"></q-btn>
+            <td class="text-center items-center">
+              <div class="row q-gutter-sm no-wrap">
+                <q-btn 
+                  outlined 
+                  dense 
+                  icon="done_outline" 
+                  color="positive" 
+                  @click="confirmCompleted(assignment)" />
+                <q-btn 
+                  outlined 
+                  dense 
+                  icon="edit" 
+                  color="primary" 
+                  @click="editAssignment(assignment)" />
+                <q-btn 
+                  outlined 
+                  dense 
+                  icon="delete" 
+                  color="negative" 
+                  @click="confirmDelete(assignment)" />
+              </div>
             </td>
           </tr>
         </template>
@@ -185,7 +205,8 @@ export default {
 
   components: {
   	'sort': () => import('../components/shared/Sort.vue'),
-  	'search': () => import('../components/shared/Search.vue')
+  	'search': () => import('../components/shared/Search.vue'),
+    'filter-date': () => import('../components/shared/FilterDate.vue')
   },
 
   computed: {
@@ -233,8 +254,6 @@ export default {
         }
       })
 
-      console.log(newArr)
-
       return newArr
     }
   },
@@ -262,6 +281,10 @@ export default {
   },
 
   methods: {
+    setSearch(search) {
+      this.$store.dispatch('assignment/setSearch', search)
+    },
+
     filterEndusers(val, update) {
       if (val === '') {
         update(() => {

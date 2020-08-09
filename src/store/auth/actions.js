@@ -1,4 +1,4 @@
-import { firebaseAuth } from 'boot/firebase'
+import { firebaseAuth, provider } from 'boot/firebase'
 import { Loading, LocalStorage } from 'quasar'
 import { showSuccessMessage, showErrorMessage } from 'src/functions/show-messages'
 
@@ -16,6 +16,25 @@ export function login({}, payload) {
 
 export function logout({}) {
 	firebaseAuth.signOut()
+}
+
+export function googleSignIn({}) {
+	firebaseAuth
+		.signInWithPopup(provider)
+		.then(res => {
+			const token = res.credential.accessToken
+			const user = res.user
+
+			console.log(token, user)
+		})
+		.catch(err => {
+			const errorCode = err.code
+			const errorMessage = err.message
+			const email = err.email
+			const credential = err.credential
+
+			console.error(errorCode, errorMessage, email, credential)
+		})
 }
 
 export function handleAuthStateChanged({ commit, dispatch }) {

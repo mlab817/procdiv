@@ -12,7 +12,6 @@
 		<q-btn 
 			:icon="sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward'" 
 			class="q-ml-sm dir" 
-			:label="sortDir === 'asc' ? 'ASC' : 'DESC'" 
 			:color="sortDir === 'asc' ? 'primary' : 'negative'" 
 			@click="toggleSortDir" />
 	</div>	
@@ -92,9 +91,5 @@
 <style>
 	.sort {
 		width: 150px;
-	}
-
-	.dir {
-		width: 105px;
 	}
 </style>

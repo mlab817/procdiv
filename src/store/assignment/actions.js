@@ -127,6 +127,11 @@ export function setSearch({ commit }, payload) {
 	commit('SET_SEARCH', payload)
 }
 
+export function filterByDate({ commit }, payload) {
+		commit('SET_START', payload.start)
+		commit('SET_END', payload.end)
+}
+
 export function fbReadData({ commit }) {
 	const assignments = firebaseDb.ref('assignments')
 
