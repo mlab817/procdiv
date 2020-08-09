@@ -14,11 +14,6 @@ export default {
   },
   mounted() {
   	this.$store.dispatch('auth/handleAuthStateChanged')
-  	this.$store.dispatch('assignment/fbReadData')
-  	this.$store.dispatch('document/fbReadData')
-    this.$store.dispatch('deleted/fbReadData')
-  	this.$store.dispatch('staff/fbReadData')
-  	this.$store.dispatch('enduser/fbReadData')
   }
 }
 </script>

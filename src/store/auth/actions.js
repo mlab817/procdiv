@@ -26,6 +26,10 @@ export function handleAuthStateChanged({ commit, dispatch }) {
 			LocalStorage.set('loggedIn', true)
 			this.$router.push('/').then(() => console.log('next')).catch(err => console.log(err.message))
 			dispatch('assignment/fbReadData', null, { root: true })
+	  	dispatch('document/fbReadData', null, { root: true })
+	    dispatch('deleted/fbReadData', null, { root: true })
+	  	dispatch('staff/fbReadData', null, { root: true })
+	  	dispatch('enduser/fbReadData', null, { root: true })
 		} else {
 			commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })
 			commit('assignment/SET_DOWNLOADED', null, { root: true })
