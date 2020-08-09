@@ -45,7 +45,26 @@ export function deleteAssignment({ dispatch }, id) {
 	dispatch('fbDelete', id)
 }
 
-export function fbDelete({}, id) {
+export function fbMoveToDelete({ state }, payload) {
+	const ref = firebaseDb.ref('deleted/' + payload.id)
+
+	ref.set(payload.assignment, error => {
+		if (error) {
+			showErrorMessage()
+		} else {
+			showSuccessMessage()
+		}
+	})
+}
+
+export function fbDelete({ state, dispatch }, id) {
+	const assignment = state.assignments[id]
+
+	dispatch('fbMoveToDelete', {
+		id: id,
+		assignment: assignment
+	})
+
 	const ref = firebaseDb.ref('assignments/' + id)
 	ref.remove(error => {
 		if (error) {

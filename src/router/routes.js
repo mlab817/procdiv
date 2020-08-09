@@ -8,6 +8,7 @@ const routes = [
       { path: 'auth', component: () => import('pages/Auth.vue') },
       { path: 'ongoing', component: () => import('pages/Ongoing.vue') },
       { path: 'completed', component: () => import('pages/Completed.vue') },
+      { path: 'deleted', component: () => import('pages/Deleted.vue') },
       { path: 'settings', component: () => import('pages/Index.vue') },
     ]
   },

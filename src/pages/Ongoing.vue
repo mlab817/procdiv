@@ -5,8 +5,16 @@
   	</div>
 
     <div class="row justify-between q-mb-md">
-    	<div class="row">
-    		<q-btn icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment"></q-btn>
+    	<div class="row items-stretch">
+    		<q-btn icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment">
+          <q-tooltip>Add new assignment</q-tooltip>  
+        </q-btn>
+        
+        <download-excel :data="ongoingArray">
+          <q-btn icon="get_app" :label="$q.screen.gt.sm ? 'Download': void 0" class="q-ml-sm btn-download" color="secondary">
+            <q-tooltip>Download ongoing assignments</q-tooltip>
+          </q-btn>
+        </download-excel>
     	</div>	
 
     	<div class="row">
@@ -200,6 +208,34 @@ export default {
 
     searchField() {
       return this.$store.state.assignment.search
+    },
+
+    ongoingArray() {
+      let arr = []
+
+      Object.keys(this.ongoing).forEach(key => {
+        const ass = this.ongoing[key]
+
+        arr.push(ass)
+      })
+
+      const newArr = arr.map(a => {
+        return {
+          'Date Assigned': a.dateAssigned,
+          'Document': a.document,
+          'Particulars': a.particulars,
+          'Enduser': a.enduser,
+          'Reference No.': a.referenceNo,
+          'Action Taken': a.actionTaken,
+          'Assigned To': a.assignedTo,
+          'Remarks': a.remarks,
+          'Due Date/Time': a.dateDue ? a.dateDue.toString() : ''
+        }
+      })
+
+      console.log(newArr)
+
+      return newArr
     }
   },
 
@@ -417,3 +453,9 @@ export default {
   }
 }
 </script>
+
+<style>
+  .btn-download {
+    height: 40px;
+  }
+</style>

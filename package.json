@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",
+    "axios": "^0.19.2",
     "chart": "^0.1.2",
     "chart.js": "^2.9.3",
     "core-js": "^3.6.5",
@@ -22,7 +23,8 @@
     "underscore": "^1.10.2",
     "vue-chartjs": "^3.5.0",
     "vue-chartkick": "^0.6.1",
-    "vue-gapi": "^0.3.1"
+    "vue-gapi": "^0.3.1",
+    "vue-json-excel": "^0.2.98"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

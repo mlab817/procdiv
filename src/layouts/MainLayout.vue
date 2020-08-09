@@ -78,6 +78,11 @@ const linksData = [
     link: '/completed'
   },
   {
+    title: 'Deleted',
+    icon: 'delete',
+    link: '/deleted'
+  },
+  {
     title: 'Settings',
     icon: 'settings',
     link: '/settings'
