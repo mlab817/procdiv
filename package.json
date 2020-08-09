@@ -14,6 +14,7 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.19.2",
     "chart.js": "^2.9.3",
+    "copy-webpack-plugin": "^6.0.3",
     "core-js": "^3.6.5",
     "firebase": "^7.17.2",
     "google-api-javascript-client": "google/google-api-javascript-client",

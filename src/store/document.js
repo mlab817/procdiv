@@ -36,8 +36,6 @@ const actions = {
 			name: payload
 		}
 
-		console.log(doc)
-
 		dispatch('fbAdd', doc)
 	},
 	fbAdd: ({}, payload) => {
@@ -97,8 +95,6 @@ const actions = {
 				id: key, 
 				document: doc
 			}
-
-			console.log('child_added', payload)
 
 			commit('ADD_DOCUMENT', payload)
 		})

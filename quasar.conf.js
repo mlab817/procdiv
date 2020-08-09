@@ -74,7 +74,7 @@ module.exports = function (/* ctx */) {
           loader: 'eslint-loader',
           exclude: /node_modules/
         })
-      },
+      }
     },
 
     // Full list of options: https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
@@ -158,7 +158,7 @@ module.exports = function (/* ctx */) {
             sizes: '512x512',
             type: 'image/png'
           }
-        ]
+        ],
       }
     },
 
