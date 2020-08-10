@@ -20,6 +20,7 @@
     <q-markup-table square flat bordered wrap-cells>
       <thead>
         <tr>
+          <th>Date Assigned</th>
           <th>Document</th>
           <th>Particulars</th>
           <th>Enduser</th>
@@ -35,6 +36,7 @@
       <tbody>
         <template v-if="Object.keys(completed).length">
           <tr v-for="(assignment, key) in completed" :key="key">
+            <td>{{assignment.dateAssigned | showDate }}</td>
             <td>{{assignment.document}}</td>
             <td>{{assignment.particulars}}</td>
             <td>{{assignment.enduser}}</td>
@@ -54,7 +56,7 @@
             </td>
             <td>{{assignment.dateCompleted}}</td>
             <td class="text-center items-center q-gutter-sm">
-              <q-btn outlined dense icon="undo" color="negative" @click="undoCompleted(assignment)"></q-btn>
+              <q-btn outlined dense icon="undo" color="negative" @click="undoCompleted(key)"></q-btn>
             </td>
           </tr>
         </template>
@@ -103,17 +105,13 @@ export default {
   },
 
   methods: {
-    markAsCompleted(assignment) {
-      this.$store.dispatch('assignment/markAsCompleted', assignment.id)
-    },
-
-    undoCompleted(assignment) {
+    undoCompleted(id) {
       this.$q.dialog({
         title: 'Undo Completed',
         message: 'Undo completed',
         cancel: true
       })
-      .onOk(() => this.$store.dispatch('assignment/undoMarkAsCompleted', assignment.id))
+      .onOk(() => this.$store.dispatch('assignment/undoMarkAsCompleted', id))
     },
 
   },
@@ -131,7 +129,8 @@ export default {
 
     showDate(val) {
       if (val) {
-        const formatDate = date.formatDate(val, 'MMM D, YYYY')
+        const srcDate = new Date(val)
+        const formatDate = date.formatDate(srcDate, 'MMM D, YYYY')
         return formatDate
       }
       return ''

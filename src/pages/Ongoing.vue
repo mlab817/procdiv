@@ -140,7 +140,14 @@
       <tbody>
         <template v-if="Object.keys(ongoing).length">
           <tr v-for="(assignment, key) in ongoing" :key="key" :class="overdue(assignment) ? 'bg-red-2': ''">
-            <td>{{assignment.dateAssigned | showDate }}</td>
+            <td>
+              <q-item-label>
+                {{assignment.dateAssigned | showDate }}
+              </q-item-label>
+              <q-item-label caption>
+                {{assignment.dateAssigned | showTime }}
+              </q-item-label>
+            </td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.document, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.particulars, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)"></td>
@@ -159,25 +166,25 @@
               </div>
             </td>
             <td class="text-center items-center">
-              <div class="row q-gutter-sm no-wrap">
+              <div class="row justify-center q-gutter-sm no-wrap">
                 <q-btn 
                   outlined 
                   dense 
                   icon="done_outline" 
                   color="positive" 
-                  @click="confirmCompleted(assignment)" />
+                  @click="confirmCompleted(key)" />
                 <q-btn 
                   outlined 
                   dense 
                   icon="edit" 
                   color="primary" 
-                  @click="editAssignment(assignment)" />
+                  @click="editAssignment(assignment, key)" />
                 <q-btn 
                   outlined 
                   dense 
                   icon="delete" 
                   color="negative" 
-                  @click="confirmDelete(assignment)" />
+                  @click="confirmDelete(key)" />
               </div>
             </td>
           </tr>
@@ -316,8 +323,6 @@ export default {
     },
 
     addAssignment() {      
-      const now = Date.now()
-
       const payload = {
         document: this.document,
         particulars: this.particulars,
@@ -327,7 +332,7 @@ export default {
         assignedTo: this.assignedTo,
         remarks: this.remarks,
         dateDue: this.dateDue,
-        dateAssigned: date.formatDate(now, 'YYYY-MM-DD hh:mm A')
+        dateAssigned: date.formatDate(Date.now(), 'YYYY-MM-DD hh:mm A')
       }
 
       this.$store.dispatch('assignment/add', payload)
@@ -345,10 +350,10 @@ export default {
       }
     },
 
-    editAssignment(assignment) {
+    editAssignment(assignment, key) {
       this.toolbarTitle = 'Edit Assignment'
 
-      this.id = assignment.id
+      this.id = key
       this.document = assignment.document ? assignment.document : ''
       this.particulars = assignment.particulars ? assignment.particulars : ''
       this.enduser = assignment.enduser ? assignment.enduser : ''
@@ -373,7 +378,7 @@ export default {
           actionTaken: this.actionTaken,
           assignedTo: this.assignedTo,
           remarks: this.remarks,
-          dateDue: this.dateDue,
+          dateDue: this.dateDue, // convert data to valid date
           dateAssigned: this.dateAssigned
         }   
       }
@@ -384,22 +389,22 @@ export default {
 
     },
 
-    confirmDelete(assignment) {
+    confirmDelete(id) {
       this.$q.dialog({
         title: 'Confirm Delete',
         message: 'Are you sure you want to delete this assignment?',
         cancel: true
       })
-      .onOk(() => this.$store.dispatch('assignment/deleteAssignment', assignment.id))
+      .onOk(() => this.$store.dispatch('assignment/deleteAssignment', id))
     },
 
-    confirmCompleted(assignment) {
+    confirmCompleted(id) {
       this.$q.dialog({
         title: 'Confirm Completed',
         message: 'Mark the assignment as completed',
         cancel: true
       })
-      .onOk(() => this.$store.dispatch('assignment/markAsCompleted', assignment.id))
+      .onOk(() => this.$store.dispatch('assignment/markAsCompleted', id))
     },
 
     addStaff() {
@@ -460,6 +465,7 @@ export default {
 
     showDate(val) {
       if (val) {
+        // get ms by multiplying by 1000
         const formatDate = date.formatDate(val, 'MMM D, YYYY')
         return formatDate
       }

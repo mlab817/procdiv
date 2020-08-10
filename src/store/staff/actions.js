@@ -1,4 +1,4 @@
-import { firebaseDb } from 'boot/firebase'
+import { firebaseDb, firebaseFs } from 'boot/firebase'
 import { uid } from 'quasar'
 import {
 	showErrorMessage,
@@ -13,7 +13,8 @@ export function add({ dispatch }, payload) {
 			name: payload
 		}
 	}
-	dispatch('fbAdd', staff)
+	// dispatch('fbAdd', staff)
+	dispatch('fsAdd', staff)
 }
 
 export function fbAdd({}, payload) {
@@ -26,6 +27,54 @@ export function fbAdd({}, payload) {
 		else {
 			showSuccessMessage()
 		}
+	})
+}
+
+export function fsAdd({}, payload) {
+	const ref = firebaseFs.collection('staff').doc()
+
+	ref.set(payload.staff)
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
+export function fsReadData({ commit }) {
+	console.log('reading data for staff')
+	const docs = firebaseFs.collection('staff')
+
+	docs.onSnapshot(querySnapshot => {
+		querySnapshot
+			.docChanges()
+			.forEach(change => {
+
+				if (change.type === 'added') {
+					console.log('firestore added', change.doc.id)
+					const payload = {
+						id: change.doc.id,
+						staff: change.doc.data()
+					}
+
+					commit('ADD_STAFF', payload)
+				}
+
+				if (change.type === 'modified') {
+					console.log('firestore modified', change.doc.id)
+					const payload = {
+						id: change.doc.id,
+						updates: change.doc.data()
+					}
+
+					commit('UPDATE_STAFF', payload)
+				}
+
+				if (change.type === 'removed') {
+					console.log('firestore removed', change.doc.id)
+					const id = change.doc.id
+
+					commit('DELETE_STAFF', id)
+				}
+				
+			})
 	})
 }
 

@@ -8,7 +8,8 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "deploy": "quasar build -m pwa && firebase deploy --only hosting"
+    "deploy:staging": "quasar build -m pwa && firebase deploy -P staging --only hosting",
+    "deploy:prod": "quasar build -m pwa && firebase deploy -P default --only hosting"
   },
   "dependencies": {
     "@quasar/extras": "^1.0.0",

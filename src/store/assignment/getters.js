@@ -6,7 +6,7 @@ export function completed(state, getters) {
 
 	Object.keys(filteredAssignments).forEach(key => {
 		let assignment = filteredAssignments[key]
-		if (assignment.completed !== undefined && assignment.completed) {
+		if (assignment.status !== undefined && assignment.status === 'completed') {
 			completedAssignments[key] = assignment
 		}
 	})
@@ -20,12 +20,26 @@ export function ongoing(state, getters) {
 
 	Object.keys(filteredAssignments).forEach(key => {
 		const assignment = filteredAssignments[key]
-		if (assignment.completed === undefined || !assignment.completed) {
+		if (assignment.status === undefined || assignment.status === 'ongoing') {
 			ongoingAssignments[key] = assignment
 		}
 	})
 
 	return ongoingAssignments
+}
+
+export function deleted(state, getters) {
+	const filteredAssignments = getters.filtered
+	let deletedAssignments = {}
+
+	Object.keys(filteredAssignments).forEach(key => {
+		const assignment = filteredAssignments[key]
+		if (assignment.status !== undefined && assignment.status === 'deleted') {
+			deletedAssignments[key] = assignment
+		}
+	})
+
+	return deletedAssignments
 }
 
 export function filtered(state, getters) {
@@ -60,7 +74,8 @@ export function filtered(state, getters) {
 }
 
 export function filteredByDate(state, getters) {
-	const start = state.start, end = state.end
+	const start = state.start
+	const end = state.end
 	let filteredByDate = {}
 
 	const assignments = getters.sorted
@@ -73,8 +88,9 @@ export function filteredByDate(state, getters) {
 	} else if (start && !end) {
 		Object.keys(assignments).forEach(key => {
 			const assignment = assignments[key]
+			const dateAssigned = assignment.dateAssigned
 
-			if (assignment.dateAssigned && date.isSameDate(assignment.dateAssigned, start, 'day')) {
+			if (dateAssigned && date.isSameDate(dateAssigned, start, 'day')) {
 				filteredByDate[key] = assignment
 			}
 		})
@@ -82,14 +98,14 @@ export function filteredByDate(state, getters) {
 	} else {
 		Object.keys(assignments).forEach(key => {
 			const assignment = assignments[key]
+			const dateAssigned = assignment.dateAssigned
 
-			if (assignment.dateAssigned && date.isBetweenDates(assignment.dateAssigned, start, end, { onlyDate: true, inclusiveFrom: true, inclusiveTo: true })) {
+			if (dateAssigned && date.isBetweenDates(dateAssigned, start, end, { onlyDate: true, inclusiveFrom: true, inclusiveTo: true })) {
 				filteredByDate[key] = assignment
 			}
 		})
 		return filteredByDate
 	}
-	
 }
 
 export function sorted(state, getters) {

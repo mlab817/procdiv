@@ -28,24 +28,43 @@
         </q-card>
       </div>
     </div>
+
+    <div class="row q-py-md q-gutter-md">
+      <q-btn label="Seed Endusers" @click="seedEndusers"></q-btn>
+
+      <q-btn label="Seed Documents" @click="seedDocuments"></q-btn>
+
+      <q-btn label="Seed Staff" @click="seedStaff"></q-btn>
+
+      <q-btn label="Seed Assignments" @click="seedAssignments"></q-btn>
+    </div>
     
   </q-page>
 </template>
 
 <script>
 import * as _ from 'underscore'
+import { ENDUSERS } from '../seeds/endusers'
+import { DOCUMENTS } from '../seeds/documents'
+import { STAFF } from '../seeds/staff'
+import { ASSIGNMENTS } from '../seeds/assignments'
+import { firebaseFs } from 'boot/firebase'
 
 export default {
   // name: 'PageName',
   data() {
   	return {
-      filterDialog: true
+      filterDialog: true,
+      endusers: ENDUSERS,
+      documents: DOCUMENTS,
+      staff: STAFF,
+      assignments: ASSIGNMENTS
   	}
   },
   computed: {
-    documents() {
-      return this.$store.state.document.documents
-    },
+    // documents() {
+    //   return this.$store.state.document.documents
+    // },
   	groupedAssignments() {
   		const assignments = this.$store.getters['assignment/ongoing']
 
@@ -59,6 +78,44 @@ export default {
       return grouped
     },
 
+  },
+  methods: {
+    seedEndusers() {
+      Object.keys(this.endusers).forEach(key => {
+        const ref = firebaseFs.collection('endusers').doc()
+        const enduser = this.endusers[key]
+        const payload = {
+          id: key, 
+          enduser: enduser
+        }
+        ref.set(enduser)
+          .then(() => console.log('success'))
+          .catch(err => console.error(err))
+      })
+    },
+    seedDocuments() {
+      Object.keys(this.documents).forEach(key => {
+        const ref = firebaseFs.collection('documents').doc()
+        const doc = this.documents[key]
+
+        ref.set(doc)
+          .then(() => console.log('success'))
+          .catch(err => console.error(err))
+      })
+    },
+    seedStaff() {
+      Object.keys(this.staff).forEach(key => {
+        const ref = firebaseFs.collection('staff').doc()
+        const staff = this.staff[key]
+
+        ref.set(staff)
+          .then(() => console.log('success'))
+          .catch(err => console.error(err))
+      })
+    },
+    seedAssignments() {
+
+    }
   }
 }
 </script>

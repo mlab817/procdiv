@@ -80,7 +80,7 @@
 		name: 'PageDeleted',
 		computed: {
 			deleted() {
-				return this.$store.state.deleted.deleted
+				return this.$store.getters['assignment/deleted']
 			}
 		},
 		methods: {

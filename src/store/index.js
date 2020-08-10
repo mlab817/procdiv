@@ -4,7 +4,6 @@ import Vuex from 'vuex'
 // import example from './module-example'
 import assignment from './assignment'
 import auth from './auth'
-import deleted from './deleted'
 import document from './document'
 import enduser from './enduser'
 import staff from './staff'
@@ -25,7 +24,6 @@ export default function (/* { ssrContext } */) {
     modules: {
       assignment,
       auth,
-      deleted,
       document,
       enduser,
       staff

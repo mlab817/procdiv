@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { firebaseDb } from 'boot/firebase'
+import { firebaseDb, firebaseFs } from 'boot/firebase'
 import {
 	showErrorMessage,
 	showSuccessMessage
@@ -33,10 +33,20 @@ const actions = {
 		const id = uid()
 		const doc = {
 			id: id, 
-			name: payload
+			doc: {
+				name: payload
+			}
 		}
 
-		dispatch('fbAdd', doc)
+		// dispatch('fbAdd', doc)
+		dispatch('fsAdd', doc)
+	},
+	fsAdd: ({}, payload) => {
+		const ref = firebaseFs.collection('documents').doc()
+
+		ref.set(payload.doc)
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
 	},
 	fbAdd: ({}, payload) => {
 		const ref = firebaseDb.ref('documents/' + payload.id)
@@ -76,6 +86,34 @@ const actions = {
 			else {
 				showSuccessMessage()
 			}
+		})
+	},
+	fsReadData: ({ commit }) => {
+		const docs = firebaseFs.collection('documents')
+
+		docs.onSnapshot(querySnapshot => {
+			querySnapshot.docChanges().forEach(change => {
+				if (change.type == 'added') {
+					const id = change.doc.id
+					const data = change.doc.data()
+					commit('ADD_DOCUMENT', {
+						id: id,
+						document: data
+					})
+				}
+				if (change.type == 'modified') {
+					const id = change.doc.id
+					const updates = change.doc.data()
+					commit('UPDATE_DOCUMENT', {
+						id: id,
+						updates: updates
+					})
+				}
+				if (change.type == 'removed') {
+					const id = change.doc.id
+					commit('DELETE_DOCUMENT', id)
+				}
+			})
 		})
 	},
 	fbReadData: ({ commit }) => {

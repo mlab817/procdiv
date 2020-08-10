@@ -1,4 +1,4 @@
-import { firebaseDb } from 'boot/firebase'
+import { firebaseDb, firebaseFs } from 'boot/firebase'
 import { uid, date, Loading } from 'quasar'
 import { showSuccessMessage, showErrorMessage } from 'src/functions/show-messages'
 
@@ -8,7 +8,8 @@ export function add({ dispatch }, payload) {
 		id: id,
 		assignment: payload
 	}
-	dispatch('fbAdd', assignment)
+	// dispatch('fbAdd', assignment)
+	dispatch('fsAdd', assignment)
 }
 
 export function fbAdd({}, payload) {
@@ -24,8 +25,19 @@ export function fbAdd({}, payload) {
 	})
 }
 
+export function fsAdd({}, payload) {
+	console.log(payload)
+	firebaseFs
+		.collection('assignments')
+		.doc()
+		.set(payload.assignment)
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
 export function update({ dispatch }, payload) {
-	dispatch('fbUpdate', payload)
+	// dispatch('fbUpdate', payload)
+	dispatch('fsUpdate', payload)
 }
 
 export function fbUpdate({}, payload) {
@@ -41,32 +53,27 @@ export function fbUpdate({}, payload) {
 	})
 }
 
-export function deleteAssignment({ dispatch }, id) {
-	dispatch('fbDelete', id)
+export function fsUpdate({}, payload) {
+	console.log('fsUpdate')
+
+	const ref = firebaseFs.collection('assignments').doc(payload.id)
+
+	ref.update(payload.updates)
+		.then(() => showSuccessMessage())
+		.catch(error => showErrorMessage(error.message))
 }
 
-export function fbMoveToDelete({ state }, payload) {
-	const ref = firebaseDb.ref('deleted/' + payload.id)
-
-	ref.set(payload.assignment, error => {
-		if (error) {
-			showErrorMessage()
-		} else {
-			showSuccessMessage()
-		}
-	})
+export function deleteAssignment({ dispatch }, id) {
+	dispatch('fbDelete', id)
+	dispatch('fsDelete', id)
 }
 
 export function fbDelete({ state, dispatch }, id) {
-	const assignment = state.assignments[id]
-
-	dispatch('fbMoveToDelete', {
-		id: id,
-		assignment: assignment
-	})
-
+	console.log(id)
 	const ref = firebaseDb.ref('assignments/' + id)
-	ref.remove(error => {
+	ref.update({
+		status: 'deleted'
+	}, error => {
 		if (error) {
 			showErrorMessage()
 		}
@@ -76,28 +83,50 @@ export function fbDelete({ state, dispatch }, id) {
 	})
 }
 
+export function fsDelete({ state, dispatch }, id) {
+	console.log(id)
+	const ref = firebaseFs.collection('assignments').doc(id)
+
+	ref.update({ status: 'deleted' })
+		.then(() => showSuccessMessage)
+		.catch(err => showErrorMessage(err.message))
+}
+
 export function markAsCompleted({ dispatch }, id) {
 	dispatch('fbMarkAsCompleted', id)
+	dispatch('fsMarkAsCompleted', id)
 }
 
 export function fbMarkAsCompleted({}, id) {
 	const ref = firebaseDb.ref('assignments/' + id)
 
 	ref.update({
-		dateCompleted: date.formatDate(Date.now(), 'YYYY-MM-DD hh:ss A'),
-		completed: true
+		dateCompleted: new Date(),
+		status: 'completed'
 	}, error => {
 		if (error) {
-			showErrorMessage()
+			showErrorMessage(error.message)
 		} else {
 			showSuccessMessage()
 		}
 	})
 }
 
+export function fsMarkAsCompleted({}, id) {
+	const ref = firebaseFs.collection('assignments').doc(id)
+
+	ref.update({
+		status: 'completed',
+		dateCompleted: Date.now()
+	})
+	.then(() => showSuccessMessage)
+	.catch(err => showErrorMessage(err.message))
+}
+
 // payload is id here
 export function undoMarkAsCompleted({ dispatch }, id) {
-	dispatch('fbUndoMarkAsCompleted', id)
+	// dispatch('fbUndoMarkAsCompleted', id)
+	dispatch('fsUndoMarkAsCompleted', id)
 }
 
 export function fbUndoMarkAsCompleted({}, id) {
@@ -115,6 +144,17 @@ export function fbUndoMarkAsCompleted({}, id) {
 	})
 }
 
+export function fsUndoMarkAsCompleted({}, id) {
+	const ref = firebaseFs.collection('assignments').doc(id)
+
+	ref.update({
+		dateCompleted: '',
+		status: 'ongoing'
+	})
+	.then(() => showSuccessMessage())
+	.catch(err => showErrorMessage(err.message))
+}
+
 export function setSortBy({ commit }, payload) {
 	commit('SET_SORT_BY', payload)
 }
@@ -128,8 +168,47 @@ export function setSearch({ commit }, payload) {
 }
 
 export function filterByDate({ commit }, payload) {
-		commit('SET_START', payload.start)
-		commit('SET_END', payload.end)
+	commit('SET_START', payload.start)
+	commit('SET_END', payload.end)
+}
+
+export function fsReadData({ commit }) {
+	const docs = firebaseFs.collection('assignments')
+
+	docs.onSnapshot(querySnapshot => {
+		querySnapshot
+			.docChanges()
+			.forEach(change => {
+
+				if (change.type === 'added') {
+					console.log('firestore added', change.doc.data())
+					const payload = {
+						id: change.doc.id,
+						assignment: change.doc.data()
+					}
+
+					commit('ADD_ASSIGNMENT', payload)
+				}
+
+				if (change.type === 'modified') {
+					console.log('firestore modified', change.doc.data())
+					const payload = {
+						id: change.doc.id,
+						updates: change.doc.data()
+					}
+
+					commit('UPDATE_ASSIGNMENT', payload)
+				}
+
+				if (change.type === 'removed') {
+					console.log('firestore removed', change.doc.data())
+					const id = change.doc.id
+
+					commit('DELETE_ASSIGNMENT', id)
+				}
+				
+			})
+	})
 }
 
 export function fbReadData({ commit }) {
@@ -144,6 +223,7 @@ export function fbReadData({ commit }) {
 
 	// child added
 	assignments.on('child_added', snapshot => {
+		console.log('realtime db added')
 		const assignment = snapshot.val()
 		assignment.id = snapshot.key
 
@@ -156,7 +236,8 @@ export function fbReadData({ commit }) {
 
 	// child changed
 	assignments.on('child_changed', snapshot => {
-		console.log('child changed')
+		console.log('realtime db changed')
+
 		const assignment = snapshot.val()
 		assignment.id = snapshot.key
 
@@ -169,6 +250,7 @@ export function fbReadData({ commit }) {
 
 	// child removed
 	assignments.on('child_removed', snapshot => {
+		console.log('realtime db removed')
 		const assignmentId = snapshot.key
 		commit('DELETE_ASSIGNMENT', assignmentId)
 	})
