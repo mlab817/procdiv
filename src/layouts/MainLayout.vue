@@ -85,6 +85,11 @@ const linksData = [
     link: '/deleted'
   },
   {
+    title: 'Manage Options',
+    icon: 'dashboard',
+    link: '/options'
+  },
+  {
     title: 'Settings',
     icon: 'settings',
     link: '/settings'
