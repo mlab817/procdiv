@@ -4,16 +4,56 @@
 			<q-toolbar-title>Manage Options</q-toolbar-title>
 		</q-toolbar>
 
-		<q-table title="Endusers" :data="endusers" :filter="filterEnduser" :columns="columnsEndusers" row-key="id">
-			<template v-slot:top-right>
-		        <q-input borderless dense debounce="300" v-model="filterEnduser" placeholder="Search">
-		          	<template v-slot:append>
-		            	<q-icon name="search" />
-		          	</template>
-		        </q-input>
-		        <q-btn color="primary" class="q-ml-md" label="Add row" @click="addEnduserDialog = true" />
-		    </template>
-		</q-table>
+		<div class="row q-mt-md">
+
+			<div class="col-12">
+
+				<q-table title="Endusers" :data="endusers" :filter="filterEnduser" :columns="columnsEndusers" row-key="id">
+					<template v-slot:top-right>
+				        <q-input borderless dense debounce="300" v-model="filterEnduser" placeholder="Search">
+				          	<template v-slot:append>
+				            	<q-icon name="search" />
+				          	</template>
+				        </q-input>
+				        <q-btn color="primary" class="q-ml-md" label="Add row" @click="addEnduserDialog = true" />
+				    </template>
+				</q-table>
+
+			</div>
+
+		</div>
+
+		<div class="row q-col-gutter-md q-mt-md">
+
+			<div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+
+				<q-table title="Documents" :data="documents" :filter="filterDocuments" row-key="id">
+					<template v-slot:top-right>
+				        <q-input borderless dense debounce="300" v-model="filterDocument" placeholder="Search">
+				          	<template v-slot:append>
+				            	<q-icon name="search" />
+				          	</template>
+				        </q-input>
+				    </template>
+				</q-table>
+
+			</div>
+
+			<div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+
+				<q-table title="Staff" :data="staff" :filter="filterStaff" row-key="id">
+					<template v-slot:top-right>
+				        <q-input borderless dense debounce="300" v-model="filterStaff" placeholder="Search">
+				          	<template v-slot:append>
+				            	<q-icon name="search" />
+				          	</template>
+				        </q-input>
+				    </template>
+				</q-table>
+
+			</div>
+
+		</div>
 
 		<q-dialog v-model="addEnduserDialog" persistent>
 	      <q-card style="min-width: 400px;">
@@ -54,11 +94,37 @@
 				})
 
 				return arrayEndusers
+			},
+			documents() {
+				const documents = this.$store.state.document.documents
+				let arrayDocuments = []
+
+				Object.keys(documents).forEach(key => {
+					arrayDocuments.push({
+						id: key,
+						name: documents[key].name
+					})
+				})
+
+				return arrayDocuments
+			},
+			staff() {
+				const staffs = this.$store.state.staff.staff
+				let arrayStaff = []
+
+				Object.keys(staffs).forEach(key => {
+					arrayStaff.push({
+						id: key,
+						name: staffs[key].name
+					})
+				})
+
+				return arrayStaff
 			}
 		},
 		data() {
 			return {
-				addEnduserDialog: true,
+				addEnduserDialog: false,
 				filterEnduser: '',
 				newEnduser: {
 					label: '',

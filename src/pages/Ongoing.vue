@@ -50,6 +50,23 @@
 
             <q-input v-model="particulars" outlined label="Particulars" stack-label></q-input>
 
+            <q-input v-model="rfqDeadline" outlined label="Due Date/Time" stack-label>
+              <template v-slot:prepend>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-date v-model="rfqDeadline" mask="YYYY-MM-DD hh:mm A" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+              <template v-slot:append>
+                <q-icon name="access_time" class="cursor-pointer">
+                  <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-time v-model="rfqDeadline" mask="YYYY-MM-DD hh:mm A" format12h />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
               <q-select v-model="enduser" use-input @filter="filterEndusers" :options="enduserOptions" outlined label="Enduser" stack-label class="col" emit-value map-options></q-select>
               <div>
@@ -269,6 +286,7 @@ export default {
     return {
       addAssignmentDialog: false,
       document: '',
+      rfqDeadline: '',
       particulars: '',
       enduser: '',
       referenceNo: '',
@@ -311,6 +329,7 @@ export default {
       this.toolbarTitle = 'Add Assignment'
       this.id = ''
       this.document = ''
+      this.rfqDeadline = date.formatDate(new Date(), 'YYYY-MM-DD') + ' 12:00 PM'
       this.particulars = ''
       this.enduser = ''
       this.referenceNo = ''
@@ -325,6 +344,7 @@ export default {
     addAssignment() {      
       const payload = {
         document: this.document,
+        rfqDeadline: this.rfqDeadline,
         particulars: this.particulars,
         enduser: this.enduser,
         referenceNo: this.referenceNo,
@@ -355,6 +375,7 @@ export default {
 
       this.id = key
       this.document = assignment.document ? assignment.document : ''
+      this.rfqDeadline = assignment.rfqDeadline ? assignment.rfqDeadline : ''
       this.particulars = assignment.particulars ? assignment.particulars : ''
       this.enduser = assignment.enduser ? assignment.enduser : ''
       this.referenceNo = assignment.referenceNo ? assignment.referenceNo : ''
@@ -372,6 +393,7 @@ export default {
         id: this.id,
         updates: {
           document: this.document,
+          rfqDeadline: this.rfqDeadline,
           particulars: this.particulars,
           enduser: this.enduser,
           referenceNo: this.referenceNo,
