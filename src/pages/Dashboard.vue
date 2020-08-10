@@ -44,27 +44,19 @@
 
 <script>
 import * as _ from 'underscore'
-import { ENDUSERS } from '../seeds/endusers'
-import { DOCUMENTS } from '../seeds/documents'
-import { STAFF } from '../seeds/staff'
-import { ASSIGNMENTS } from '../seeds/assignments'
+import { SEED } from '../seeds'
 import { firebaseFs } from 'boot/firebase'
+import { date } from 'quasar'
 
 export default {
   // name: 'PageName',
   data() {
   	return {
       filterDialog: true,
-      endusers: ENDUSERS,
-      documents: DOCUMENTS,
-      staff: STAFF,
-      assignments: ASSIGNMENTS
+      seed: SEED
   	}
   },
   computed: {
-    // documents() {
-    //   return this.$store.state.document.documents
-    // },
   	groupedAssignments() {
   		const assignments = this.$store.getters['assignment/ongoing']
 
@@ -72,8 +64,18 @@ export default {
   	},
     groupedByDate() {
       const assignments = this.$store.getters['assignment/ongoing']
+      let recoded = []
 
-      const grouped = _.countBy(assignments, ['dateAssigned'])
+      Object.keys(assignments).forEach(key => {
+        const assignment = assignments[key]
+        const dateAssigned = date.formatDate(assignment.dateAssigned,'YYYY-MM-DD')
+        recoded.push({
+          ...assignment,
+          dateAssigned
+        })
+      })
+
+      const grouped = _.countBy(recoded, ['dateAssigned'])
 
       return grouped
     },
@@ -81,9 +83,11 @@ export default {
   },
   methods: {
     seedEndusers() {
-      Object.keys(this.endusers).forEach(key => {
+      const endusers = this.seed.endusers
+
+      Object.keys(endusers).forEach(key => {
         const ref = firebaseFs.collection('endusers').doc()
-        const enduser = this.endusers[key]
+        const enduser = endusers[key]
         const payload = {
           id: key, 
           enduser: enduser
@@ -94,9 +98,11 @@ export default {
       })
     },
     seedDocuments() {
-      Object.keys(this.documents).forEach(key => {
+      const documents = this.seed.documents
+
+      Object.keys(documents).forEach(key => {
         const ref = firebaseFs.collection('documents').doc()
-        const doc = this.documents[key]
+        const doc = documents[key]
 
         ref.set(doc)
           .then(() => console.log('success'))
@@ -104,9 +110,11 @@ export default {
       })
     },
     seedStaff() {
-      Object.keys(this.staff).forEach(key => {
+      const staffs = this.seed.staff
+
+      Object.keys(staffs).forEach(key => {
         const ref = firebaseFs.collection('staff').doc()
-        const staff = this.staff[key]
+        const staff = staffs[key]
 
         ref.set(staff)
           .then(() => console.log('success'))
@@ -114,7 +122,17 @@ export default {
       })
     },
     seedAssignments() {
+      const assignments = this.seed.assignments
 
+      Object.keys(assignments).forEach(key => {
+        const ref = firebaseFs.collection('assignments').doc()
+        const assignment = assignments[key]
+        assignment.status = (assignment.completed) ? 'completed' : 'ongoing'
+
+        ref.set(assignment)
+          .then(() => console.log('success'))
+          .catch(err => console.error(err))
+      })
     }
   }
 }

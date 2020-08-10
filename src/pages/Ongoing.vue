@@ -148,20 +148,20 @@
                 {{assignment.dateAssigned | showTime }}
               </q-item-label>
             </td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.document, searchField)"></td>
+            <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.document, searchField)" @click="setSearch(assignment.document)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.particulars, searchField)"></td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)"></td>
+            <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)" @click="setSearch(assignment.enduser)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.referenceNo, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.actionTaken, searchField)"></td>
             <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.assignedTo, searchField)" @click="setSearch(assignment.assignedTo)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.remarks, searchField)"></td>
             <td class="text-right">
               <div class="row justify-end items-center no-wrap">
-                {{assignment.dateDue | showDate }}    
+                {{assignment.dateDue | showDate}}    
                 <q-icon name="event" class="text-grey-8" v-if="assignment.dateDue"></q-icon>
               </div>
               <div class="row justify-end items-center no-wrap">
-                {{assignment.dateDue | showTime }}  
+                {{assignment.dateDue | showTime}}  
                 <q-icon name="alarm" class="text-grey-8" v-if="assignment.dateDue"></q-icon>  
               </div>
             </td>
