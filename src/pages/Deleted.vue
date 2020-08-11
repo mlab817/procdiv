@@ -77,6 +77,10 @@
 
 <script>
 	export default {
+    components: {
+      'search': () => import('../components/shared/Search.vue'),
+      'sort': () => import('../components/shared/Sort.vue')
+    },
 		name: 'PageDeleted',
 		computed: {
 			deleted() {

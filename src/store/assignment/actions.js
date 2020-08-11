@@ -181,7 +181,7 @@ export function fsReadData({ commit }) {
 			.forEach(change => {
 
 				if (change.type === 'added') {
-					console.log('firestore added', change.doc.data())
+					// console.log('firestore added', change.doc.data())
 					const payload = {
 						id: change.doc.id,
 						assignment: change.doc.data()
@@ -191,7 +191,7 @@ export function fsReadData({ commit }) {
 				}
 
 				if (change.type === 'modified') {
-					console.log('firestore modified', change.doc.data())
+					// console.log('firestore modified', change.doc.data())
 					const payload = {
 						id: change.doc.id,
 						updates: change.doc.data()
@@ -201,7 +201,7 @@ export function fsReadData({ commit }) {
 				}
 
 				if (change.type === 'removed') {
-					console.log('firestore removed', change.doc.data())
+					// console.log('firestore removed', change.doc.data())
 					const id = change.doc.id
 
 					commit('DELETE_ASSIGNMENT', id)

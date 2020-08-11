@@ -51,6 +51,7 @@
             <q-input v-model="particulars" outlined label="Particulars" stack-label></q-input>
 
             <q-input v-model="rfqDeadline" outlined label="RFQ Deadline" stack-label clearable>
+
               <template v-slot:prepend>
                 <q-icon name="event" class="cursor-pointer">
                   <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -150,6 +151,7 @@
           <th>Action Taken</th>
           <th>Assigned To</th>
           <th>Remarks</th>
+          <th>RFQ Deadline</th>
           <th>Due Date/Time</th>
           <th>Actions</th>
         </tr>
@@ -165,20 +167,30 @@
                 {{assignment.dateAssigned | showTime }}
               </q-item-label>
             </td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.document, searchField)"></td>
+            <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.document, searchField)" @click="setSearch(assignment.document)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.particulars, searchField)"></td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)" @click="setSearch(assignment.enduser)"></td>
+            <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)" @click="setSearch(assignment.enduser)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.referenceNo, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.actionTaken, searchField)"></td>
             <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.assignedTo, searchField)" @click="setSearch(assignment.assignedTo)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.remarks, searchField)"></td>
             <td class="text-right">
+              <div class="row justify-end items-center no-wrap" v-if="assignment.rfqDeadline">
+                {{assignment.rfqDeadline | showDate}}    
+                <q-icon name="event" class="text-grey-8" v-if="assignment.dateDue"></q-icon>
+              </div>
+              <div class="row justify-end items-center no-wrap" v-if="assignment.rfqDeadline">
+                {{assignment.rfqDeadline | showTime}}  
+                <q-icon name="alarm" class="text-grey-8" v-if="assignment.dateDue"></q-icon>  
+              </div>
+            </td>
+            <td class="text-right">
               <div class="row justify-end items-center no-wrap">
-                {{assignment.dateDue | showDate }}    
+                {{assignment.dateDue | showDate}}    
                 <q-icon name="event" class="text-grey-8" v-if="assignment.dateDue"></q-icon>
               </div>
               <div class="row justify-end items-center no-wrap">
-                {{assignment.dateDue | showTime }}  
+                {{assignment.dateDue | showTime}}  
                 <q-icon name="alarm" class="text-grey-8" v-if="assignment.dateDue"></q-icon>  
               </div>
             </td>
@@ -288,8 +300,8 @@ export default {
     return {
       addAssignmentDialog: false,
       document: '',
-      particulars: '',
       rfqDeadline: '',
+      particulars: '',
       enduser: '',
       referenceNo: '',
       actionTaken: '',
@@ -333,6 +345,7 @@ export default {
       this.toolbarTitle = 'Add Assignment'
       this.id = ''
       this.document = ''
+      this.rfqDeadline = date.formatDate(new Date(), 'YYYY-MM-DD') + ' 12:00 PM'
       this.particulars = ''
       this.rfqDeadline = date.formatDate(Date.now(), 'YYYY-MM-DD') + ' 12:00 PM'
       this.enduser = ''
@@ -348,6 +361,7 @@ export default {
     addAssignment() {      
       const payload = {
         document: this.document,
+        rfqDeadline: this.rfqDeadline,
         particulars: this.particulars,
         rfqDeadline: this.rfqDeadline,
         enduser: this.enduser,
@@ -379,6 +393,7 @@ export default {
 
       this.id = key
       this.document = assignment.document ? assignment.document : ''
+      this.rfqDeadline = assignment.rfqDeadline ? assignment.rfqDeadline : ''
       this.particulars = assignment.particulars ? assignment.particulars : ''
       this.rfqDeadline = assignment.rfqDeadline ? assignment.rfqDeadline : ''
       this.enduser = assignment.enduser ? assignment.enduser : ''
@@ -397,6 +412,7 @@ export default {
         id: this.id,
         updates: {
           document: this.document,
+          rfqDeadline: this.rfqDeadline,
           particulars: this.particulars,
           rfqDeadline: this.rfqDeadline,
           enduser: this.enduser,
@@ -470,7 +486,7 @@ export default {
 
     overdue(assignment) {
       const now = Date.now()
-      const dateDue = assignment.dateDue
+      const dateDue = parseDate(assignment.dateDue)
 
       const diff = date.getDateDiff(dateDue, now, 'seconds')
 

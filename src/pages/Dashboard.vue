@@ -58,9 +58,6 @@ export default {
   	}
   },
   computed: {
-    // documents() {
-    //   return this.$store.state.document.documents
-    // },
   	groupedAssignments() {
   		const assignments = this.$store.getters['assignment/ongoing']
 
@@ -72,9 +69,11 @@ export default {
 
       Object.keys(assignments).forEach(key => {
         const assignment = assignments[key]
+
+        const dateAssigned = date.formatDate(assignment.dateAssigned,'YYYY-MM-DD')
         recoded.push({
           ...assignment,
-          dateAssigned: date.formatDate(parseDate(assignment.dateAssigned),'YYYY-MM-DD')
+          dateAssigned
         })
       })
 
@@ -99,6 +98,7 @@ export default {
     },
     seedDocuments() {
       const documents = this.seed.documents
+
       Object.keys(documents).forEach(key => {
         const ref = firebaseFs.collection('documents').doc()
         const doc = documents[key]
@@ -110,6 +110,7 @@ export default {
     },
     seedStaff() {
       const staffs = this.seed.staff
+
       Object.keys(staffs).forEach(key => {
         const ref = firebaseFs.collection('staff').doc()
         const staff = staffs[key]
@@ -121,12 +122,14 @@ export default {
     },
     seedAssignments() {
       const assignments = this.seed.assignments
-      Object.keys(this.seed.assignments).forEach(key => {
-        const ref = firebaseFs.collection('assignments').doc()
-        const ass = assignments
-        ass.status = ass.completed ? 'completed' : 'ongoing'
 
-        ref.set(ass)
+      Object.keys(assignments).forEach(key => {
+        const ref = firebaseFs.collection('assignments').doc()
+        const assignment = assignments[key]
+        
+        assignment.status = (assignment.completed) ? 'completed' : 'ongoing'
+
+        ref.set(assignment)
           .then(() => console.log('success'))
           .catch(err => console.error(err))
       })

@@ -23,7 +23,7 @@ const actions = {
 				.forEach(change => {
 
 					if (change.type === 'added') {
-						console.log('firestore added', change.doc.id)
+						// console.log('firestore added', change.doc.id)
 						const payload = {
 							id: change.doc.id,
 							enduser: change.doc.data()
@@ -33,7 +33,7 @@ const actions = {
 					}
 
 					if (change.type === 'modified') {
-						console.log('firestore modified', change.doc.id)
+						// console.log('firestore modified', change.doc.id)
 						const payload = {
 							id: change.doc.id,
 							updates: change.doc.data()
@@ -43,7 +43,7 @@ const actions = {
 					}
 
 					if (change.type === 'removed') {
-						console.log('firestore removed', change.doc.id)
+						// console.log('firestore removed', change.doc.id)
 						const id = change.doc.id
 
 						commit('DELETE_ENDUSER', id)
