@@ -1,4 +1,4 @@
-import { firebaseAuth, provider } from 'boot/firebase'
+import { firebaseAuth, provider, firebaseFs } from 'boot/firebase'
 import { Loading, LocalStorage } from 'quasar'
 import { showSuccessMessage, showErrorMessage } from 'src/functions/show-messages'
 
@@ -18,7 +18,36 @@ export function logout({}) {
 	firebaseAuth.signOut()
 }
 
-export function googleSignIn({}) {
+export function createUserProfile({}, user) {
+  
+}
+
+export function getUserProfile({}, user) {
+  const userRef = firebaseFs.collection('users').doc(user.uid)
+
+  userRef.get()
+    .then(snapshot => {
+      if (snapshot.exists) {
+        // do something about the data
+      } else {
+        // create it
+        const { displayName, email, photoURL, uid } = user
+
+        userRef.set({
+          displayName: displayName,
+          email: email,
+          photoURL: photoURL,
+          uid: uid,
+          role: 'user'
+        })
+        .then(() => showSuccessMessage())
+        .catch(err => showErrorMessage(err.message))
+      }
+    })
+
+}
+
+export function googleSignIn({dispatch}) {
 	firebaseAuth
 		.signInWithPopup(provider)
 		.then(res => {
@@ -26,6 +55,7 @@ export function googleSignIn({}) {
 			const user = res.user
 
 			console.log(token, user)
+      dispatch('createUserProfile', user)
 		})
 		.catch(err => {
 			const errorCode = err.code
@@ -41,11 +71,12 @@ export function handleAuthStateChanged({ commit, dispatch }) {
 	firebaseAuth.onAuthStateChanged(user => {
 		Loading.hide()
 		if (user) {
+      dispatch('getUserProfile', user)
 			commit('SET_LOGGED_IN', true)
 			LocalStorage.set('loggedIn', true)
 			this.$router.push('/').then(() => console.log('next')).catch(err => console.log(err.message))
 			// dispatch('assignment/fbReadData', null, { root: true })
-			dispatch('assignment/fsReadData', null, { root: true })
+			// dispatch('assignment/fsReadData', null, { root: true })
 		  	// dispatch('document/fbReadData', null, { root: true })
 		  	// dispatch('staff/fbReadData', null, { root: true })
 		  	// dispatch('enduser/fbReadData', null, { root: true })
@@ -53,7 +84,7 @@ export function handleAuthStateChanged({ commit, dispatch }) {
 		  	dispatch('document/fsReadData', null, { root: true })
 		  	dispatch('enduser/fsReadData', null, { root: true })
 		} else {
-			commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })
+			// commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })
 			commit('assignment/SET_DOWNLOADED', null, { root: true })
 			commit('SET_LOGGED_IN', false)
 			LocalStorage.set('loggedIn', false)
