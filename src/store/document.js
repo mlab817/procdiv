@@ -158,17 +158,37 @@ const actions = {
 }
 
 const getters = {
-	options: (state) => {
+	options: (state, getters) => {
 		let options = []
+		const sortedDocuments = getters.sorted
 
-		Object.keys(state.documents).forEach(key => {
+		Object.keys(sortedDocuments).forEach(key => {
 			options.push({
-				value: state.documents[key].name,
-				label: state.documents[key].name
+				value: sortedDocuments[key].name,
+				label: sortedDocuments[key].name
 			})
 		})
 
 		return options
+	},
+	sorted: (state) => {
+		const documents = state.documents
+		let sorted = {}, keysOrdered = Object.keys(documents)
+		
+		keysOrdered.sort((a, b) => {
+			let aProp = documents[a].name.toLowerCase(),
+				bProp = documents[b].name.toLowerCase()
+
+			if (aProp > bProp) return 1
+			else if (aProp < bProp) return -1
+			else return 0
+		})
+
+		keysOrdered.forEach((key) => {
+			sorted[key] = documents[key]
+		})
+
+		return sorted
 	}
 }
 

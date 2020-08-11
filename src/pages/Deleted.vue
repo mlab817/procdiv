@@ -57,7 +57,8 @@
             </td>
             <td>{{assignment.dateCompleted}}</td>
             <td class="text-center items-center q-gutter-sm">
-              <q-btn outlined dense icon="restore" color="primary" @click="restore(assignment)"></q-btn>
+              <q-btn dense icon="restore" color="primary" @click="restore(key)"></q-btn>
+              <q-btn dense icon="delete" color="negative" @click="confirmDelete(key)"></q-btn>
             </td>
           </tr>
         </template>
@@ -88,15 +89,38 @@
 			}
 		},
 		methods: {
-			restore(assignment) {
+			restore(id) {
 				this.$q.dialog({
 					title: 'Restore Assignment', 
 					message: 'Are you sure you want to restore assignment?',
 					persistent: true,
 					cancel: true
 				})
-				.onOk(() => this.$store.dispatch('deleted/restore', assignment))
-			}
+				.onOk(() => this.$store.dispatch('assignment/undoDelete', id))
+			},
+      confirmDelete(id) {
+        this.$q.dialog({
+          title: 'Permanently Delete',
+          message: `Are you sure you want to delete this assignment? Please type the following key to delete: <strong>${id}</strong>.`,
+          cancel: true,
+          persistent: true,
+          html: true,
+          prompt: {
+            model: '',
+            type: 'text',
+            isValid: val => val === id,
+            outlined: true,
+            label: 'Key',
+            stackLabel: true
+          }
+        })
+        .onOk(() => {
+          this.permaDelete(id)
+        })
+      },
+      permaDelete(id) {
+        this.$store.dispatch('assignment/permaDelete', id)
+      }
 		}
 	}
 </script>

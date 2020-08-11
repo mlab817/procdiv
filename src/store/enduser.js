@@ -164,9 +164,9 @@ const mutations = {
 }
 
 const getters = {
-	options: (state) => {
+	options: (state, getters) => {
 		let arr = []
-		const endusers = state.endusers
+		const endusers = getters.sorted
 
 		Object.keys(endusers).forEach(key => {
 			const enduser = endusers[key]
@@ -174,6 +174,25 @@ const getters = {
 		})
 
 		return arr
+	},
+	sorted: (state) => {
+		const endusers = state.endusers
+		let sorted = {}, keysOrdered = Object.keys(endusers)
+
+		keysOrdered.sort((a, b) => {
+			let aProp = endusers[a].label.toLowerCase(),
+				bProp = endusers[b].label.toLowerCase()
+
+			if (aProp > bProp) return 1
+			else if (aProp < bProp) return -1
+			else return 0
+		})
+
+		keysOrdered.forEach(key => {
+			sorted[key] = endusers[key]
+		})
+
+		return sorted
 	}
 }
 

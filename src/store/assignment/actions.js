@@ -92,6 +92,33 @@ export function fsDelete({ state, dispatch }, id) {
 		.catch(err => showErrorMessage(err.message))
 }
 
+export function permaDelete({ dispatch }, id) {
+	dispatch('fsPermaDelete', id)
+}
+
+export function fsPermaDelete({}, id) {
+	const ref = firebaseFs.collection('assignments').doc(id)
+
+	ref.delete()
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
+export function undoDelete({ dispatch }, id) {
+	dispatch('fsUndoDelete', id)
+}
+
+export function fsUndoDelete({}, id) {
+	console.log(id)
+	const ref = firebaseFs.collection('assignments').doc(id)
+
+	ref.update({
+		status: 'ongoing'
+	})
+	.then(() => showSuccessMessage())
+	.catch(err => showErrorMessage(err.message))
+}
+
 export function markAsCompleted({ dispatch }, id) {
 	dispatch('fbMarkAsCompleted', id)
 	dispatch('fsMarkAsCompleted', id)
