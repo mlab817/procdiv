@@ -1,4 +1,4 @@
-export const SEED = {
+{
   "assignments" : {
     "0188cb03-929f-40b7-a825-ea21b7ad3cbd" : {
       "abc" : "",
