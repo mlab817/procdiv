@@ -87,7 +87,7 @@ export default {
     seedEndusers() {
       const endusers = this.seed.endusers
 
-      Object.keys(this.endusers).forEach(key => {
+      Object.keys(endusers).forEach(key => {
         const ref = firebaseFs.collection('endusers').doc()
         const enduser = endusers[key]
 
