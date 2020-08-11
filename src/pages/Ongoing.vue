@@ -50,6 +50,23 @@
 
             <q-input v-model="particulars" outlined label="Particulars" stack-label></q-input>
 
+            <q-input v-model="rfqDeadline" outlined label="RFQ Deadline" stack-label clearable>
+              <template v-slot:prepend>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-date v-model="rfqDeadline" mask="YYYY-MM-DD hh:mm A" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+              <template v-slot:append>
+                <q-icon name="access_time" class="cursor-pointer">
+                  <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-time v-model="rfqDeadline" mask="YYYY-MM-DD hh:mm A" format12h />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
               <q-select v-model="enduser" use-input @filter="filterEndusers" :options="enduserOptions" outlined label="Enduser" stack-label class="col" emit-value map-options></q-select>
               <div>
@@ -150,7 +167,7 @@
             </td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.document, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.particulars, searchField)"></td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)"></td>
+            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)" @click="setSearch(assignment.enduser)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.referenceNo, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.actionTaken, searchField)"></td>
             <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.assignedTo, searchField)" @click="setSearch(assignment.assignedTo)"></td>
@@ -206,6 +223,7 @@
 
 <script>
 import { uid, date } from 'quasar'
+import { parseDate } from 'src/functions/parse-date'
 
 export default {
   name: 'PageIndex',
@@ -252,6 +270,7 @@ export default {
           'Date Assigned': a.dateAssigned,
           'Document': a.document,
           'Particulars': a.particulars,
+          'RFQ Deadline': a.rfqDeadline,
           'Enduser': a.enduser,
           'Reference No.': a.referenceNo,
           'Action Taken': a.actionTaken,
@@ -270,6 +289,7 @@ export default {
       addAssignmentDialog: false,
       document: '',
       particulars: '',
+      rfqDeadline: '',
       enduser: '',
       referenceNo: '',
       actionTaken: '',
@@ -288,6 +308,8 @@ export default {
   },
 
   methods: {
+    parseDate,
+
     setSearch(search) {
       this.$store.dispatch('assignment/setSearch', search)
     },
@@ -312,6 +334,7 @@ export default {
       this.id = ''
       this.document = ''
       this.particulars = ''
+      this.rfqDeadline = date.formatDate(Date.now(), 'YYYY-MM-DD') + ' 12:00 PM'
       this.enduser = ''
       this.referenceNo = ''
       this.actionTaken = ''
@@ -326,6 +349,7 @@ export default {
       const payload = {
         document: this.document,
         particulars: this.particulars,
+        rfqDeadline: this.rfqDeadline,
         enduser: this.enduser,
         referenceNo: this.referenceNo,
         actionTaken: this.actionTaken,
@@ -356,6 +380,7 @@ export default {
       this.id = key
       this.document = assignment.document ? assignment.document : ''
       this.particulars = assignment.particulars ? assignment.particulars : ''
+      this.rfqDeadline = assignment.rfqDeadline ? assignment.rfqDeadline : ''
       this.enduser = assignment.enduser ? assignment.enduser : ''
       this.referenceNo = assignment.referenceNo ? assignment.referenceNo : ''
       this.actionTaken = assignment.actionTaken ? assignment.actionTaken : ''
@@ -373,6 +398,7 @@ export default {
         updates: {
           document: this.document,
           particulars: this.particulars,
+          rfqDeadline: this.rfqDeadline,
           enduser: this.enduser,
           referenceNo: this.referenceNo,
           actionTaken: this.actionTaken,
@@ -465,8 +491,9 @@ export default {
 
     showDate(val) {
       if (val) {
-        // get ms by multiplying by 1000
-        const formatDate = date.formatDate(val, 'MMM D, YYYY')
+        const parsedDate = parseDate(val)
+        const formatDate = date.formatDate(parsedDate, 'MMM D, YYYY')
+
         return formatDate
       }
       return ''
@@ -474,7 +501,8 @@ export default {
 
     showTime(val) {
       if (val) {
-        const formatTime = date.formatDate(val, 'hh:mm A')
+        const parsedDate = parseDate(val)
+        const formatTime = date.formatDate(parsedDate, 'hh:mm A')
         return formatTime
       }
       return ''

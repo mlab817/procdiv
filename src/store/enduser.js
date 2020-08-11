@@ -120,6 +120,31 @@ const actions = {
 		ref.set(payload.enduser)
 			.then(() => showSuccessMessage)
 			.catch(err => showErrorMessage(err.message))
+	},
+	update: ({ dispatch }, payload) => {
+		const enduser = {
+			id: payload.id,
+			updates: payload
+		}
+
+		dispatch('fsUpdate', enduser)
+	},
+	fsUpdate: ({}, payload) => {
+		const ref = firebaseFs.collection('endusers').doc(payload.id)
+
+		ref.set(payload.updates)
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
+	},
+	delete: ({ dispatch }, id) => {
+		dispatch('fsDelete', id)
+	},
+	fsDelete: ({}, id) => {
+		const ref = firebaseFs.collection('endusers').doc(id)
+
+		ref.delete()
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
 	}
 }
 

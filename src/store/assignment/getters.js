@@ -1,4 +1,5 @@
 import { date } from 'quasar'
+import { parseDate } from 'src/functions/parse-date'
 
 export function completed(state, getters) {
 	const filteredAssignments = getters.filtered
@@ -88,7 +89,7 @@ export function filteredByDate(state, getters) {
 	} else if (start && !end) {
 		Object.keys(assignments).forEach(key => {
 			const assignment = assignments[key]
-			const dateAssigned = assignment.dateAssigned
+			const dateAssigned = new Date(parseDate(assignment.dateAssigned))
 
 			if (dateAssigned && date.isSameDate(dateAssigned, start, 'day')) {
 				filteredByDate[key] = assignment
@@ -98,7 +99,7 @@ export function filteredByDate(state, getters) {
 	} else {
 		Object.keys(assignments).forEach(key => {
 			const assignment = assignments[key]
-			const dateAssigned = assignment.dateAssigned
+			const dateAssigned = new Date(parseDate(assignment.dateAssigned))
 
 			if (dateAssigned && date.isBetweenDates(dateAssigned, start, end, { onlyDate: true, inclusiveFrom: true, inclusiveTo: true })) {
 				filteredByDate[key] = assignment
@@ -118,8 +119,8 @@ export function sorted(state, getters) {
 		let assignmentAProp = null,
 			assignmentBProp = null
 		if (sortBy === 'dateAssigned' || sortBy === 'dateDue') {
-			assignmentAProp = state.assignments[a][sortBy] && new Date(state.assignments[a][sortBy])
-			assignmentBProp = state.assignments[b][sortBy] && new Date(state.assignments[b][sortBy])	
+			assignmentAProp = state.assignments[a][sortBy] && new Date(parseDate(state.assignments[a][sortBy]))
+			assignmentBProp = state.assignments[b][sortBy] && new Date(parseDate(state.assignments[b][sortBy]))	
 		} else {
 			assignmentAProp = state.assignments[a][sortBy] && state.assignments[a][sortBy].toLowerCase()
 			assignmentBProp = state.assignments[b][sortBy] && state.assignments[b][sortBy].toLowerCase()	
@@ -152,7 +153,7 @@ export function friendlyDate(state) {
 	Object.keys(assignments).forEach(key => {
 		friendlyDate.push({
 			...assignments[key],
-			assignedAt: date.formatDate(assignments[key].dateAssigned,'YYYY-MM-DD')
+			assignedAt: date.formatDate(parseDate(assignments[key].dateAssigned),'YYYY-MM-DD')
 		})
 	})
 
