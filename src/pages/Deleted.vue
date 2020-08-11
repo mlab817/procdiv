@@ -23,6 +23,7 @@
     <q-markup-table square flat bordered wrap-cells>
       <thead>
         <tr>
+          <th>Date Assigned</th>
           <th>Document</th>
           <th>Particulars</th>
           <th>Enduser</th>
@@ -32,12 +33,13 @@
           <th>Remarks</th>
           <th>Due Date</th>
           <th>Completed</th>
-          <th>Actions</th>
+          <th v-if="role ==='admin'">Actions</th>
         </tr>
       </thead>
       <tbody>
         <template v-if="Object.keys(deleted).length">
           <tr v-for="(assignment, key) in deleted" :key="key">
+            <td>{{assignment.dateAssigned}}</td>
             <td>{{assignment.document}}</td>
             <td>{{assignment.particulars}}</td>
             <td>{{assignment.enduser}}</td>
@@ -56,7 +58,7 @@
               </div>
             </td>
             <td>{{assignment.dateCompleted}}</td>
-            <td class="text-center items-center q-gutter-sm">
+            <td class="text-center items-center q-gutter-sm" v-if="role ==='admin'">
               <q-btn dense icon="restore" color="primary" @click="restore(key)"></q-btn>
               <q-btn dense icon="delete" color="negative" @click="confirmDelete(key)"></q-btn>
             </td>
@@ -84,6 +86,10 @@
     },
 		name: 'PageDeleted',
 		computed: {
+      role() {
+        return this.$store.getters['auth/role']
+      },
+
 			deleted() {
 				return this.$store.getters['assignment/deleted']
 			}

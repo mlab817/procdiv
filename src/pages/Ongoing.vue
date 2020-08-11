@@ -6,12 +6,12 @@
 
     <div class="row justify-between q-mb-sm">
     	<div class="row items-stretch">
-    		<q-btn icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment">
+    		<q-btn class="q-mr-sm" icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment" v-if="role === 'admin'">
           <q-tooltip>Add new assignment</q-tooltip>  
         </q-btn>
         
         <download-excel :data="ongoingArray">
-          <q-btn icon="get_app" :label="$q.screen.gt.sm ? 'Download': void 0" class="q-ml-sm btn-download" color="secondary">
+          <q-btn icon="get_app" :label="$q.screen.gt.sm ? 'Download': void 0" class="btn-download" color="secondary">
             <q-tooltip>Download ongoing assignments</q-tooltip>
           </q-btn>
         </download-excel>
@@ -153,7 +153,7 @@
           <th>Remarks</th>
           <th>RFQ Deadline</th>
           <th>Due Date/Time</th>
-          <th>Actions</th>
+          <th v-if="role === 'admin'">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -194,7 +194,7 @@
                 <q-icon name="alarm" class="text-grey-8" v-if="assignment.dateDue"></q-icon>  
               </div>
             </td>
-            <td class="text-center items-center">
+            <td class="text-center items-center" v-if="role === 'admin'">
               <div class="row justify-center q-gutter-sm no-wrap">
                 <q-btn 
                   outlined 
@@ -247,6 +247,10 @@ export default {
   },
 
   computed: {
+    role() {
+      return this.$store.getters['auth/role']
+    },
+
     ongoing() {
       return this.$store.getters['assignment/ongoing']
     },

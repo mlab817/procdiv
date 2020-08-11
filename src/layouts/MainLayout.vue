@@ -19,7 +19,9 @@
         <q-space/>
 
         <q-btn flat stretch icon="person" label="Login" to="/auth" v-if="!loggedIn"></q-btn>
-        <q-btn flat stretch icon-right="exit_to_app" label="Logout" v-else @click="confirmLogout"></q-btn>
+        <q-btn flat stretch icon-right="exit_to_app" label="Logout" v-else @click="confirmLogout">
+          
+        </q-btn>
       </q-toolbar>
     </q-header>
 
@@ -31,23 +33,39 @@
       content-class="bg-primary"
       v-if="loggedIn"
     >
-      <q-list dark>
-        <q-item-label header>
-          Navigation
-        </q-item-label>
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
+      
+      <q-img class="absolute-top" style="height: 200px" src="https://cdn.quasar.dev/img/material.png">
+        <div class="absolute-bottom bg-transparent">
+          <q-avatar size="56px" class="q-mb-sm">
+            <img :src="user ? user.photoURL : ''" />
+          </q-avatar>
+          <div class="text-weight-bold text-uppercase">
+            {{ user ? user.displayName : '' }}
+          </div>
+          <div>@{{ user ? user.email : '' }}</div>
+        </div>
+      </q-img>
+
+      <q-scroll-area style="height: calc(100% - 200px); margin-top: 200px; border-right: 1px solid #ddd">
+
+        <q-list dark>
+          <q-item-label header>
+            Navigation
+          </q-item-label>
+          <EssentialLink
+            v-for="link in essentialLinks"
+            :key="link.title"
+            v-bind="link"
+          />
+        </q-list>
+      </q-scroll-area>
     </q-drawer>
 
     <q-page-container>
       <router-view />
     </q-page-container>
 
-    <q-footer>
+    <q-footer v-if="loggedIn">
       <q-tabs>
         <q-route-tab
           v-for="nav in essentialLinks"
@@ -102,6 +120,9 @@ export default {
   computed: {
     loggedIn() {
       return this.$store.state.auth.loggedIn
+    },
+    user() {
+      return this.$store.state.auth.user
     }
   },
   data () {

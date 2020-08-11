@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="show">
     <q-item
       clickable
       tag="a"
@@ -45,6 +45,19 @@ export default {
     icon: {
       type: String,
       default: ''
+    }
+  },
+  computed: {
+    role() {
+      return this.$store.getters['auth/role']
+    },
+
+    show() {
+      if (this.title === 'Manage Options' && this.role !== 'admin') {
+        return false
+      } else {
+        return true
+      }
     }
   }
 }

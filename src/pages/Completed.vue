@@ -30,7 +30,7 @@
           <th>Remarks</th>
           <th>Due Date</th>
           <th>Completed</th>
-          <th>Actions</th>
+          <th v-if="role ==='admin'">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -55,7 +55,7 @@
               </div>
             </td>
             <td>{{assignment.dateCompleted}}</td>
-            <td class="text-center items-center q-gutter-sm">
+            <td class="text-center items-center q-gutter-sm" v-if="role ==='admin'">
               <q-btn outlined dense icon="undo" color="negative" @click="undoCompleted(key)"></q-btn>
             </td>
           </tr>
@@ -87,6 +87,9 @@ export default {
   },
 
   computed: {
+    role() {
+      return this.$store.getters['auth/role']
+    },
 
     completed() {
       return this.$store.getters['assignment/completed']

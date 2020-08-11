@@ -18,32 +18,29 @@ export function logout({}) {
 	firebaseAuth.signOut()
 }
 
-export function createUserProfile({}, user) {
-  
-}
-
-export function getUserProfile({}, user) {
+export function getUserProfile({ commit }, user) {
   const userRef = firebaseFs.collection('users').doc(user.uid)
+  const { email, displayName, photoURL, uid } = user
 
-  userRef.get()
-    .then(snapshot => {
-      if (snapshot.exists) {
-        // do something about the data
-      } else {
-        // create it
-        const { displayName, email, photoURL, uid } = user
+  userRef
+  	.get()
+  	.then(doc => {
+  		if (doc.exists) {
+  			commit('SET_USER', doc.data())
+  			console.log(doc.data())
+  		} else {
+  			let newUser = {}
+  			newUser.email = email
+  			newUser.displayName = displayName
+  			newUser.photoURL = photoURL
+  			newUser.uid = uid
+  			newUser.role = 'user'
 
-        userRef.set({
-          displayName: displayName,
-          email: email,
-          photoURL: photoURL,
-          uid: uid,
-          role: 'user'
-        })
-        .then(() => showSuccessMessage())
-        .catch(err => showErrorMessage(err.message))
-      }
-    })
+  			userRef.set(newUser)
+  				.then(() => showSuccessMessage())
+  				.catch(err => showErrorMessage(err.message))
+  		}
+  	})
 
 }
 
@@ -55,7 +52,6 @@ export function googleSignIn({dispatch}) {
 			const user = res.user
 
 			console.log(token, user)
-      dispatch('createUserProfile', user)
 		})
 		.catch(err => {
 			const errorCode = err.code
@@ -86,6 +82,7 @@ export function handleAuthStateChanged({ commit, dispatch }) {
 		} else {
 			// commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })
 			commit('assignment/SET_DOWNLOADED', null, { root: true })
+			commit('CLEAR_USER')
 			commit('SET_LOGGED_IN', false)
 			LocalStorage.set('loggedIn', false)
 			this.$router.replace('/auth').then(() => console.log('next')).catch(err => console.log(err.message))
