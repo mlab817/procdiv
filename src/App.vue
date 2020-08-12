@@ -5,6 +5,8 @@
 </template>
 
 <script>
+import { firebaseConfig } from './config'
+
 export default {
   name: 'App',
   computed: {

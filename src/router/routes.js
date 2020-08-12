@@ -7,6 +7,7 @@ const routes = [
       { path: '', component: () => import('pages/Dashboard.vue') },
       { path: 'auth', component: () => import('pages/Auth.vue') },
       { path: 'ongoing', component: () => import('pages/Ongoing.vue') },
+      { path: 'ongoing-v2', component: () => import('pages/Ongoingv2.vue') },
       { path: 'completed', component: () => import('pages/Completed.vue') },
       { path: 'deleted', component: () => import('pages/Deleted.vue') },
       { path: 'options', component: () => import('pages/Options.vue') },
