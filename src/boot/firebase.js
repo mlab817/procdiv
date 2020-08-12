@@ -4,7 +4,7 @@ import 'firebase/auth'
 import 'firebase/database'
 import 'firebase/firestore'
 
-import { firebaseConfig } from './firebase-config'
+import { firebaseConfig } from '../config'
 
 import { showErrorMessage } from 'src/functions/show-messages'
 
