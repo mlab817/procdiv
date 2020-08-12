@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div class="row q-py-md q-gutter-md">
+    <!-- <div class="row q-py-md q-gutter-md">
       <q-btn label="Seed Endusers" @click="seedEndusers"></q-btn>
 
       <q-btn label="Seed Documents" @click="seedDocuments"></q-btn>
@@ -37,7 +37,7 @@
       <q-btn label="Seed Staff" @click="seedStaff"></q-btn>
 
       <q-btn label="Seed Assignments" @click="seedAssignments"></q-btn>
-    </div>
+    </div> -->
     
   </q-page>
 </template>

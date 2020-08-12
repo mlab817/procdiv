@@ -1,15 +1,15 @@
-// const dev = {
-//   apiKey: "AIzaSyCgLUAiuq7MNkebSOvYyWSPlqz5oE6tWhk",
-//   authDomain: "proc-staging.firebaseapp.com",
-//   databaseURL: "https://proc-staging.firebaseio.com",
-//   projectId: "proc-staging",
-//   storageBucket: "proc-staging.appspot.com",
-//   messagingSenderId: "65901482904",
-//   appId: "1:65901482904:web:bac07fc0fd53e62939d1ed",
-//   measurementId: "G-YESLQDZBV6"
-// }
+const dev = {
+  apiKey: "AIzaSyCgLUAiuq7MNkebSOvYyWSPlqz5oE6tWhk",
+  authDomain: "proc-staging.firebaseapp.com",
+  databaseURL: "https://proc-staging.firebaseio.com",
+  projectId: "proc-staging",
+  storageBucket: "proc-staging.appspot.com",
+  messagingSenderId: "65901482904",
+  appId: "1:65901482904:web:bac07fc0fd53e62939d1ed",
+  measurementId: "G-YESLQDZBV6"
+}
 
-// export const firebaseConfig = dev
+export const firebaseConfig = dev
 
 const prod = {
 	apiKey: "AIzaSyBo6tER2OUthEOw-K_57A6RpaQH-f7BJY4",
@@ -24,4 +24,4 @@ const prod = {
 
 // export const firebaseConfig = process.env.DEV ? dev : prod
 
-export const firebaseConfig = prod
+// export const firebaseConfig = prod

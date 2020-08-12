@@ -2,9 +2,24 @@ import { firebaseAuth, provider, firebaseFs } from 'boot/firebase'
 import { Loading, LocalStorage } from 'quasar'
 import { showSuccessMessage, showErrorMessage } from 'src/functions/show-messages'
 
+export function register({}, payload) {
+  Loading.show()
+  const { email, password } = payload
+  firebaseAuth.createUserWithEmailAndPassword(email, password)
+    .catch(err => {
+      const errorCode = err.code
+      const errorMessage = err.message
+
+      showErrorMessage(`${errorCode}: ${errorMessage}`)
+    })
+    .finally(() => Loading.hide())
+}
+
 export function login({}, payload) {
 	Loading.show()
-	firebaseAuth.signInWithEmailAndPassword(payload.email, payload.password)
+  const { email, password } = payload
+
+	firebaseAuth.signInWithEmailAndPassword(email, password)
 		.then(res => {
 			showSuccessMessage()
 		})
