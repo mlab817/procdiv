@@ -18,6 +18,11 @@
 
         <q-space/>
 
+        <q-btn flat round icon="notifications" color="grey-9">
+          <q-badge color="red" floating transparent>
+            4
+          </q-badge>
+        </q-btn>
         <q-btn flat stretch icon="person" label="Login" to="/auth" v-if="!loggedIn"></q-btn>
         <q-btn flat stretch icon-right="exit_to_app" label="Logout" v-else @click="confirmLogout">
           
@@ -52,11 +57,32 @@
           <q-item-label header>
             Navigation
           </q-item-label>
-          <EssentialLink
+          <template
             v-for="link in essentialLinks"
-            :key="link.title"
-            v-bind="link"
-          />
+          >
+            <q-item
+              clickable
+              tag="a"
+              :to="link.link"
+              exact
+              :key="link.title"
+              class="text-grey-4"
+            >
+              <q-item-section
+                v-if="link.icon"
+                avatar
+              >
+                <q-icon :name="link.icon" />
+              </q-item-section>
+
+              <q-item-section>
+                <q-item-label>{{ link.title }}</q-item-label>
+                <q-item-label caption>
+                  {{ link.caption }}
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -79,8 +105,6 @@
 </template>
 
 <script>
-import EssentialLink from 'components/EssentialLink.vue'
-
 const linksData = [
   {
     title: 'Dashboard',
@@ -116,7 +140,7 @@ const linksData = [
 
 export default {
   name: 'MainLayout',
-  components: { EssentialLink },
+  components: {},
   computed: {
     loggedIn() {
       return this.$store.state.auth.loggedIn

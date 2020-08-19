@@ -6,6 +6,7 @@ import assignment from './assignment'
 import auth from './auth'
 import document from './document'
 import enduser from './enduser'
+import notification from './notification'
 import staff from './staff'
 
 Vue.use(Vuex)
@@ -26,6 +27,7 @@ export default function (/* { ssrContext } */) {
       auth,
       document,
       enduser,
+      notification,
       staff
     },
 

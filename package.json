@@ -8,9 +8,9 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "dev": "QENV=development quasar dev",
-    "staging": "QENV=development quasar build -m pwa && firebase deploy -P staging --only hosting",
-    "prod": "QENV=production quasar build -m pwa && firebase deploy -P default --only hosting"
+    "dev": "cross-env QENV=development quasar dev",
+    "staging": "cross-env QENV=development quasar build -m pwa && firebase deploy -P staging --only hosting",
+    "prod": "cross-env QENV=production quasar build -m pwa && firebase deploy -P default --only hosting"
   },
   "dependencies": {
     "@quasar/extras": "^1.9.4",
@@ -31,6 +31,7 @@
     "@quasar/app": "^2.0.0",
     "@quasar/quasar-app-extension-qenv": "^1.0.3",
     "babel-eslint": "^10.0.1",
+    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-loader": "^3.0.3",
