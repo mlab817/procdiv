@@ -15,6 +15,20 @@ export function completed(state, getters) {
 	return completedAssignments
 }
 
+export function forOpening(state, getters) {
+	const filteredAssignments = getters.filtered
+	let forOpening = {}
+
+	Object.keys(filteredAssignments).forEach(key => {
+		const assignment = filteredAssignments[key]
+		if (assignment.status !== undefined && assignment.status === 'for opening') {
+			forOpening[key] = assignment
+		}
+	})
+
+	return forOpening
+}
+
 export function ongoing(state, getters) {
 	const filteredAssignments = getters.filtered
 	let ongoingAssignments = {}
@@ -81,10 +95,7 @@ export function filteredByDate(state, getters) {
 
 	const assignments = getters.sorted
 
-	console.log(Object.keys(assignments).length)
-
 	if (!start && !end) {
-		console.log('no dates selected')
 		return  assignments
 	} else if (start && !end) {
 		Object.keys(assignments).forEach(key => {

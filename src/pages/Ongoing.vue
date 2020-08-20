@@ -80,7 +80,7 @@
             <q-input v-model="actionTaken" outlined label="Action Taken" stack-label></q-input>
 
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
-              <q-select v-model="assignedTo" :options="staff" outlined label="Assigned To" stack-label class="col" emit-value map-options></q-select>
+              <q-select v-model="assignedTo" :options="staff" outlined label="Assigned To" stack-label class="col" option-label="displayName" option-value="id"></q-select>
               <div>
                 <q-btn flat round icon="edit" @click="addStaff" color="primary"></q-btn>
               </div>
@@ -201,7 +201,7 @@
                   dense 
                   icon="done_outline" 
                   color="positive" 
-                  @click="confirmCompleted(key)" />
+                  @click="confirmCompleted(assignment, key)" />
                 <q-btn 
                   outlined 
                   dense 
@@ -257,7 +257,8 @@ export default {
 
     staff() {
       // return this.$store.state.staff.staff
-      return this.$store.getters['staff/options']
+      // return this.$store.getters['staff/options']
+      return this.$store.getters['user/options']
     },
 
     endusers() {
@@ -444,13 +445,16 @@ export default {
       .onOk(() => this.$store.dispatch('assignment/deleteAssignment', id))
     },
 
-    confirmCompleted(id) {
+    confirmCompleted(assignment, key) {
       this.$q.dialog({
         title: 'Confirm Completed',
         message: 'Mark the assignment as completed',
         cancel: true
       })
-      .onOk(() => this.$store.dispatch('assignment/markAsCompleted', id))
+      .onOk(() => this.$store.dispatch('assignment/markAsCompleted', {
+        id: key,
+        assignment: assignment
+      }))
     },
 
     addStaff() {
@@ -527,6 +531,9 @@ export default {
       }
       return ''
     }
+  },
+  created() {
+    console.log(this.$store.getters['assignment/forOpening'])
   }
 }
 </script>

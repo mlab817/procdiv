@@ -18,10 +18,11 @@
 
         <q-space/>
 
-        <q-btn flat round icon="notifications" color="grey-9">
-          <q-badge color="red" floating transparent>
-            4
+        <q-btn flat round icon="notifications" color="grey-9" @click="rightDrawerOpen = !rightDrawerOpen">
+          <q-badge color="red" floating>
+            {{Object.keys(notifications).length}}
           </q-badge>
+          <q-tooltip>Notifications</q-tooltip>
         </q-btn>
         <q-btn flat stretch icon="person" label="Login" to="/auth" v-if="!loggedIn"></q-btn>
         <q-btn flat stretch icon-right="exit_to_app" label="Logout" v-else @click="confirmLogout">
@@ -87,6 +88,40 @@
       </q-scroll-area>
     </q-drawer>
 
+    <q-drawer v-model="rightDrawerOpen" side="right" bordered overlay>
+      <div class="q-pa-sm">
+        <div class="text-h6">Notifications</div>
+      </div>
+      <q-list>
+        <template v-if="Object.keys(notifications).length">
+          <q-item v-for="(notification, key) in notifications" :key="key" clickable @mouseover="hover = key" @mouseleave="hover = null">
+            <q-item-section avatar>
+              <q-avatar class="bg-primary text-white">A</q-avatar>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>
+                {{notification.message}}
+              </q-item-label>
+              <q-item-label caption :class="notification.read ? 'text-grey-5' : 'text-primary'">
+                {{timeAgo(notification.createdAt)}}
+              </q-item-label>
+            </q-item-section>
+            <q-item-section top side v-if="!notification.read && hover == key">
+              <q-btn icon="done" flat round dense @click="markAsRead(key)"></q-btn>
+            </q-item-section>
+          </q-item>
+        </template>
+        <q-item v-else>
+          <q-item-section avatar>
+            <q-avatar class="bg-negative text-white">?</q-avatar>
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>No new notifications.</q-item-label>
+          </q-item-section>
+        </q-item>
+      </q-list>
+    </q-drawer>
+
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -105,6 +140,8 @@
 </template>
 
 <script>
+import { timeAgo } from 'src/functions'
+
 const linksData = [
   {
     title: 'Dashboard',
@@ -112,9 +149,19 @@ const linksData = [
     link: '/'
   },
   {
+    title: 'Add PR/PRAS',
+    icon: 'article',
+    link: '/pr-pras'
+  },
+  {
     title: 'Ongoing',
     icon: 'code',
     link: '/ongoing'
+  },
+  {
+    title: 'For Opening',
+    icon: 'code',
+    link: '/for-opening'
   },
   {
     title: 'Completed',
@@ -147,12 +194,17 @@ export default {
     },
     user() {
       return this.$store.state.auth.user
+    },
+    notifications() {
+      return this.$store.state.notification.notifications
     }
   },
   data () {
     return {
       leftDrawerOpen: false,
-      essentialLinks: linksData
+      essentialLinks: linksData,
+      rightDrawerOpen: false,
+      hover: null
     }
   },
   methods: {
@@ -166,7 +218,11 @@ export default {
     },
     logout() {
       this.$store.dispatch('auth/logout')
-    }
+    },
+    markAsRead(key) {
+      this.$store.dispatch('notification/markAsRead', key)
+    },
+    timeAgo
   }
 }
 </script>

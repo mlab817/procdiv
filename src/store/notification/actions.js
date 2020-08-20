@@ -1,9 +1,45 @@
-import { firebaseFs } from 'boot/firebase'
+import { firebaseFs, firebaseAuth } from 'boot/firebase'
+import { date } from 'quasar'
+import { showErrorMessage, showSuccessMessage } from 'src/functions'
 
 const docs = firebaseFs.collection('notifications')
 
-export function fbReadData({ commit }) {
-	docs.onSnapshot(querySnapshot => {
+export function add({ dispatch }, payload) {
+	// notification must have from, to, createdAt, readAt, read, message, subject fields
+	const notification = {
+		from: payload.from ?  payload.from : '',
+		to: payload.to ? payload.to : '',
+		createdAt: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A'),
+		readAt: '',
+		read: false,
+		message: payload.message ? payload.message : '',
+		subject: payload.subject ? payload.subject : '',
+		relatedDoc: payload.relatedDoc ? payload.relatedDoc : '',
+		relatedId: payload.relatedId ? payload.relatedId : ''
+	}
+
+	dispatch('fbAdd', notification)
+}
+
+export function fbAdd({}, payload) {
+	const doc = firebaseFs.collection('notifications')
+
+	doc.add(payload)
+		.then(() => {
+			console.log('notification sent')
+		})
+		.catch(err => showErrorMessage(err.message))
+}
+
+export function fbReadData({ commit, rootGetters }) {
+	// only pick up unread notifications
+	// should also pick up only the id of the user
+	const uid = firebaseAuth.currentUser.uid
+	
+	docs
+		.where('read','==',false)
+		.where('to','==',uid)
+		.onSnapshot(querySnapshot => {
 		querySnapshot
 			.docChanges()
 			.forEach(change => {
@@ -37,4 +73,20 @@ export function fbReadData({ commit }) {
 				
 			})
 	})
+}
+
+export function markAsRead({dispatch}, key) {
+	dispatch('fbMarkAsRead', key)
+}
+
+export function fbMarkAsRead({}, id) {
+	const doc = docs.doc(id)
+	const now = date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
+
+	doc.update({
+		readAt: now,
+		read: true
+	})
+	.then(() => showSuccessMessage())
+	.catch(error => showErrorMessage(error.message))
 }

@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { firebaseDb, firebaseFs } from 'boot/firebase'
 import { uid, date, Loading } from 'quasar'
 import { showSuccessMessage, showErrorMessage } from 'src/functions/show-messages'
@@ -25,13 +26,26 @@ export function fbAdd({}, payload) {
 	})
 }
 
-export function fsAdd({}, payload) {
-	console.log(payload)
-	firebaseFs
-		.collection('assignments')
-		.doc()
-		.set(payload.assignment)
-		.then(() => showSuccessMessage())
+export function fsAdd({ dispatch }, payload) {
+	const docRef = firebaseFs.collection('assignments')
+
+	docRef.add(payload.assignment)
+		.then((docRef) => {
+			showSuccessMessage()
+			const { referenceNo, document, assignedTo } = payload.assignment
+			const message = `${referenceNo}: ${document}`
+
+			const notification = {
+				from: this.state.auth.user.displayName,
+				to: assignedTo.id,
+				subject: 'New Assignment',
+				message: message,
+				relatedDoc: 'assignments',
+				relatedId: docRef.id
+			}
+
+			dispatch('notification/add', notification, { root: true })
+		})
 		.catch(err => showErrorMessage(err.message))
 }
 
@@ -119,9 +133,11 @@ export function fsUndoDelete({}, id) {
 	.catch(err => showErrorMessage(err.message))
 }
 
-export function markAsCompleted({ dispatch }, id) {
-	dispatch('fbMarkAsCompleted', id)
-	dispatch('fsMarkAsCompleted', id)
+export function markAsCompleted({ dispatch }, payload) {
+	dispatch('fsMarkAsCompleted', payload.id)
+	if (payload.assignment.document === 'PRAS/ PR for preparation of RFQ') {
+		dispatch('fbMarkAsForOpening', payload.assignment)
+	}
 }
 
 export function fbMarkAsCompleted({}, id) {
@@ -139,12 +155,27 @@ export function fbMarkAsCompleted({}, id) {
 	})
 }
 
+export function fbMarkAsForOpening({}, payload) {
+	// create a new document that has status for opening
+	const doc = firebaseFs.collection('assignments').doc()
+	const newObj = Object.assign({}, payload)
+	Vue.set(newObj, 'status', 'for opening')
+	Vue.set(newObj, 'document', 'Waiting for opening')
+
+	console.log(newObj)
+
+	doc.set(newObj)
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
 export function fsMarkAsCompleted({}, id) {
 	const ref = firebaseFs.collection('assignments').doc(id)
+	const dateCompleted = date.formatDate(Date.now(), 'YYYY-MM-DD hh:mm A')
 
 	ref.update({
 		status: 'completed',
-		dateCompleted: Date.now()
+		dateCompleted: dateCompleted
 	})
 	.then(() => showSuccessMessage)
 	.catch(err => showErrorMessage(err.message))

@@ -16,7 +16,6 @@ export default {
   },
   mounted() {
   	this.$store.dispatch('auth/handleAuthStateChanged')
-    this.$store.dispatch('notification/fbReadData')
   }
 }
 </script>

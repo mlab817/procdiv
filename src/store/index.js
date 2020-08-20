@@ -7,7 +7,9 @@ import auth from './auth'
 import document from './document'
 import enduser from './enduser'
 import notification from './notification'
+import pras from './pras'
 import staff from './staff'
+import user from './user'
 
 Vue.use(Vuex)
 
@@ -28,7 +30,9 @@ export default function (/* { ssrContext } */) {
       document,
       enduser,
       notification,
-      staff
+      pras,
+      staff,
+      user
     },
 
     // enable strict mode (adds overhead!)

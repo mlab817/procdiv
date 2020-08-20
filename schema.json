@@ -1,0 +1,65 @@
+{
+	// map to tasks
+	"assignments": {},
+	// procurement coordinator
+	"clientContacts": {},
+	// clients map to endusers/offices
+	"clients": {
+		"ID1": {
+			"name": "", // string
+			"label": "", // string
+			"value": "", // string
+			// map to procurement coordinator
+			"clientContacts": {
+				"name": "", // string
+				"position": "", // string
+				"contactNumber": "", // can be array
+				"email": "", // string
+			}
+		}
+	},
+	"documents": {},
+	// map to staff and users
+	"employees": {},
+	"endusers": {},
+	"milestoneStatus": {},
+	// major grouping of activities for the project
+	"milestones": {},
+	"notifications": {},
+	"pras": {},
+	// ongoing/completed/cancelled/failed/etc.
+	"projectStatus": {},
+	// map to reference number (these will be pras and pr)
+	"projects": {
+		"ID1": {
+			"subject": "",
+			"type": "", // whether PRAS or PR
+			"referenceNo": ""
+		}
+	},
+	"projectTypes": {
+		"ID1": {
+			"name": "PR",
+			// collection of projects
+			"projects": {} 
+		},
+		"ID2": {
+			"name": "PRAS",
+			// collection of projects
+			"projects": {}
+		}
+	},
+	// category for roles
+	"roles": {
+		"ID1": {
+			"name": "admin"
+		},
+		"ID2": {
+			"name": "user"
+		}
+	},
+	"staff": {},
+	"taskStatus": {},
+	"tasks": {},
+	"users": {}
+}
