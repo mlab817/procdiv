@@ -61,7 +61,7 @@ export function fsReadData({ commit }) {
 					// console.log('firestore modified', change.doc.id)
 					const payload = {
 						id: change.doc.id,
-						updates: change.doc.data()
+						data: change.doc.data()
 					}
 
 					commit('UPDATE_STAFF', payload)
@@ -118,4 +118,20 @@ export function fbReadData({ commit }) {
 		const staffId = snapshot.key
 		commit('DELETE_STAFF', staffId)
 	})
+}
+
+export function linkUser({ dispatch }, payload) {
+	// payload: {
+	// 	id: ID
+	// 	user: User
+	// }
+	dispatch('fbLinkUser', payload)
+}
+
+export function fbLinkUser({}, payload) {
+	const doc = firebaseFs.collection('staff').doc(payload.id)
+
+	doc.update({ linked: true, ...payload.user})
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
 }

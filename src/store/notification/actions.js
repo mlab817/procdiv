@@ -32,13 +32,14 @@ export function fbAdd({}, payload) {
 }
 
 export function fbReadData({ commit, rootGetters }) {
+	console.log(rootGetters)
 	// only pick up unread notifications
 	// should also pick up only the id of the user
-	const uid = firebaseAuth.currentUser.uid
-	
+	// const docs = firebaseFs.collection('staff').doc(rootGetters['auth/staffId']).collection('notifications')
+	const docs = rootGetters['auth/notificationPath']
+
 	docs
 		.where('read','==',false)
-		.where('to','==',uid)
 		.onSnapshot(querySnapshot => {
 		querySnapshot
 			.docChanges()
@@ -79,8 +80,9 @@ export function markAsRead({dispatch}, key) {
 	dispatch('fbMarkAsRead', key)
 }
 
-export function fbMarkAsRead({}, id) {
-	const doc = docs.doc(id)
+export function fbMarkAsRead({ rootGetters }, id) {
+	const notificationPath = rootGetters['auth/notificationPath']
+	const doc = notificationPath.doc(id)
 	const now = date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
 
 	doc.update({

@@ -21,6 +21,18 @@
     		</q-avatar>
     	</q-td>
     </template>
+    <template v-slot:body-cell-actions="props">
+    	<q-td :props="props">
+    		<q-btn 
+    			:icon="props.row.linked ? 'link_off' : 'link'" 
+    			flat 
+    			round 
+    			dense 
+    			:color="props.row.linked ? 'negative' : 'primary'" 
+    			@click="linkStaff(props.row)"
+    			:disabled="props.row.linked"></q-btn>
+    	</q-td>
+    </template>
 	</q-table>
 </template>
 
@@ -52,6 +64,19 @@
 		computed: {
 			users() {
 				return this.$store.getters['user/array']
+			},
+			staff() {
+				const staff = this.$store.state.staff.staff
+				let array = []
+
+				Object.keys(staff).forEach(key => {
+					const stf = staff[key]
+					array.push({
+						value: key,
+						label: staff[key].name
+					})
+				})
+				return array
 			}
 		},
 		data() {
@@ -87,11 +112,29 @@
 						label: 'User ID',
 						field: 'uid',
 						align: 'center'
+					},
+					{
+						name: 'staffId',
+						label: 'Staff',
+						field: (row) => this.getStaffName(row.staffId)
+					},
+					{
+						name: 'actions',
+						label: 'Actions'
 					}
 				]
 			}
 		},
 		methods: {
+			getStaffName(id) {
+				const assocStaff = this.staff.filter(x => x.value === id)
+				
+				if (assocStaff.length > 0) {
+					return assocStaff[0].label
+				} else {
+					return ''
+				}
+			},
 	    exportTable () {
 	      // naive encoding to csv format
 	      const content = [ this.columns.map(col => wrapCsvValue(col.label)) ].concat(
@@ -116,6 +159,34 @@
 	          icon: 'warning'
 	        })
 	      }
+	    },
+	    linkStaff(user) {
+	    	const staff = this.staff
+	    	
+	    	this.$q.dialog({
+	    		title: 'Link Staff',
+	    		message: 'Assign this user to a staff. This will allow them to view their tasks and receive in-app notifications.',
+	    		cancel: true,
+	    		persistent: true,
+	    		options: {
+	    			model: '',
+	    			items: staff,
+	    			type: 'radio',
+	    			isValid: val => !!val
+	    		}
+	    	})
+	    	.onOk(data => {
+	    		// data is staff id here
+	    		const payload = {
+	    			id: user.uid,
+	    			staffId: data
+	    		}
+	    		this.handleLink(payload)
+	    	})
+	    },
+	    handleLink(payload) {
+	    	// handle link here
+	    	this.$store.dispatch('user/linkStaff', payload)
 	    }
 	  }
 	}

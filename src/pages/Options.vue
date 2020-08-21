@@ -10,6 +10,8 @@
 
 		<user-table class="q-mt-md"></user-table>
 
+		<staff-table class="q-mt-md"></staff-table>
+
 	</q-page>
 </template>
 
@@ -18,7 +20,8 @@
 		components: {
 			'enduser-table': () => import('../components/options/EnduserTable.vue'),
 			'user-table': () => import('../components/options/UserTable.vue'),
-			'document-table': () => import('../components/options/DocumentTable.vue')
+			'document-table': () => import('../components/options/DocumentTable.vue'),
+			'staff-table': () => import('../components/options/StaffTable.vue')
 		},
 		name: 'PageOptions'
 	}

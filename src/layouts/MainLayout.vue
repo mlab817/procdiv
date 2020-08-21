@@ -25,7 +25,7 @@
           <q-tooltip>Notifications</q-tooltip>
         </q-btn>
         <q-btn flat stretch icon="person" label="Login" to="/auth" v-if="!loggedIn"></q-btn>
-        <q-btn flat stretch icon-right="exit_to_app" label="Logout" v-else @click="confirmLogout">
+        <q-btn flat stretch icon-right="exit_to_app" :label="$q.screen.lt.sm ? void 0 : 'Logout'" v-else @click="confirmLogout">
           
         </q-btn>
       </q-toolbar>
@@ -58,6 +58,32 @@
           <q-item-label header>
             Navigation
           </q-item-label>
+          <q-expansion-item label="Tasks" icon="folder" default-expand-all>
+            <q-item clickable tag="a" to="/ongoing">
+              <q-item-section avatar>
+                <q-icon name="code"></q-icon>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Ongoing</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable tag="a" to="/completed">
+              <q-item-section avatar>
+                <q-icon name="check"></q-icon>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Completed</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable tag="a" to="/trash">
+              <q-item-section avatar>
+                <q-icon name="delete"></q-icon>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Trash</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
           <template
             v-for="link in essentialLinks"
           >
@@ -67,7 +93,7 @@
               :to="link.link"
               exact
               :key="link.title"
-              class="text-grey-4"
+              class="text-grey-4 drawer"
             >
               <q-item-section
                 v-if="link.icon"
@@ -92,34 +118,7 @@
       <div class="q-pa-sm">
         <div class="text-h6">Notifications</div>
       </div>
-      <q-list>
-        <template v-if="Object.keys(notifications).length">
-          <q-item v-for="(notification, key) in notifications" :key="key" clickable @mouseover="hover = key" @mouseleave="hover = null">
-            <q-item-section avatar>
-              <q-avatar class="bg-primary text-white">A</q-avatar>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>
-                {{notification.message}}
-              </q-item-label>
-              <q-item-label caption :class="notification.read ? 'text-grey-5' : 'text-primary'">
-                {{timeAgo(notification.createdAt)}}
-              </q-item-label>
-            </q-item-section>
-            <q-item-section top side v-if="!notification.read && hover == key">
-              <q-btn icon="done" flat round dense @click="markAsRead(key)"></q-btn>
-            </q-item-section>
-          </q-item>
-        </template>
-        <q-item v-else>
-          <q-item-section avatar>
-            <q-avatar class="bg-negative text-white">?</q-avatar>
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>No new notifications.</q-item-label>
-          </q-item-section>
-        </q-item>
-      </q-list>
+      <notifications-list></notifications-list>
     </q-drawer>
 
     <q-page-container>
@@ -140,8 +139,6 @@
 </template>
 
 <script>
-import { timeAgo } from 'src/functions'
-
 const linksData = [
   {
     title: 'Dashboard',
@@ -152,26 +149,6 @@ const linksData = [
     title: 'Add PR/PRAS',
     icon: 'article',
     link: '/pr-pras'
-  },
-  {
-    title: 'Ongoing',
-    icon: 'code',
-    link: '/ongoing'
-  },
-  {
-    title: 'For Opening',
-    icon: 'code',
-    link: '/for-opening'
-  },
-  {
-    title: 'Completed',
-    icon: 'done_outline',
-    link: '/completed'
-  },
-  {
-    title: 'Deleted',
-    icon: 'delete',
-    link: '/deleted'
   },
   {
     title: 'Manage Options',
@@ -187,7 +164,9 @@ const linksData = [
 
 export default {
   name: 'MainLayout',
-  components: {},
+  components: {
+    'notifications-list': () => import('../components/layout/NotificationsList.vue')
+  },
   computed: {
     loggedIn() {
       return this.$store.state.auth.loggedIn
@@ -218,11 +197,7 @@ export default {
     },
     logout() {
       this.$store.dispatch('auth/logout')
-    },
-    markAsRead(key) {
-      this.$store.dispatch('notification/markAsRead', key)
-    },
-    timeAgo
+    }
   }
 }
 </script>

@@ -37,7 +37,7 @@ export function getUserProfile({ commit }, user) {
   const userRef = firebaseFs.collection('users').doc(user.uid)
   const { email, displayName, photoURL, uid } = user
 
-  userRef
+  return userRef
   	.get()
   	.then(doc => {
   		if (doc.exists) {
@@ -79,25 +79,24 @@ export function googleSignIn({dispatch}) {
 }
 
 export function handleAuthStateChanged({ commit, dispatch }) {
-	firebaseAuth.onAuthStateChanged(user => {
+	firebaseAuth.onAuthStateChanged(async user => {
 		Loading.hide()
 		if (user) {
-      dispatch('getUserProfile', user)
-			commit('SET_LOGGED_IN', true)
-			LocalStorage.set('loggedIn', true)
-			this.$router.push('/').then(() => console.log('next')).catch(err => console.log(err.message))
-			// dispatch('assignment/fbReadData', null, { root: true })
-			dispatch('assignment/fsReadData', null, { root: true })
-	  	// dispatch('document/fbReadData', null, { root: true })
-	  	// dispatch('staff/fbReadData', null, { root: true })
-	  	// dispatch('enduser/fbReadData', null, { root: true })
-	  	dispatch('staff/fsReadData', null, { root: true })
-	  	dispatch('document/fsReadData', null, { root: true })
-	  	dispatch('enduser/fsReadData', null, { root: true })
-	  	dispatch('user/fbReadData', null, { root: true })
-	  	dispatch('notification/fbReadData', null, { root: true })
+			// dispatch profile before retrieving any more data
+      dispatch('getUserProfile', user).then(() => {
+      	commit('SET_LOGGED_IN', true)
+				LocalStorage.set('loggedIn', true)
+				this.$router.push('/').then(() => console.log('next')).catch(err => console.log(err.message))
+				// dispatch('assignment/fsReadData', null, { root: true })
+		  	dispatch('staff/fsReadData', null, { root: true })
+		  	dispatch('document/fsReadData', null, { root: true })
+		  	dispatch('enduser/fsReadData', null, { root: true })
+		  	dispatch('user/fbReadData', null, { root: true })
+		  	dispatch('notification/fbReadData', null, { root: true })
+		  	dispatch('task/fbReadData', null, { root: true })
+      })
 		} else {
-			// commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })
+			commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })
 			commit('assignment/SET_DOWNLOADED', null, { root: true })
 			commit('CLEAR_USER')
 			commit('SET_LOGGED_IN', false)

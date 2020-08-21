@@ -9,6 +9,7 @@ import enduser from './enduser'
 import notification from './notification'
 import pras from './pras'
 import staff from './staff'
+import task from './task'
 import user from './user'
 
 Vue.use(Vuex)
@@ -32,6 +33,7 @@ export default function (/* { ssrContext } */) {
       notification,
       pras,
       staff,
+      task,
       user
     },
 

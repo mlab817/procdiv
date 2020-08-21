@@ -6,7 +6,7 @@ export function options(state, getters) {
 		const staff = sortedStaff[key]
 		options.push({
 			label: staff.name,
-			value: staff.name
+			value: key
 		})
 	})
 

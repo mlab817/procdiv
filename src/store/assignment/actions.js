@@ -140,21 +140,6 @@ export function markAsCompleted({ dispatch }, payload) {
 	}
 }
 
-export function fbMarkAsCompleted({}, id) {
-	const ref = firebaseDb.ref('assignments/' + id)
-
-	ref.update({
-		dateCompleted: new Date(),
-		status: 'completed'
-	}, error => {
-		if (error) {
-			showErrorMessage(error.message)
-		} else {
-			showSuccessMessage()
-		}
-	})
-}
-
 export function fbMarkAsForOpening({}, payload) {
 	// create a new document that has status for opening
 	const doc = firebaseFs.collection('assignments').doc()
@@ -187,21 +172,6 @@ export function undoMarkAsCompleted({ dispatch }, id) {
 	dispatch('fsUndoMarkAsCompleted', id)
 }
 
-export function fbUndoMarkAsCompleted({}, id) {
-	const ref = firebaseDb.ref('assignments/' + id)
-
-	ref.update({
-		dateCompleted: '',
-		completed: false
-	}, error => {
-		if (error) {
-			showErrorMessage()
-		} else {
-			showSuccessMessage()
-		}
-	})
-}
-
 export function fsUndoMarkAsCompleted({}, id) {
 	const ref = firebaseFs.collection('assignments').doc(id)
 
@@ -230,8 +200,17 @@ export function filterByDate({ commit }, payload) {
 	commit('SET_END', payload.end)
 }
 
-export function fsReadData({ commit }) {
-	const docs = firebaseFs.collection('assignments')
+export function fsReadData({ commit, rootGetters }) {
+	const role = rootGetters['auth/role']
+	const uid = rootGetters['auth/uid']
+	console.log(role,uid)
+
+	let docs
+	if (role === 'user') {
+		docs = firebaseFs.collection('assignments').where('assignedTo','==',uid)
+	} else {
+		docs = firebaseFs.collection('assignments')
+	}
 
 	docs.onSnapshot(querySnapshot => {
 		querySnapshot
@@ -266,50 +245,5 @@ export function fsReadData({ commit }) {
 				}
 				
 			})
-	})
-}
-
-export function fbReadData({ commit }) {
-	const assignments = firebaseDb.ref('assignments')
-
-	// initial check for data
-	assignments.once('value', snapshot => {
-		commit('SET_DOWNLOADED', true)
-	}, error => {
-		this.$router.replace('/auth')
-	})
-
-	// child added
-	assignments.on('child_added', snapshot => {
-		console.log('realtime db added')
-		const assignment = snapshot.val()
-		assignment.id = snapshot.key
-
-		const payload = {
-			id: snapshot.key,
-			assignment: assignment
-		}
-		commit('ADD_ASSIGNMENT', payload)
-	})
-
-	// child changed
-	assignments.on('child_changed', snapshot => {
-		console.log('realtime db changed')
-
-		const assignment = snapshot.val()
-		assignment.id = snapshot.key
-
-		const payload = {
-			id: snapshot.key,
-			updates: assignment
-		}
-		commit('UPDATE_ASSIGNMENT', payload)
-	})
-
-	// child removed
-	assignments.on('child_removed', snapshot => {
-		console.log('realtime db removed')
-		const assignmentId = snapshot.key
-		commit('DELETE_ASSIGNMENT', assignmentId)
 	})
 }

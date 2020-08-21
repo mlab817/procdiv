@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import { firebaseFs } from 'boot/firebase'
+import { showSuccessMessage, showErrorMessage } from 'src/functions'
 
 const state = () => {
 	return {
@@ -35,6 +36,20 @@ const actions = {
 				}
 			})
 		})
+	},
+	linkStaff: ({ dispatch }, payload) => {
+		dispatch('fbLinkStaff', payload)
+	},
+	fbLinkStaff: ({}, payload) => {
+		// current user and staff id
+		const user = firebaseFs.collection('users').doc(payload.id)
+
+		user.update({
+			staffId: payload.staffId,
+			linked: true
+		})
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
 	}
 }
 
@@ -70,8 +85,8 @@ const getters = {
 
 		Object.keys(users).forEach(key => {
 			array.push({
-				id: key,
-				displayName: users[key].displayName
+				value: key,
+				label: users[key].displayName
 			})
 		})
 
