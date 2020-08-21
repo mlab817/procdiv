@@ -1,6 +1,6 @@
 <template>
 	<q-page padding>
-		<q-table title="Completed" :data="tasks" :columns="columns" :filter="filter" wrap-cells>
+		<q-table title="Completed" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>

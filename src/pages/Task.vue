@@ -5,32 +5,40 @@
 		<q-card bordered flat class="q-mt-md">
 			<q-list separator>
 				<q-item>
+					<q-item-section>Date Assigned</q-item-section>
+					<q-item-section>{{ task.dateAssigned | formatDate }}</q-item-section>
+				</q-item>
+				<q-item>
 					<q-item-section>Document</q-item-section>
-					<q-item-section>{{task.document}}</q-item-section>
+					<q-item-section>{{ task.document }}</q-item-section>
 				</q-item>
 				<q-item>
 					<q-item-section>Enduser</q-item-section>
-					<q-item-section>{{task.enduser}}</q-item-section>
+					<q-item-section>{{ task.enduser }}</q-item-section>
 				</q-item>
 				<q-item>
 					<q-item-section>Reference Number</q-item-section>
-					<q-item-section>{{task.referenceNo}}</q-item-section>
+					<q-item-section>{{ task.referenceNo }}</q-item-section>
 				</q-item>
 				<q-item>
 					<q-item-section>Particulars</q-item-section>
-					<q-item-section>{{task.particulars}}</q-item-section>
+					<q-item-section>{{ task.particulars }}</q-item-section>
 				</q-item>
 				<q-item>
 					<q-item-section>RFQ Deadline</q-item-section>
-					<q-item-section>{{task.rfqDeadline}}</q-item-section>
+					<q-item-section>{{ task.rfqDeadline | formatDate }}</q-item-section>
+				</q-item>
+				<q-item>
+					<q-item-section>Due Date/Time</q-item-section>
+					<q-item-section>{{ task.dateDue | formatDate }}</q-item-section>
 				</q-item>
 				<q-item>
 					<q-item-section>Action Taken</q-item-section>
-					<q-item-section>{{task.actionTaken}}</q-item-section>
+					<q-item-section>{{ task.actionTaken }}</q-item-section>
 				</q-item>
 				<q-item>
 					<q-item-section>Remarks</q-item-section>
-					<q-item-section>{{task.remarks}}</q-item-section>
+					<q-item-section>{{ task.remarks }}</q-item-section>
 				</q-item>
 				<q-item>
 					<q-item-section>Status</q-item-section>
@@ -48,6 +56,9 @@
 </template>
 
 <script>
+	import { parseDate } from 'src/functions'
+	import { date } from 'quasar'
+
 	export default {
 		name: 'TaskDetail',
 		computed: {
@@ -58,6 +69,16 @@
 
 				if (task) return task
 				return null
+			}
+		},
+		filters: {
+			formatDate(val) {
+				if (val) {
+					const dateToFormat = parseDate(val)
+
+					return date.formatDate(dateToFormat,'MMM DD, YYYY hh:mm A')
+				}
+				return ''
 			}
 		}
 	}

@@ -1,5 +1,9 @@
 <template>
 	<q-page padding>
+		<div class="row justify-end q-mb-md">
+			<q-btn icon="archive" class="q-ml-sm" label="Download" color="green" />
+			<q-btn icon="add_task" class="q-ml-sm" label="Add Task" color="primary" @click="addTask" />
+		</div>
 		<q-table title="Ongoing" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
@@ -7,8 +11,6 @@
 						<q-icon name="search" />
 					</template>
 				</q-input>
-				<q-btn icon="archive" class="q-ml-sm" dense color="green" />
-				<q-btn icon="add_task" class="q-ml-sm" dense color="primary" @click="addTask" />
 			</template>
 
 			<template v-slot:body-cell-overdue="props">

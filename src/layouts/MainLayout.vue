@@ -54,12 +54,20 @@
 
       <q-scroll-area style="height: calc(100% - 200px); margin-top: 200px; border-right: 1px solid #ddd">
 
-        <q-list dark>
+        <q-list dark class="text-grey-4">
           <q-item-label header>
             Navigation
           </q-item-label>
+          <q-item clickable tag="a" exact to="/">
+            <q-item-section avatar>
+              <q-icon name="dashboard"></q-icon>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Dashboard</q-item-label>
+            </q-item-section>
+          </q-item>
           <q-expansion-item label="Tasks" icon="folder" default-expand-all>
-            <q-item clickable tag="a" to="/ongoing">
+            <q-item clickable tag="a" to="/ongoing" inset-level="1">
               <q-item-section avatar>
                 <q-icon name="code"></q-icon>
               </q-item-section>
@@ -67,7 +75,7 @@
                 <q-item-label>Ongoing</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable tag="a" to="/completed">
+            <q-item clickable tag="a" to="/completed" inset-level="1">
               <q-item-section avatar>
                 <q-icon name="check"></q-icon>
               </q-item-section>
@@ -75,7 +83,7 @@
                 <q-item-label>Completed</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable tag="a" to="/trash">
+            <q-item clickable tag="a" to="/trash" inset-level="1">
               <q-item-section avatar>
                 <q-icon name="delete"></q-icon>
               </q-item-section>
@@ -84,32 +92,22 @@
               </q-item-section>
             </q-item>
           </q-expansion-item>
-          <template
-            v-for="link in essentialLinks"
-          >
-            <q-item
-              clickable
-              tag="a"
-              :to="link.link"
-              exact
-              :key="link.title"
-              class="text-grey-4 drawer"
-            >
-              <q-item-section
-                v-if="link.icon"
-                avatar
-              >
-                <q-icon :name="link.icon" />
-              </q-item-section>
-
-              <q-item-section>
-                <q-item-label>{{ link.title }}</q-item-label>
-                <q-item-label caption>
-                  {{ link.caption }}
-                </q-item-label>
-              </q-item-section>
-            </q-item>
-          </template>
+          <q-item clickable tag="a" to="/options" exact>
+            <q-item-section avatar>
+              <q-icon name="unfold_more" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Manage Options</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable tag="a" to="/settings" exact>
+            <q-item-section avatar>
+              <q-icon name="settings" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Settings</q-item-label>
+            </q-item-section>
+          </q-item>
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -146,13 +144,13 @@ const linksData = [
     link: '/'
   },
   {
-    title: 'Add PR/PRAS',
-    icon: 'article',
-    link: '/pr-pras'
+    title: 'Tasks',
+    icon: 'code',
+    link: '/ongoing'
   },
   {
     title: 'Manage Options',
-    icon: 'dashboard',
+    icon: 'unfold_more',
     link: '/options'
   },
   {

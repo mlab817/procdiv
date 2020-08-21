@@ -10,16 +10,31 @@
 		<q-card-section>
 			<q-form ref="myForm" greedy class="q-gutter-sm">
 	      <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
-	        <q-select v-model="taskToSubmit.document" :options="documents" outlined label="Document" stack-label class="col" emit-value map-options :rules="required" hide-bottom-space />
+	        <q-select 
+	        	v-model="taskToSubmit.document" 
+	        	:options="documents" 
+	        	outlined 
+	        	label="Document" 
+	        	stack-label class="col" 
+	        	emit-value 
+	        	map-options 
+	        	:rules="required" 
+	        	hide-bottom-space 
+	        	:dense="dense" 
+	        	lazy-rules />
 	        <div>
 	          <q-btn flat round icon="edit" @click="addDocument" color="primary"></q-btn>
 	        </div>
 	      </div>
 
-	      <q-input v-model="taskToSubmit.particulars" outlined label="Particulars" stack-label></q-input>
+	      <q-input 
+	      	v-model="taskToSubmit.particulars" 
+	      	outlined 
+	      	label="Particulars" 
+	      	stack-label 
+	      	:dense="dense" />
 
-	      <q-input v-model="taskToSubmit.rfqDeadline" outlined label="RFQ Deadline" stack-label clearable>
-
+	      <q-input v-model="taskToSubmit.rfqDeadline" outlined label="RFQ Deadline" stack-label clearable :dense="dense">
 	        <template v-slot:prepend>
 	          <q-icon name="event" class="cursor-pointer">
 	            <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -37,18 +52,49 @@
 	      </q-input>
 
 	      <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
-	        <q-select v-model="taskToSubmit.enduser" use-input @filter="filterEndusers" :options="enduserOptions" outlined label="Enduser" stack-label class="col" emit-value map-options></q-select>
+	        <q-select 
+	        	v-model="taskToSubmit.enduser" 
+	        	use-input 
+	        	@filter="filterEndusers" 
+	        	:options="enduserOptions" 
+	        	outlined 
+	        	label="Enduser" 
+	        	stack-label 
+	        	class="col" 
+	        	emit-value 
+	        	map-options 
+	        	:dense="dense"></q-select>
 	        <div>
 	          <q-btn flat round icon="edit" @click="addEnduserDialog = true" color="primary"></q-btn>
 	        </div>
 	      </div>
 
-	      <q-input v-model="taskToSubmit.referenceNo" outlined label="Reference No" stack-label></q-input>
+	      <q-input 
+	      	v-model="taskToSubmit.referenceNo" 
+	      	outlined 
+	      	label="Reference No"
+	      	stack-label 
+	      	:dense="dense" />
 
-	      <q-input v-model="taskToSubmit.actionTaken" outlined label="Action Taken" stack-label></q-input>
+	      <q-input 
+	      	v-model="taskToSubmit.actionTaken" 
+	      	outlined 
+	      	label="Action Taken" 
+	      	stack-label 
+	      	:dense="dense" />
 
 	      <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
-	        <q-select v-model="taskToSubmit.assignedTo" :options="staff" outlined label="Assigned To" stack-label class="col" :rules="required" hide-bottom-space></q-select>
+	        <q-select 
+	        	v-model="taskToSubmit.assignedTo" 
+	        	:options="staff" 
+	        	outlined 
+	        	label="Assigned To" 
+	        	stack-label 
+	        	class="col" 
+	        	:rules="required" 
+	        	hide-bottom-space 
+	        	:dense="dense" 
+	        	lazy-rules></q-select>
 	        <div>
 	          <q-btn flat round icon="edit" @click="addStaff" color="primary"></q-btn>
 	        </div>
@@ -58,13 +104,15 @@
 	      	v-model="taskToSubmit.remarks" 
 	      	outlined 
 	      	label="Remarks" 
-	      	stack-label></q-input>
+	      	stack-label
+	      	:dense="dense"></q-input>
 
 	      <q-input 
 	      	v-model="taskToSubmit.dateDue" 
 	      	outlined 
 	      	label="Due Date/Time" 
-	      	stack-label>
+	      	stack-label
+	      	:dense="dense">
 	        <template v-slot:prepend>
 	          <q-icon name="event" class="cursor-pointer">
 	            <q-popup-proxy transition-show="scale" transition-hide="scale">
@@ -83,10 +131,22 @@
 	    </q-form>
 		</q-card-section>
 		<q-card-actions align="right">
-			<q-btn flat label="Delete" color="negative" v-if="!!taskToSubmit.id" @click="deleteTask"></q-btn>
+			<q-btn 
+				flat 
+				label="Delete" 
+				color="negative" 
+				v-if="!!taskToSubmit.id" 
+				@click="deleteTask"></q-btn>
 			<q-space />
-			<q-btn flat label="Cancel" v-close-popup />
-			<q-btn flat label="Ok" color="primary" @click="submitForm" />
+			<q-btn 
+				flat 
+				label="Cancel" 
+				v-close-popup />
+			<q-btn 
+				flat 
+				label="Ok" 
+				color="primary" 
+				@click="submitForm" />
 		</q-card-actions>
 	</q-card>
 </template>
@@ -107,6 +167,9 @@
 			},
 			users() {
 				return this.$store.getters['user/options']
+			},
+			dense() {
+				return this.$q.screen.lt.sm
 			}
 		},
 		data() {
