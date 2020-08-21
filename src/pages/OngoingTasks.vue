@@ -4,7 +4,10 @@
 			<q-btn icon="archive" class="q-ml-sm" label="Download" color="green" />
 			<q-btn icon="add_task" class="q-ml-sm" label="Add Task" color="primary" @click="addTask" />
 		</div>
-		<q-table title="Ongoing" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm">
+
+		<!-- :grid="$q.screen.lt.sm" -->
+
+		<q-table title="Ongoing" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" row-key="id">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>
@@ -52,6 +55,97 @@
           </span>
           <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon" />
         </div>
+      </template>
+
+      <template v-slot:item="props">
+      	<div class="q-pa-sm col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+	      	<q-card>
+	      		<q-card-section class="q-pa-none">
+	      			<q-list>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Date Assigned</q-item-label>
+										<q-item-label>{{ props.row.dateAssigned | formatDate }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Document</q-item-label>
+										<q-item-label>{{ props.row.document }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Enduser</q-item-label>
+										<q-item-label>{{ props.row.enduser }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Reference Number</q-item-label>
+										<q-item-label>{{ props.row.referenceNo }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Particulars</q-item-label>
+										<q-item-label>{{ props.row.particulars }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>RFQ Deadline</q-item-label>
+										<q-item-label>{{ props.row.rfqDeadline | formatDate }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Due Date/Time</q-item-label>
+										<q-item-label>{{ props.row.dateDue | formatDate }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Action Taken</q-item-label>
+										<q-item-label>{{ props.row.actionTaken }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Remarks</q-item-label>
+										<q-item-label>{{ props.row.remarks }}</q-item-label>
+									</q-item-section>
+								</q-item>
+								<q-item>
+									<q-item-section>
+										<q-item-label caption>Status</q-item-label>
+										<q-item-label>
+											<div>
+												<q-badge color="positive" v-if="props.row.status === 'completed'">COMPLETED</q-badge>
+												<q-badge color="primary" v-if="props.row.status === 'ongoing'">ONGOING</q-badge>
+												<q-badge color="negative" v-if="props.row.status === 'deleted'">DELETED</q-badge>
+											</div>
+										</q-item-label>
+									</q-item-section>
+								</q-item>
+							</q-list>
+	      		</q-card-section>
+	      		<q-card-actions align="right">
+	      			<q-btn icon="check" flat round dense color="positive" @click="completeTask(props.row)">
+								<q-tooltip>Mark as completed</q-tooltip>
+							</q-btn>
+							<q-btn icon="edit" flat round dense color="primary" @click="editTask(props.row)">
+								<q-tooltip>Edit</q-tooltip>
+							</q-btn>
+							<q-btn icon="delete" flat round dense color="negative" @click="deleteTask(props.row)">
+								<q-tooltip>Delete</q-tooltip>
+							</q-btn>
+							<q-btn icon="notifications" flat round dense color="grey" @click="remindTask(props.row)" :disabled="props.row.reminded">
+								<q-tooltip>Remind!</q-tooltip>
+							</q-btn>
+	      		</q-card-actions>
+	      	</q-card>
+      	</div>
       </template>
 		</q-table>
 
@@ -238,6 +332,15 @@
 					cancel: true
 				})
 				.onOk(() => this.$store.dispatch('task/remindTask', row))
+			}
+		},
+		filters: {
+			formatDate(val) {
+				if (val) {
+					const dateToFormat = parseDate(val)
+					return date.formatDate(dateToFormat, 'MMM DD, YYYY hh:mm A')
+				}
+				return ''
 			}
 		}
 	}
