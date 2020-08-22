@@ -12,7 +12,7 @@
 	        	v-model="taskToSubmit.document" 
 	        	:options="documents" 
 	        	outlined 
-	        	label="Document" 
+	        	label="Document*" 
 	        	stack-label class="col" 
 	        	emit-value 
 	        	map-options 
@@ -70,9 +70,12 @@
 	      <q-input 
 	      	v-model="taskToSubmit.referenceNo" 
 	      	outlined 
-	      	label="Reference No"
+	      	label="Reference No*"
 	      	stack-label 
-	      	:dense="dense" />
+	      	:dense="dense" 
+	      	:rules="required" 
+	      	hide-bottom-space 
+	      	lazy-rules />
 
 	      <q-input 
 	      	v-model="taskToSubmit.actionTaken" 
@@ -86,7 +89,7 @@
 	        	v-model="taskToSubmit.assignedTo" 
 	        	:options="staff" 
 	        	outlined 
-	        	label="Assigned To" 
+	        	label="Assigned To*" 
 	        	stack-label 
 	        	class="col" 
 	        	:rules="required" 
