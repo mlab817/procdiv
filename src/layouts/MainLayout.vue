@@ -166,15 +166,15 @@ const linksData = [
     link: '/ongoing'
   },
   {
+    title: 'For Opening',
+    icon: 'drafts',
+    link: '/for-opening'
+  },
+  {
     title: 'Manage Options',
     icon: 'unfold_more',
     link: '/options'
-  },
-  {
-    title: 'Settings',
-    icon: 'settings',
-    link: '/settings'
-  },
+  }
 ];
 
 export default {

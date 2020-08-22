@@ -130,7 +130,7 @@
 								</q-item>
 							</q-list>
 	      		</q-card-section>
-	      		<q-card-actions align="right">
+	      		<q-card-actions align="right" v-if="admin">
 	      			<q-btn icon="check" flat round dense color="positive" @click="completeTask(props.row)">
 								<q-tooltip>Mark as completed</q-tooltip>
 							</q-btn>
@@ -152,6 +152,7 @@
 		<q-dialog v-model="addTaskDialog" persistent>
 			<add-edit-task :task="task" @close="addTaskDialog = false"></add-edit-task>
 		</q-dialog>
+
 	</q-page>
 </template>
 

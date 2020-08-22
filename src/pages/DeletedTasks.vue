@@ -14,6 +14,30 @@
 					<q-btn icon="restore" flat round color="positive" @click="restoreTask(props.row.id)"/>
 				</q-td>
 			</template>
+
+			<template v-slot:item="props">
+				<div class="q-pa-sm col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+					<q-card>
+						<q-card-section class="q-pa-none">
+							<q-list dense>
+	              <q-item v-for="col in props.cols.filter(col => col.name !== 'actions')" :key="col.name">
+	                <q-item-section>
+	                  <q-item-label caption>{{ col.label }}</q-item-label>
+	                </q-item-section>
+	                <q-item-section side>
+	                  <q-item-label class="text-weight-bold text-black">{{ col.value }}</q-item-label>
+	                </q-item-section>
+	              </q-item>
+	            </q-list>
+						</q-card-section>
+						<q-card-actions align="right" v-if="admin">
+							<q-btn icon="restore" flat round color="positive" @click="restoreTask(props.row.id)">
+								<q-tooltip>Undo Completed</q-tooltip>
+							</q-btn>
+						</q-card-actions>
+					</q-card>
+				</div>
+			</template>
 		</q-table>
 	</q-page>
 </template>

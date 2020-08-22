@@ -1,5 +1,5 @@
 <template>
-	<q-card style="width: 400px;">
+	<q-card style="width: 400px; max-width: 80wh;">
 		<q-card-section class="row">
 			<div class="text-h6">
 				Add/Edit Task
@@ -153,6 +153,26 @@
 		<q-dialog v-model="help">
 			<task-help />
 		</q-dialog>
+
+		<q-dialog v-model="addEnduserDialog" persistent>
+      <q-card style="width: 400px; max-width: 80vh;">
+        <q-card-section class="row justify-between">
+          <div class="text-h6">Add Enduser</div>
+          <q-space/>
+          <q-btn flat round dense v-close-popup icon="close"></q-btn>
+        </q-card-section>
+        <q-card-section>
+          <q-form class="q-gutter-md">
+            <q-input v-model="newEnduser.label" label="Label" stack-label outlined />
+            <q-input v-model="newEnduser.value" label="Value" stack-label outlined />
+          </q-form>
+        </q-card-section>
+        <q-card-actions align="right">
+          <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
+          <q-btn flat label="OK" color="primary" :disabled="!newEnduser.label || !newEnduser.value" @click="addEnduser"></q-btn>
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
 	</q-card>
 </template>
 
@@ -185,8 +205,12 @@
 				help: false,
 				taskToSubmit: {},
 				required: [val => !!val || '* Required'],
+				enduserOptions: [],
 				addEnduserDialog: false,
-				enduserOptions: []
+				newEnduser: {
+					label: '',
+					value: ''
+				},
 			}
 		},
 		methods: {
@@ -208,12 +232,6 @@
 					}
 					this.$emit('close')
 				})
-			},
-			addDocument() {
-
-			},
-			addStaff() {
-
 			},
 			filterEndusers(val, update, abort) {
 				update(() => {
@@ -238,7 +256,39 @@
 					}
 				})
 				.onOk(() => this.$store.dispatch('task/deleteTask', id))
-			}
+			},
+			addEnduser() {
+	    	this.$store.dispatch('enduser/add', this.newEnduser)
+	      this.newEnduser = {
+	        label: '',
+	        value: ''
+	      }
+	      this.addEnduserDialog = false
+	    },
+	    addDocument() {
+	      this.$q.dialog({
+	        title: 'Add Document',
+	        prompt: {
+	          model: '',
+	          type: 'text',
+	          isValid: val => !!val
+	        },
+	        cancel: true
+	      })
+	      .onOk(data => this.$store.dispatch('document/add', data))
+	    },
+	    addStaff() {
+	      this.$q.dialog({
+	        title: 'Add Staff',
+	        prompt: {
+	          model: '',
+	          type: 'text',
+	          isValid: val => !!val
+	        },
+	        cancel: true
+	      })
+	      .onOk(data => this.$store.dispatch('staff/add', data))
+	    }
 		},
 		mounted() {
 			this.taskToSubmit = Object.assign({}, this.task)

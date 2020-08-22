@@ -16,11 +16,37 @@
 			</template>
 
 			<template v-slot:body-cell-actions="props">
-				<q-td :props="props">
+				<q-td :props="props" v-if="admin">
 					<q-btn icon="check" flat round dense color="positive" @click="openItem(props.row.id)" v-if="!props.row.opened"></q-btn>
 					<!-- <q-btn icon="edit" flat round dense color="primary" @click="editItem(props.row)"></q-btn> -->
 					<q-btn icon="delete" flat round dense color="negative" @click="deleteItem(props.row.id)" v-if="!props.row.opened"></q-btn>
 				</q-td>
+			</template>
+
+			<template v-slot:item="props">
+				<div
+          class="q-pa-xs col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition"
+	        >
+					<q-card>
+						<q-card-section class="q-pa-none">
+							<q-list dense>
+	              <q-item v-for="col in props.cols.filter(col => (col.name !== 'actions' && col.name !== 'task'))" :key="col.name">
+	                <q-item-section>
+	                  <q-item-label caption>{{ col.label }}</q-item-label>
+	                </q-item-section>
+	                <q-item-section side>
+	                  <q-item-label class="text-weight-bold text-black">{{ col.value }}</q-item-label>
+	                </q-item-section>
+	              </q-item>
+	            </q-list>
+						</q-card-section>
+						<q-card-actions align="right" v-if="admin">
+							<q-btn flat round dense color="primary" icon="launch" :to="`/tasks/${props.row.taskId}`" v-if="props.row.taskId"></q-btn>
+							<q-btn icon="check" flat round dense color="positive" @click="openItem(props.row.id)" v-if="!props.row.opened"></q-btn>
+							<q-btn icon="delete" flat round dense color="negative" @click="deleteItem(props.row.id)" v-if="!props.row.opened"></q-btn>
+						</q-card-actions>
+					</q-card>
+				</div>
 			</template>
 		</q-table>
 	</q-page>
@@ -49,6 +75,9 @@
     		})
 
     		return array
+    	},
+    	admin() {
+    		return this.$store.getters['auth/admin']
     	}
 		},
 		data() {

@@ -1,6 +1,6 @@
 <template>
 	<q-page padding>
-		<q-table title="Completed" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" separator="cell">
+		<q-table title="Completed" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" separator="cell" :pagination="pagination">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>
@@ -11,10 +11,34 @@
 			
 			<template v-slot:body-cell-actions="props" v-if="admin">
 				<q-td :props="props">
-					<q-btn icon="undo" flat round color="negative" @click="undoCompleted(props.row.id)">
+					<q-btn icon="undo" flat round color="negative" @click="undoCompleted(props.row.id)" v-if="admin">
 						<q-tooltip>Undo Completed</q-tooltip>
 					</q-btn>
 				</q-td>
+			</template>
+
+			<template v-slot:item="props">
+				<div class="q-pa-sm col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+					<q-card>
+						<q-card-section class="q-pa-none">
+							<q-list dense>
+	              <q-item v-for="col in props.cols.filter(col => col.name !== 'actions')" :key="col.name">
+	                <q-item-section>
+	                  <q-item-label caption>{{ col.label }}</q-item-label>
+	                </q-item-section>
+	                <q-item-section side>
+	                  <q-item-label class="text-weight-bold text-black">{{ col.value }}</q-item-label>
+	                </q-item-section>
+	              </q-item>
+	            </q-list>
+						</q-card-section>
+						<q-card-actions align="right">
+							<q-btn icon="undo" flat round color="negative" @click="undoCompleted(props.row.id)" v-if="admin">
+								<q-tooltip>Undo Completed</q-tooltip>
+							</q-btn>
+						</q-card-actions>
+					</q-card>
+				</div>
 			</template>
 		</q-table>
 	</q-page>
@@ -37,6 +61,9 @@
 		data() {
 			return {
 				filter: '',
+				pagination: {
+					rowsPerPage: 10
+				},
 				columns: [
 					{
 						name: 'dateAssigned',

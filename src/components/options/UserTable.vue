@@ -1,49 +1,99 @@
 <template>
-	<q-table title="Users" :data="users" :columns="columns" :filter="filter" wrap-cells>
-		<template v-slot:top-right>
-			<q-input v-model="filter" class="q-mr-sm" placeholder="Search" borderless>
-				<template v-slot:append>
-					<q-icon name="search" />
-				</template>
-			</q-input>
-      <q-btn
-        color="primary"
-        icon-right="archive"
-        label="Export"
-        no-caps
-        @click="exportTable"
-      />
-    </template>
-    <template v-slot:body-cell-avatar="props">
-    	<q-td :props="props">
-    		<q-avatar>
-    			<q-img :src="props.row.photoURL"/>
-    		</q-avatar>
-    	</q-td>
-    </template>
-    <template v-slot:body-cell-actions="props">
-    	<q-td :props="props">
-    		<q-btn 
-    			:icon="props.row.linked ? 'link_off' : 'link'" 
-    			flat 
-    			round 
-    			dense 
-    			:color="props.row.linked ? 'negative' : 'primary'" 
-    			@click="linkStaff(props.row)"
-    			:disabled="props.row.linked"></q-btn>
-    		<q-btn 
-    			icon="stars"
-    			flat
-    			round
-    			dense
-    			:color="props.row.admin ? 'amber' : 'grey'"
-    			@click="promoteToAdmin(props.row.id)"
-    			:disabled="props.row.admin">
-    			<q-tooltip v-if="!props.row.admin">Promote to admin</q-tooltip>		
-    		</q-btn>
-    	</q-td>
-    </template>
-	</q-table>
+	<div>
+		<div class="row justify-end">
+			<q-btn
+	      color="primary"
+	      icon-right="archive"
+	      label="Export"
+	      no-caps
+	      @click="exportTable"
+	    />
+    </div>
+    <div class="row q-mt-md">
+	    <q-table title="Users" :data="users" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" class="col" :pagination="pagination">
+				<template v-slot:top-right>
+					<q-input v-model="filter" class="q-mr-sm" placeholder="Search" borderless>
+						<template v-slot:append>
+							<q-icon name="search" />
+						</template>
+					</q-input>
+		    </template>
+		    <template v-slot:body-cell-avatar="props">
+		    	<q-td :props="props">
+		    		<q-avatar>
+		    			<q-img :src="props.row.photoURL"/>
+		    		</q-avatar>
+		    	</q-td>
+		    </template>
+		    <template v-slot:body-cell-actions="props">
+		    	<q-td :props="props">
+		    		<q-btn 
+		    			:icon="props.row.linked ? 'link_off' : 'link'" 
+		    			flat 
+		    			round 
+		    			dense 
+		    			:color="props.row.linked ? 'negative' : 'primary'" 
+		    			@click="linkStaff(props.row)"
+		    			:disabled="props.row.linked"></q-btn>
+		    		<q-btn 
+		    			icon="stars"
+		    			flat
+		    			round
+		    			dense
+		    			:color="props.row.admin ? 'amber' : 'grey'"
+		    			@click="promoteToAdmin(props.row.id)"
+		    			:disabled="props.row.admin">
+		    			<q-tooltip v-if="!props.row.admin">Promote to admin</q-tooltip>		
+		    		</q-btn>
+		    	</q-td>
+		    </template>
+
+		    <template v-slot:item="props">
+		    	<div class="q-pa-sm col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+						<q-card>
+							<q-card-section class="q-pa-none">
+								<q-item>
+									<q-item-section avatar>
+										<q-avatar>
+											<q-img :src="props.row.photoURL" />
+										</q-avatar>
+									</q-item-section>
+									<q-item-section>
+										<q-item-label>{{props.row.displayName}}</q-item-label>
+										<q-item-label caption>{{props.row.email}}</q-item-label>
+										<q-item-label>Linked to <strong>{{getStaffName(props.row.staffId)}}</strong></q-item-label>
+									</q-item-section>
+									<q-item-section side v-if="admin">
+										<div class="column">
+											<q-btn 
+							    			:icon="props.row.linked ? 'link_off' : 'link'" 
+							    			flat 
+							    			round 
+							    			dense 
+							    			:color="props.row.linked ? 'negative' : 'primary'" 
+							    			@click="linkStaff(props.row)"
+							    			:disabled="props.row.linked"></q-btn>
+							    		<q-btn 
+							    			icon="stars"
+							    			flat
+							    			round
+							    			dense
+							    			:color="props.row.admin ? 'amber' : 'grey'"
+							    			@click="promoteToAdmin(props.row.id)"
+							    			:disabled="props.row.admin">
+							    			<q-tooltip v-if="!props.row.admin">Promote to admin</q-tooltip>
+							    		</q-btn>
+										</div>
+									</q-item-section>
+								</q-item>
+							</q-card-section>
+						</q-card>
+					</div>
+		    </template>
+			</q-table>
+		</div>
+	</div>
+	
 </template>
 
 <script>
@@ -87,10 +137,16 @@
 					})
 				})
 				return array
+			},
+			admin() {
+				return this.$store.getters['auth/admin']
 			}
 		},
 		data() {
 			return {
+				pagination: {
+					rowsPerPage: 10
+				},
 				filter: '',
 				columns: [
 					{
@@ -142,7 +198,7 @@
 				if (assocStaff.length > 0) {
 					return assocStaff[0].label
 				} else {
-					return ''
+					return 'None'
 				}
 			},
 	    exportTable () {
