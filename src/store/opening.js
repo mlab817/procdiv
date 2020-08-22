@@ -11,42 +11,49 @@ const state = () => {
 
 const actions = {
 	fbReadData: ({ commit, rootGetters }) => {
+		const admin = rootGetters['auth/admin']
+		const staffId = rootGetters['auth/staffId']
+
 		let docs
 
-		if (rootGetters['auth/admin']) {
-			docs = firebaseFs.collection('openings')
-		} 
-		else {
-			docs = firebaseFs.collection('openings').where('assignedId','==',rootGetters['auth/staffId'])
-		}
+		if (!admin && !staffId) {
+			return 
+		} else {
+			if (admin) {
+				docs = firebaseFs.collection('openings')
+			} 
+			else {
+				docs = firebaseFs.collection('openings').where('assignedId','==',staffId)
+			}
 
-		docs.onSnapshot(querySnaphot => {
-			querySnaphot.docChanges().forEach(change => {
-				if (change.type === 'added') {
-					const payload = {
-						id: change.doc.id,
-						data: change.doc.data()
+			docs.onSnapshot(querySnaphot => {
+				querySnaphot.docChanges().forEach(change => {
+					if (change.type === 'added') {
+						const payload = {
+							id: change.doc.id,
+							data: change.doc.data()
+						}
+
+						commit('ADD_OPENING', payload)
 					}
 
-					commit('ADD_OPENING', payload)
-				}
+					if (change.type === 'modified') {
+						const payload = {
+							id: change.doc.id,
+							data: change.doc.data()
+						}
 
-				if (change.type === 'modified') {
-					const payload = {
-						id: change.doc.id,
-						data: change.doc.data()
+						commit('UPDATE_OPENING', payload)
 					}
 
-					commit('UPDATE_OPENING', payload)
-				}
+					if (change.type === 'removed') {
+						const id = change.doc.id
 
-				if (change.type === 'removed') {
-					const id = change.doc.id
-
-					commit('DELETE_OPENING', id)
-				}
+						commit('DELETE_OPENING', id)
+					}
+				})
 			})
-		})
+		}
 	},
 	add: ({ dispatch }, payload) => {
 		console.log('add opening: ', payload)

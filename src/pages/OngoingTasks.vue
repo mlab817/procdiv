@@ -2,7 +2,7 @@
 	<q-page padding>
 		<div class="row justify-end q-mb-md">
 			<q-btn icon="archive" class="q-ml-sm" label="Download" color="green" @click="exportTable" />
-			<q-btn icon="add_task" class="q-ml-sm" label="Add Task" color="primary" @click="addTask" />
+			<q-btn icon="add_task" class="q-ml-sm" label="Add Task" color="primary" @click="addTask" v-if="admin" />
 		</div>
 
 		<!-- :grid="$q.screen.lt.sm" -->
@@ -28,7 +28,7 @@
 				</q-td>
 			</template>
 
-			<template v-slot:body-cell-actions="props">
+			<template v-slot:body-cell-actions="props" v-if="admin">
 				<q-td :props="props">
 					<div>
 						<q-btn icon="check" flat round dense color="positive" @click="completeTask(props.row)">
@@ -187,6 +187,9 @@
 		computed: {
 			tasks() {
 				return this.$store.getters['task/ongoing']
+			},
+			admin() {
+				return this.$store.getters['auth/admin']
 			}
 		},
 		data() {
@@ -312,7 +315,8 @@
 				// mark as completed
 				this.$q.dialog({
 					title: 'Complete Task',
-					message: 'Mark task as completed?',
+					message: 'Mark task as completed? If the task has a set RFQ deadline, it will be added to <strong>For Opening.</strong>',
+					html: true,
 					cancel: true,
 					persistent: true
 				})
@@ -334,9 +338,6 @@
 					cancel: true
 				})
 				.onOk(() => this.$store.dispatch('task/deleteTask', row.id))
-			},
-			notifyUser(row) {
-				// send notification to user by creating a notification
 			},
 			overdue(dateDue) {
 				const now = new Date()

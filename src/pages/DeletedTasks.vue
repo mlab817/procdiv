@@ -9,7 +9,7 @@
 				</q-input>
 			</template>
 
-			<template v-slot:body-cell-actions="props">
+			<template v-slot:body-cell-actions="props" v-if="admin">
 				<q-td :props="props">
 					<q-btn icon="restore" flat round color="positive" @click="restoreTask(props.row.id)"/>
 				</q-td>
@@ -27,6 +27,9 @@
 		computed: {
 			tasks() {
 				return this.$store.getters['task/deleted']
+			},
+			admin() {
+				return this.$store.getters['auth/admin']
 			}
 		},
 		data() {

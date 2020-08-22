@@ -38,42 +38,44 @@ export function fbReadData({ commit, rootGetters }) {
 	// const docs = firebaseFs.collection('staff').doc(rootGetters['auth/staffId']).collection('notifications')
 	const docs = rootGetters['auth/notificationPath']
 
-	docs
-		.where('read','==',false)
-		.onSnapshot(querySnapshot => {
-		querySnapshot
-			.docChanges()
-			.forEach(change => {
+	if (docs) {
+		docs
+			.where('read','==',false)
+			.onSnapshot(querySnapshot => {
+			querySnapshot
+				.docChanges()
+				.forEach(change => {
 
-				if (change.type === 'added') {
-					// console.log('firestore added', change.doc.data())
-					const payload = {
-						id: change.doc.id,
-						data: change.doc.data()
+					if (change.type === 'added') {
+						// console.log('firestore added', change.doc.data())
+						const payload = {
+							id: change.doc.id,
+							data: change.doc.data()
+						}
+
+						commit('ADD_NOTIFICATION', payload)
 					}
 
-					commit('ADD_NOTIFICATION', payload)
-				}
+					if (change.type === 'modified') {
+						// console.log('firestore modified', change.doc.data())
+						const payload = {
+							id: change.doc.id,
+							data: change.doc.data()
+						}
 
-				if (change.type === 'modified') {
-					// console.log('firestore modified', change.doc.data())
-					const payload = {
-						id: change.doc.id,
-						data: change.doc.data()
+						commit('UPDATE_NOTIFICATION', payload)
 					}
 
-					commit('UPDATE_NOTIFICATION', payload)
-				}
+					if (change.type === 'removed') {
+						// console.log('firestore removed', change.doc.data())
+						const id = change.doc.id
 
-				if (change.type === 'removed') {
-					// console.log('firestore removed', change.doc.data())
-					const id = change.doc.id
-
-					commit('DELETE_NOTIFICATION', id)
-				}
-				
-			})
-	})
+						commit('DELETE_NOTIFICATION', id)
+					}
+					
+				})
+		})
+	}
 }
 
 export function markAsRead({dispatch}, key) {

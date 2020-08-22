@@ -9,7 +9,7 @@
 				</q-input>
 			</template>
 			
-			<template v-slot:body-cell-actions="props">
+			<template v-slot:body-cell-actions="props" v-if="admin">
 				<q-td :props="props">
 					<q-btn icon="undo" flat round color="negative" @click="undoCompleted(props.row.id)">
 						<q-tooltip>Undo Completed</q-tooltip>
@@ -29,6 +29,9 @@
 		computed: {
 			tasks() {
 				return this.$store.getters['task/completed']
+			},
+			admin() {
+				return this.$store.getters['auth/admin']
 			}
 		},
 		data() {

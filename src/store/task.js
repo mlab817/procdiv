@@ -12,46 +12,54 @@ const state = () => {
 const actions = {
 	fbReadData: ({ commit, rootGetters }) => {
 		// if user is admin, allow them to see all tasks, otherwise filter to staffId
-		let docs
+		const admin = rootGetters['auth/admin']
+		const staffId = rootGetters['auth/staffId']
 
-		if (rootGetters['auth/admin']) {
-			docs = firebaseFs.collection('tasks')
-		}
-		else {
-			docs = firebaseFs.collection('tasks').where('assignedId','==',rootGetters['auth/staffId'])
-		}
+		if (!admin && !staffId) {
+			return 
+		} else {
+			let docs
 
-		docs
-			.onSnapshot(querySnapshot => {
-				querySnapshot
-					.docChanges()
-					.forEach(change => {
-						const { type, doc } = change
+			if (admin) {
+				docs = firebaseFs.collection('tasks')
+			}
+			else {
+				docs = firebaseFs.collection('tasks').where('assignedId','==',staffId)
+			}
 
-						if (type === 'added') {
-							const payload = {
-								id: doc.id, 
-								data: doc.data()
+			docs
+				.onSnapshot(querySnapshot => {
+					querySnapshot
+						.docChanges()
+						.forEach(change => {
+							const { type, doc } = change
+
+							if (type === 'added') {
+								const payload = {
+									id: doc.id, 
+									data: doc.data()
+								}
+
+								commit('ADD_TASK', payload)
 							}
 
-							commit('ADD_TASK', payload)
-						}
+							if (type === 'modified') {
+								const payload = {
+									id: doc.id,
+									data: doc.data()
+								}
 
-						if (type === 'modified') {
-							const payload = {
-								id: doc.id,
-								data: doc.data()
+								commit('UPDATE_TASK', payload)
 							}
 
-							commit('UPDATE_TASK', payload)
-						}
+							if (type === 'removed') {
+								commit('DELETE_TASK', doc.id)
+							}
 
-						if (type === 'removed') {
-							commit('DELETE_TASK', doc.id)
-						}
-
-					})
-			})
+						})
+				})
+		}
+			
 	},
 	addTask: ({ dispatch }, payload) => {
 		const taskToAdd = {
@@ -87,7 +95,7 @@ const actions = {
 					createdAt: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
 				}
 				dispatch('notifyUser', notification)
-				dispatch('copyToTask', docRef)
+				showSuccessMessage()
 			})
 			.catch(err => showErrorMessage(err.message))
 	},

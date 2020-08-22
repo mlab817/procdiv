@@ -44,5 +44,13 @@ export function notificationPath(state) {
 	if (user.staffId) {
 		return firebaseFs.collection('staff').doc(user.staffId).collection('notifications')
 	}
-	return firebaseFs.collection('notifications')
+	return null
+}
+
+export function linked(state) {
+	const user = state.user
+	if (user.linked) {
+		return true
+	}
+	return false
 }

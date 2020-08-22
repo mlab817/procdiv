@@ -1,5 +1,12 @@
 <template>
   <q-page padding>
+    <q-banner class="bg-grey-3" v-if="!linked">
+      <template v-slot:avatar>
+        <q-icon name="link_off" color="red" />
+      </template>
+      You are not connected to any record. You will not be able to view records in the application until then. Please wait or notify the admin.
+    </q-banner>
+
     <q-toolbar>
       <q-toolbar-title>
         Ongoing Assignments
@@ -58,6 +65,9 @@ export default {
   	}
   },
   computed: {
+    linked() {
+      return this.$store.getters['auth/linked']
+    },
   	groupedAssignments() {
   		const assignments = this.$store.getters['assignment/ongoing']
 

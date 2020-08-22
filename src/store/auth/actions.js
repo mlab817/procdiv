@@ -78,7 +78,7 @@ export function googleSignIn({dispatch}) {
 		})
 }
 
-export function handleAuthStateChanged({ commit, dispatch }) {
+export function handleAuthStateChanged({ commit, dispatch, getters }) {
 	firebaseAuth.onAuthStateChanged(async user => {
 		Loading.hide()
 		if (user) {
@@ -88,13 +88,16 @@ export function handleAuthStateChanged({ commit, dispatch }) {
 				LocalStorage.set('loggedIn', true)
 				this.$router.push('/').then(() => console.log('next')).catch(err => console.log(err.message))
 				// dispatch('assignment/fsReadData', null, { root: true })
-		  	dispatch('staff/fsReadData', null, { root: true })
-		  	dispatch('document/fsReadData', null, { root: true })
-		  	dispatch('enduser/fsReadData', null, { root: true })
-		  	dispatch('user/fbReadData', null, { root: true })
 		  	dispatch('notification/fbReadData', null, { root: true })
 		  	dispatch('task/fbReadData', null, { root: true })
 		  	dispatch('opening/fbReadData', null, { root: true })
+		  	if (getters['admin']) {
+		  		console.log('admin triggered')
+		  		dispatch('staff/fsReadData', null, { root: true })
+			  	dispatch('document/fsReadData', null, { root: true })
+			  	dispatch('enduser/fsReadData', null, { root: true })
+			  	dispatch('user/fbReadData', null, { root: true })
+		  	}
       })
 		} else {
 			commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })
