@@ -125,8 +125,8 @@
               <q-item-label>Settings</q-item-label>
             </q-item-section>
           </q-item> -->
-          <q-item class="text-center">
-            <q-btn outline icon="archive" label="Download Tasks" @click="downloadTasks" />
+          <q-item>
+            <download-task></download-task>
           </q-item>
         </q-list>
       </q-scroll-area>
@@ -157,8 +157,6 @@
 </template>
 
 <script>
-import { exportFile } from 'quasar'
-
 const linksData = [
   {
     title: 'Dashboard',
@@ -185,7 +183,8 @@ const linksData = [
 export default {
   name: 'MainLayout',
   components: {
-    'notifications-list': () => import('../components/layout/NotificationsList.vue')
+    'notifications-list': () => import('../components/layout/NotificationsList.vue'),
+    'download-task': () => import('../components/layout/DownloadTask.vue')
   },
   computed: {
     user() {
@@ -199,9 +198,6 @@ export default {
     },
     loggedIn() {
       return this.$store.getters['auth/loggedIn']
-    },
-    tasks() {
-      return this.$store.state.task.tasks
     }
   },
   data () {
@@ -223,27 +219,6 @@ export default {
     },
     logout() {
       this.$store.dispatch('auth/logout')
-    },
-    downloadTasks() {
-      const tasks = this.tasks
-      let arrayTask = []
-
-      Object.keys(tasks).forEach(key => {
-        const task = tasks[key]
-        arrayTask.push({
-          ...task,
-          id: key
-        })
-      })
-
-      console.log(arrayTask)
-      const status = exportFile('tasks.json', JSON.stringify(arrayTask))
-
-      if (status === true) {
-        // browser allowed
-      } else {
-        alert('Error' + status)
-      }
     }
   }
 }
