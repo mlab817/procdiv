@@ -7,6 +7,7 @@ import auth from './auth'
 import document from './document'
 import enduser from './enduser'
 import notification from './notification'
+import opening from './opening'
 import pras from './pras'
 import staff from './staff'
 import task from './task'
@@ -31,6 +32,7 @@ export default function (/* { ssrContext } */) {
       document,
       enduser,
       notification,
+      opening,
       pras,
       staff,
       task,

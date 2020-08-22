@@ -94,6 +94,7 @@ export function handleAuthStateChanged({ commit, dispatch }) {
 		  	dispatch('user/fbReadData', null, { root: true })
 		  	dispatch('notification/fbReadData', null, { root: true })
 		  	dispatch('task/fbReadData', null, { root: true })
+		  	dispatch('opening/fbReadData', null, { root: true })
       })
 		} else {
 			commit('assignment/CLEAR_ASSIGNMENTS', null, { root: true })

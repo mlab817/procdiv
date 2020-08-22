@@ -1,7 +1,7 @@
 <template>
 	<q-card style="width: 400px;">
-		<q-card-section class="row q-pa-sm">
-			<div class="text-h6 row justify-between">
+		<q-card-section class="row">
+			<div class="text-h6">
 				Add/Edit Task
 			</div>
 			<q-space/>
@@ -131,6 +131,7 @@
 	    </q-form>
 		</q-card-section>
 		<q-card-actions align="right">
+			<q-btn icon="help" flat round dense color="primary" @click="help = true"></q-btn>
 			<q-btn 
 				flat 
 				label="Delete" 
@@ -148,12 +149,19 @@
 				color="primary" 
 				@click="submitForm" />
 		</q-card-actions>
+
+		<q-dialog v-model="help">
+			<task-help />
+		</q-dialog>
 	</q-card>
 </template>
 
 <script>
 	export default {
 		name: 'AddEditTask',
+		components: {
+			'task-help': () => import('./tasks/TaskHelp.vue')
+		},
 		props: ['task'],
 		computed: {
 			documents() {
@@ -174,6 +182,7 @@
 		},
 		data() {
 			return {
+				help: false,
 				taskToSubmit: {},
 				required: [val => !!val || '* Required'],
 				addEnduserDialog: false,

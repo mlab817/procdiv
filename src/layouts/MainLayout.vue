@@ -18,7 +18,7 @@
 
         <q-space/>
 
-        <q-btn flat round icon="notifications" color="grey-9" @click="rightDrawerOpen = !rightDrawerOpen">
+        <q-btn flat round icon="notifications" color="grey-9" @click="rightDrawerOpen = !rightDrawerOpen" v-if="loggedIn">
           <q-badge color="red" floating>
             {{Object.keys(notifications).length}}
           </q-badge>
@@ -66,8 +66,8 @@
               <q-item-label>Dashboard</q-item-label>
             </q-item-section>
           </q-item>
-          <q-expansion-item label="Tasks" icon="folder" default-expand-all>
-            <q-item clickable tag="a" to="/ongoing" inset-level="1">
+          <q-expansion-item label="Tasks" icon="folder" default-expand-all :content-inset-level="1">
+            <q-item clickable tag="a" to="/ongoing">
               <q-item-section avatar>
                 <q-icon name="code"></q-icon>
               </q-item-section>
@@ -75,7 +75,7 @@
                 <q-item-label>Ongoing</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable tag="a" to="/completed" inset-level="1">
+            <q-item clickable tag="a" to="/completed">
               <q-item-section avatar>
                 <q-icon name="check"></q-icon>
               </q-item-section>
@@ -83,7 +83,7 @@
                 <q-item-label>Completed</q-item-label>
               </q-item-section>
             </q-item>
-            <q-item clickable tag="a" to="/trash" inset-level="1">
+            <q-item clickable tag="a" to="/trash">
               <q-item-section avatar>
                 <q-icon name="delete"></q-icon>
               </q-item-section>
@@ -91,8 +91,25 @@
                 <q-item-label>Trash</q-item-label>
               </q-item-section>
             </q-item>
+            <q-separator />
+            <q-item clickable tag="a" exact to="/for-opening">
+              <q-item-section avatar>
+                <q-icon name="drafts" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>For Opening</q-item-label>
+              </q-item-section>
+            </q-item>
           </q-expansion-item>
-          <q-item clickable tag="a" to="/options" exact>
+          <q-item clickable tag="a" to="/manage-users" exact v-if="admin">
+            <q-item-section avatar>
+              <q-icon name="supervisor_account" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Manage Users</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable tag="a" to="/options" exact v-if="admin">
             <q-item-section avatar>
               <q-icon name="unfold_more" />
             </q-item-section>
@@ -100,14 +117,14 @@
               <q-item-label>Manage Options</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable tag="a" to="/settings" exact>
+          <!-- <q-item clickable tag="a" to="/settings" exact>
             <q-item-section avatar>
               <q-icon name="settings" />
             </q-item-section>
             <q-item-section>
               <q-item-label>Settings</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -166,14 +183,17 @@ export default {
     'notifications-list': () => import('../components/layout/NotificationsList.vue')
   },
   computed: {
-    loggedIn() {
-      return this.$store.state.auth.loggedIn
-    },
     user() {
       return this.$store.state.auth.user
     },
     notifications() {
       return this.$store.state.notification.notifications
+    },
+    admin() {
+      return this.$store.getters['auth/admin']
+    },
+    loggedIn() {
+      return this.$store.getters['auth/loggedIn']
     }
   },
   data () {

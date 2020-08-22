@@ -1,13 +1,13 @@
 <template>
 	<q-page padding>
 		<div class="row justify-end q-mb-md">
-			<q-btn icon="archive" class="q-ml-sm" label="Download" color="green" />
+			<q-btn icon="archive" class="q-ml-sm" label="Download" color="green" @click="exportTable" />
 			<q-btn icon="add_task" class="q-ml-sm" label="Add Task" color="primary" @click="addTask" />
 		</div>
 
 		<!-- :grid="$q.screen.lt.sm" -->
 
-		<q-table title="Ongoing" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" row-key="id">
+		<q-table title="Ongoing" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" row-key="id" separator="cell" :pagination="pagination">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>
@@ -157,7 +157,27 @@
 
 <script>
 	import { parseDate } from 'src/functions'
-	import { date } from 'quasar'
+	import { date, exportFile } from 'quasar'
+
+	function wrapCsvValue (val, formatFn) {
+	  let formatted = formatFn !== void 0
+	    ? formatFn(val)
+	    : val
+
+	  formatted = formatted === void 0 || formatted === null
+	    ? ''
+	    : String(formatted)
+
+	  formatted = formatted.split('"').join('""')
+	  /**
+	   * Excel accepts \n and \r in strings, but some other CSV parsers do not
+	   * Uncomment the next two lines to escape new lines
+	   */
+	  // .split('\n').join('\\n')
+	  // .split('\r').join('\\r')
+
+	  return `"${formatted}"`
+	}
 
 	export default {
 		components: {
@@ -265,7 +285,10 @@
 						label: 'Actions',
 						align: 'center'
 					}
-				]
+				],
+				pagination: {
+					rowsPerPage: 10
+				}
 			}
 		},
 		methods: {
@@ -293,7 +316,7 @@
 					cancel: true,
 					persistent: true
 				})
-				.onOk(() => this.$store.dispatch('task/completeTask', row.id))
+				.onOk(() => this.$store.dispatch('task/completeTask', row))
 			},
 			editTask(row) {
 				this.task = row
@@ -332,7 +355,32 @@
 					cancel: true
 				})
 				.onOk(() => this.$store.dispatch('task/remindTask', row))
-			}
+			},
+			exportTable () {
+	      // naive encoding to csv format
+	      const content = [ this.columns.map(col => wrapCsvValue(col.label)) ].concat(
+	        this.tasks.map(row => this.columns.map(col => wrapCsvValue(
+	          typeof col.field === 'function'
+	            ? col.field(row)
+	            : row[col.field === void 0 ? col.name : col.field],
+	          col.format
+	        )).join(','))
+	      ).join('\r\n')
+
+	      const status = exportFile(
+	        'ongoing-tasks.csv',
+	        content,
+	        'text/csv'
+	      )
+
+	      if (status !== true) {
+	        this.$q.notify({
+	          message: 'Browser denied file download...',
+	          color: 'negative',
+	          icon: 'warning'
+	        })
+	      }
+	    }
 		},
 		filters: {
 			formatDate(val) {

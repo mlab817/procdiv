@@ -31,6 +31,16 @@
     			:color="props.row.linked ? 'negative' : 'primary'" 
     			@click="linkStaff(props.row)"
     			:disabled="props.row.linked"></q-btn>
+    		<q-btn 
+    			icon="stars"
+    			flat
+    			round
+    			dense
+    			:color="props.row.admin ? 'amber' : 'grey'"
+    			@click="promoteToAdmin(props.row.id)"
+    			:disabled="props.row.admin">
+    			<q-tooltip v-if="!props.row.admin">Promote to admin</q-tooltip>		
+    		</q-btn>
     	</q-td>
     </template>
 	</q-table>
@@ -187,6 +197,20 @@
 	    handleLink(payload) {
 	    	// handle link here
 	    	this.$store.dispatch('user/linkStaff', payload)
+	    },
+	    promoteToAdmin(id) {
+	    	this.$q.dialog({
+	    		title: 'Promote User',
+	    		message: 'Promote this user to admin? This will allow the user to manage tasks. Are you sure? Type <strong>Yes</strong> to confirm.',
+	    		cancel: true,
+	    		persistent: true,
+	    		html: true,
+	    		prompt: {
+	    			model: '',
+	    			type: 'text',
+	    			isValid: val => (val.toLowerCase() === 'yes')
+	    		}
+	    	}).onOk(() => this.$store.dispatch('user/promoteToAdmin', id))
 	    }
 	  }
 	}

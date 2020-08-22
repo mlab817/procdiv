@@ -11,8 +11,15 @@ const state = () => {
 
 const actions = {
 	fbReadData: ({ commit, rootGetters }) => {
-		// const docs = firebaseFs.collection('tasks')
-		const docs = firebaseFs.collection('tasks').where('assignedId','==',rootGetters['auth/staffId'])
+		// if user is admin, allow them to see all tasks, otherwise filter to staffId
+		let docs
+
+		if (rootGetters['auth/admin']) {
+			docs = firebaseFs.collection('tasks')
+		}
+		else {
+			docs = firebaseFs.collection('tasks').where('assignedId','==',rootGetters['auth/staffId'])
+		}
 
 		docs
 			.onSnapshot(querySnapshot => {
@@ -69,7 +76,6 @@ const actions = {
 		docRef.add(payload)
 			.then(docRef => {
 				// decide what data to send
-				console.log(firebaseAuth.currentUser.displayName)
 				const notification = {
 					from: firebaseAuth.currentUser.displayName,
 					to: payload.assignedTo.value,
@@ -117,8 +123,11 @@ const actions = {
 			.then(() => console.log('User notified'))
 			.catch(err => console.log(err.message))
 	},
-	completeTask: ({ dispatch }, id) => {
-		dispatch('fbCompleteTask', id)
+	completeTask: ({ dispatch }, payload) => {
+		dispatch('fbCompleteTask', payload.id)
+		if (!!payload.rfqDeadline) {
+			dispatch('opening/add', payload, { root: true })
+		}
 	},
 	fbCompleteTask: ({}, id) => {
 		const task = firebaseFs.collection('tasks').doc(id)
@@ -190,7 +199,7 @@ const getters = {
 
 		const filteredKeys = Object.keys(tasks).forEach(key => {
 			const task = tasks[key]
-			console.log(key, task.completed)
+			
 			if (!task.completed && task.status === 'ongoing' && !task.deleted) {
 				ongoingTasks.push({
 					...task,

@@ -50,6 +50,19 @@ const actions = {
 		})
 		.then(() => showSuccessMessage())
 		.catch(err => showErrorMessage(err.message))
+	},
+	promoteToAdmin: ({ dispatch }, id) => {
+		dispatch('fbPromoteToAdmin', id)
+	},
+	fbPromoteToAdmin: ({}, id) => {
+		const user = firebaseFs.collection('users').doc(id)
+
+		user.update({
+			admin: true,
+			role: 'admin'
+		})
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
 	}
 }
 

@@ -15,6 +15,7 @@ const routes = [
       { path: 'pr-pras', component: () => import('pages/PrPras.vue') },
       { path: 'trash', component: () => import('pages/DeletedTasks.vue') },
       { path: 'tasks/:id', component: () => import('pages/Task.vue') },
+      { path: 'manage-users', component: () => import('pages/ManageUsers.vue') },
       { path: 'settings', component: () => import('pages/Settings.vue') },
     ]
   },

@@ -1,11 +1,26 @@
 import { firebaseFs } from 'boot/firebase'
 
+export function loggedIn(state) {
+	if (state.loggedIn) {
+		return true
+	}
+	return false
+}
+
 export function role(state) {
 	const user = state.user
 	if (user.role) {
 		return user.role
 	}
 	return 'user'
+}
+
+export function admin(state) {
+	const user = state.user
+	if (user.admin) {
+		return true
+	}
+	return false
 }
 
 export function uid(state) {
