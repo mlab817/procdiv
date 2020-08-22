@@ -87,7 +87,7 @@ export function handleAuthStateChanged({ commit, dispatch, getters }) {
       	commit('SET_LOGGED_IN', true)
 				LocalStorage.set('loggedIn', true)
 				this.$router.push('/').then(() => console.log('next')).catch(err => console.log(err.message))
-				// dispatch('assignment/fsReadData', null, { root: true })
+				dispatch('assignment/fsReadData', null, { root: true })
 		  	dispatch('notification/fbReadData', null, { root: true })
 		  	dispatch('task/fbReadData', null, { root: true })
 		  	dispatch('opening/fbReadData', null, { root: true })

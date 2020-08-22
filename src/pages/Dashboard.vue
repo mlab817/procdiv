@@ -4,7 +4,7 @@
       <template v-slot:avatar>
         <q-icon name="link_off" color="red" />
       </template>
-      You are not connected to any record. You will not be able to view records in the application until then. Please wait or notify the admin.
+      You are not connected to any staff. You will not be able to view records in the application until then. Please wait or notify the admin.
     </q-banner>
 
     <q-toolbar>

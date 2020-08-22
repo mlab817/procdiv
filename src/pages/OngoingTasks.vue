@@ -47,13 +47,12 @@
 				</q-td>
 			</template>
 
-			<template v-slot:no-data="{ icon, message, filter }">
-        <div class="full-width row flex-center text-negative q-gutter-sm">
-          <q-icon size="2em" name="sentiment_dissatisfied" />
+			<template v-slot:no-data="{ filter }">
+        <div class="full-width row flex-center q-gutter-sm" :class="filter ? 'text-negative' : 'text-positive'">
           <span>
-            Well this is sad... {{ message }}
+            {{ filter ? `No data found for ${filter}` : 'Hooray! You don\'t have a pending task...' }}
           </span>
-          <q-icon size="2em" :name="filter ? 'filter_b_and_w' : icon" />
+          <q-icon size="2em" :name="filter ? 'sentiment_dissatisfied' : 'sentiment_satisfied_alt'" />
         </div>
       </template>
 
@@ -150,7 +149,9 @@
 		</q-table>
 
 		<q-dialog v-model="addTaskDialog" persistent>
-			<add-edit-task :task="task" @close="addTaskDialog = false"></add-edit-task>
+			<div style="width: 400px; max-width: 80wh;">
+				<add-edit-task :task="task" @close="addTaskDialog = false" :cancel="true"></add-edit-task>
+			</div>
 		</q-dialog>
 
 	</q-page>

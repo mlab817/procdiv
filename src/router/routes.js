@@ -5,10 +5,11 @@ const routes = [
     component: () => import('layouts/MainLayout.vue'),
     children: [
       { path: '', component: () => import('pages/Dashboard.vue') },
+      { path: 'add-task', component: () => import('pages/AddTask.vue') },
+      { path: 'assignments', component: () => import('pages/Ongoing.vue') },
       { path: 'auth', component: () => import('pages/Auth.vue') },
       { path: 'for-opening', component: () => import('pages/ForOpening.vue') },
-      { path: 'ongoing', component: () => import('pages/OngoingTasks.vue') },
-      { path: 'ongoing-v2', component: () => import('pages/Ongoingv2.vue') },
+      { path: 'ongoing', component: () => import('pages/OngoingTasks.vue') },      
       { path: 'completed', component: () => import('pages/CompletedTasks.vue') },
       { path: 'deleted', component: () => import('pages/Deleted.vue') },
       { path: 'options', component: () => import('pages/Options.vue') },

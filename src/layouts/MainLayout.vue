@@ -38,6 +38,7 @@
       bordered
       content-class="bg-primary"
       v-if="loggedIn"
+      show-if-above
     >
       
       <q-img class="absolute-top" style="height: 200px" src="https://cdn.quasar.dev/img/material.png">
@@ -66,7 +67,23 @@
               <q-item-label>Dashboard</q-item-label>
             </q-item-section>
           </q-item>
-          <q-expansion-item label="Tasks" icon="folder" default-expand-all :content-inset-level="1">
+          <q-item clickable tag="a" exact to="/assignments" v-if="Object.keys(ongoing).length">
+            <q-item-section avatar>
+              <q-icon name="priority_high"></q-icon>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Assignments<q-badge floating color="negative">deprecated</q-badge></q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item clickable tag="a" exact to="/add-task">
+            <q-item-section avatar>
+              <q-icon name="add_task"></q-icon>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>Add Task</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-expansion-item label="Tasks" icon="folder" :default-expand-all="$q.screen.gt.sm" :content-inset-level="1">
             <q-item clickable tag="a" to="/ongoing">
               <q-item-section avatar>
                 <q-icon name="code"></q-icon>
@@ -91,7 +108,7 @@
                 <q-item-label>Trash</q-item-label>
               </q-item-section>
             </q-item>
-            <q-separator />
+            <q-separator color="grey-3" />
             <q-item clickable tag="a" exact to="/for-opening">
               <q-item-section avatar>
                 <q-icon name="drafts" />
@@ -198,6 +215,9 @@ export default {
     },
     loggedIn() {
       return this.$store.getters['auth/loggedIn']
+    },
+    ongoing() {
+      return this.$store.getters['assignment/ongoing']
     }
   },
   data () {

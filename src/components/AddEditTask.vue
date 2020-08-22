@@ -1,11 +1,9 @@
 <template>
-	<q-card style="width: 400px; max-width: 80wh;">
+	<q-card>
 		<q-card-section class="row">
 			<div class="text-h6">
 				Add/Edit Task
 			</div>
-			<q-space/>
-			<q-btn icon="close" flat round dense v-close-popup />
 		</q-card-section>
 		<q-card-section>
 			<q-form ref="myForm" greedy class="q-gutter-sm">
@@ -168,8 +166,8 @@
           </q-form>
         </q-card-section>
         <q-card-actions align="right">
-          <q-btn flat label="Cancel" color="primary" v-close-popup></q-btn>
-          <q-btn flat label="OK" color="primary" :disabled="!newEnduser.label || !newEnduser.value" @click="addEnduser"></q-btn>
+          <q-btn flat label="Cancel" color="primary" v-close-popup v-if="cancel"></q-btn>
+          <q-btn flat label="Submit" color="primary" :disabled="!newEnduser.label || !newEnduser.value" @click="addEnduser"></q-btn>
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -182,7 +180,7 @@
 		components: {
 			'task-help': () => import('./tasks/TaskHelp.vue')
 		},
-		props: ['task'],
+		props: ['task','cancel'],
 		computed: {
 			documents() {
 				return this.$store.getters['document/options']

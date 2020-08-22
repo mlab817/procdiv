@@ -1,12 +1,23 @@
 <template>
   <q-page padding>
+    <q-banner class="bg-red-1 q-mb-md">
+      <template v-slot:avatar>
+        <q-icon name="warning" color="negative" />
+      </template>
+      <p class="text-weight-bold text-h6">Deprecation Notice </p>
+      <p><strong>Assignments</strong> have been replaced by <strong>Tasks</strong>. This feature will only be available until all assignments have been completed.</p>
+      <template v-slot:action>
+        <q-btn flat color="negative" label="Go to Tasks" to="/ongoing" />
+      </template>
+    </q-banner>
+
   	<div class="row q-my-sm" v-if="$q.screen.lt.md">
   		<search class="col" />
   	</div>
 
     <div class="row justify-between q-mb-sm">
     	<div class="row items-stretch">
-    		<q-btn class="q-mr-sm" icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment" v-if="role === 'admin'">
+    		<q-btn disabled class="q-mr-sm" icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment" v-if="role === 'admin'">
           <q-tooltip>Add new assignment</q-tooltip>  
         </q-btn>
         
