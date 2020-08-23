@@ -24,7 +24,8 @@ module.exports = function (/* ctx */) {
       'firebase',
       'gapi',
       'router-auth',
-      'charts'
+      'charts',
+      'zingchart'
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css

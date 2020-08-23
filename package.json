@@ -25,7 +25,8 @@
     "underscore": "^1.10.2",
     "vue-chartkick": "^0.6.1",
     "vue-gapi": "^0.3.1",
-    "vue-json-excel": "^0.2.98"
+    "vue-json-excel": "^0.2.98",
+    "zingchart-vue": "^2.0.1"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",

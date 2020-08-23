@@ -2,6 +2,7 @@ import Vue from 'vue'
 import { firebaseFs, firebaseAuth } from 'boot/firebase'
 import { showErrorMessage, showSuccessMessage } from 'src/functions'
 import { date } from 'quasar'
+import { parseDate } from 'src/functions'
 
 const state = () => {
 	return {
@@ -249,6 +250,24 @@ const getters = {
 		})
 
 		return deletedTasks
+	},
+	overdue: (state) => {
+		const tasks = state.tasks
+		let overdueTasks = {}
+
+		Object.keys(tasks).forEach(key => {
+			const task = tasks[key]
+			const dateDue = task.dateDue ? new Date(parseDate(task.dateDue)) : ''
+			const today = new Date()
+			
+			if (dateDue && today > dateDue && !task.completed) {
+				overdueTasks[key] = task
+			}
+		})
+
+		console.log(tasks)
+
+		return overdueTasks
 	}
 }
 

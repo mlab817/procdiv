@@ -32,7 +32,6 @@ export function fbAdd({}, payload) {
 }
 
 export function fbReadData({ commit, rootGetters }) {
-	console.log(rootGetters)
 	// only pick up unread notifications
 	// should also pick up only the id of the user
 	// const docs = firebaseFs.collection('staff').doc(rootGetters['auth/staffId']).collection('notifications')
