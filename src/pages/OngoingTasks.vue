@@ -7,7 +7,7 @@
 
 		<!-- :grid="$q.screen.lt.sm" -->
 
-		<q-table title="Ongoing" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" row-key="id" separator="cell" :pagination="pagination">
+		<q-table :title="`Ongoing (${tasks.length})`" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" row-key="id" separator="cell" :pagination="pagination">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>

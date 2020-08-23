@@ -10,7 +10,7 @@
 	    />
     </div>
     <div class="row q-mt-md">
-	    <q-table title="Users" :data="users" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" class="col" :pagination="pagination">
+	    <q-table :title="`Users (${users.length})`" :data="users" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" class="col" :pagination="pagination">
 				<template v-slot:top-right>
 					<q-input v-model="filter" class="q-mr-sm" placeholder="Search" borderless>
 						<template v-slot:append>

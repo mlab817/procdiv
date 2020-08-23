@@ -3,7 +3,7 @@
 		<div class="row justify-end q-mb-md">
 			<q-btn label="Add Document" color="primary" @click="addDocument" />
 		</div>
-		<q-table title="Documents" :data="documents" :filter="filter" :columns="columns" :grid="$q.screen.lt.sm">
+		<q-table :title="`Documents (${documents.length})`" :data="documents" :filter="filter" :columns="columns" :grid="$q.screen.lt.sm">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search" class="q-mr-sm">
 					<template v-slot:append>

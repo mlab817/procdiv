@@ -1,6 +1,6 @@
 <template>
 	<q-page padding>
-		<q-table title="For Opening" flat bordered :data="openings" :columns="columns" row-key="id" separator="cell" :filter="filter" :grid="$q.screen.lt.sm">
+		<q-table :title="`For Opening (${openings.length})`" flat bordered :data="openings" :columns="columns" row-key="id" separator="cell" :filter="filter" :grid="$q.screen.lt.sm">
 			<template v-slot:top-right>
 				<q-input v-model="filter" borderless placeholder="Search">
 					<template v-slot:append>

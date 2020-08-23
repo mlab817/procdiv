@@ -18,6 +18,9 @@
 
         <q-space/>
 
+        <q-btn flat round icon="add_task" v-if="loggedIn" to="/add-task">
+          <q-tooltip>Add Task</q-tooltip>
+        </q-btn>
         <q-btn flat round icon="notifications" color="grey-9" @click="rightDrawerOpen = !rightDrawerOpen" v-if="loggedIn">
           <q-badge color="red" floating>
             {{Object.keys(notifications).length}}

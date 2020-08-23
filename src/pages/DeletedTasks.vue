@@ -1,6 +1,6 @@
 <template>
 	<q-page padding>
-		<q-table title="Trash" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" separator="cell">
+		<q-table :title="`Trash (${tasks.length})`" :data="tasks" :columns="columns" :filter="filter" wrap-cells :grid="$q.screen.lt.sm" separator="cell">
 			<template v-slot:top-right>
 				<q-input placeholder="Search" borderless v-model="filter">
 					<template v-slot:append>

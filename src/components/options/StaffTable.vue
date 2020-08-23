@@ -3,7 +3,7 @@
 		<div class="row justify-end q-mb-md">
 			<q-btn color="primary" label="Add Staff" @click="addStaff"></q-btn>
 		</div>
-		<q-table title="Staff" :data="staff" :columns="columns" :pagination="pagination" :grid="$q.screen.lt.sm" :filter="filter">
+		<q-table :title="`Staff (${staff.length})`" :data="staff" :columns="columns" :pagination="pagination" :grid="$q.screen.lt.sm" :filter="filter">
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>
@@ -105,7 +105,7 @@
 					}
 				],
 				pagination: {
-					rowsPerPage: 0
+					rowsPerPage: 5
 				}
 			}
 		},

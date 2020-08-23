@@ -3,7 +3,7 @@
 		<div class="row justify-end q-mb-md">
 			<q-btn label="Add Enduser" @click="addEnduser" color="primary" />
 		</div>
-		<q-table title="Endusers" :data="endusers" :filter="filterEnduser" :columns="columnsEndusers" row-key="id" :grid="$q.screen.lt.sm">
+		<q-table :title="`Endusers (${endusers.length})`" :data="endusers" :filter="filterEnduser" :columns="columnsEndusers" row-key="id" :grid="$q.screen.lt.sm">
 			<template v-slot:top-right>
         <q-input borderless dense debounce="300" v-model="filterEnduser" placeholder="Search">
           	<template v-slot:append>
@@ -124,7 +124,8 @@ export default {
 				},
 				{
 					name: 'actions',
-					label: 'Actions'
+					label: 'Actions',
+					align: 'center'
 				}
 			]
 		}

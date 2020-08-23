@@ -5,9 +5,9 @@
 		</q-toolbar>
 
 		<q-tabs v-model="tab">
-			<q-tab name="documents" label="Documents"></q-tab>
-			<q-tab name="endusers" label="Enduser"></q-tab>
-			<q-tab name="staff" label="Staff"></q-tab>
+			<q-tab icon="file_copy" name="documents" label="Documents"></q-tab>
+			<q-tab icon="apartment" name="endusers" label="Enduser"></q-tab>
+			<q-tab icon="supervised_user_circle" name="staff" label="Staff"></q-tab>
 		</q-tabs>
 
 		<q-tab-panels v-model="tab" animated>
