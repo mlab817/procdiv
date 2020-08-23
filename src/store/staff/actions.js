@@ -78,60 +78,29 @@ export function fsReadData({ commit }) {
 	})
 }
 
-export function fbReadData({ commit }) {
-	const staff = firebaseDb.ref('staff')
-
-	// initial check for data
-	staff.once('value', snapshot => {
-		commit('SET_DOWNLOADED', true)
-	}, error => {
-		this.$router.replace('/auth')
-	})
-
-	// child added
-	staff.on('child_added', snapshot => {
-		const staff = snapshot.val()
-		staff.id = snapshot.key
-
-		const payload = {
-			id: snapshot.key,
-			staff: staff
-		}
-		commit('ADD_STAFF', payload)
-	})
-
-	// child changed
-	staff.on('child_changed', snapshot => {
-		console.log('child changed')
-		const staff = snapshot.val()
-		staff.id = snapshot.key
-
-		const payload = {
-			id: snapshot.key,
-			updates: staff
-		}
-		commit('UPDATE_STAFF', payload)
-	})
-
-	// child removed
-	staff.on('child_removed', snapshot => {
-		const staffId = snapshot.key
-		commit('DELETE_STAFF', staffId)
-	})
+export function deleteStaff({ dispatch }, id) {
+	dispatch('fbDelete', id)
 }
 
-export function linkUser({ dispatch }, payload) {
-	// payload: {
-	// 	id: ID
-	// 	user: User
-	// }
-	dispatch('fbLinkUser', payload)
-}
+export function fbDelete({}, id) {
+	const staff = firebaseFs.collection('staff').doc(id)
 
-export function fbLinkUser({}, payload) {
-	const doc = firebaseFs.collection('staff').doc(payload.id)
-
-	doc.update({ linked: true, ...payload.user})
+	staff.delete()
 		.then(() => showSuccessMessage())
 		.catch(err => showErrorMessage(err.message))
+}
+
+export function update({ dispatch }, payload) {
+	dispatch('fbUpdate', payload)
+}
+
+export function fbUpdate({}, payload) {
+	// payload { id, updates }
+	const staff = firebaseFs.collection('staff').doc(payload.id)
+
+	staff.update({
+		name: payload.updates
+	})
+	.then(() => showSuccessMessage())
+	.catch(err => showErrorMessage(err.message))
 }

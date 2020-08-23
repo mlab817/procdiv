@@ -9,6 +9,10 @@
 					<q-item-section>{{ task.dateAssigned | formatDate }}</q-item-section>
 				</q-item>
 				<q-item>
+					<q-item-section>Assigned To</q-item-section>
+					<q-item-section>{{ task.assignedTo ? task.assignedTo.label : '-' }}</q-item-section>
+				</q-item>
+				<q-item>
 					<q-item-section>Document</q-item-section>
 					<q-item-section>{{ task.document }}</q-item-section>
 				</q-item>

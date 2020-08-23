@@ -1,20 +1,47 @@
 <template>
-	<q-table :data="staff" :columns="columns">
-		<template v-slot:body-cell-actions="props">
-			<q-td :props="props">
-				<q-btn :icon="props.row.linked ? 'link_off' : 'link' " flat round dense :color="props.row.linked ? 'negative' : 'primary'" @click="linkUser(props.row)">
-					<q-tooltip>{{ props.row.linked ? 'Unlink' : 'Link' }}</q-tooltip>
-				</q-btn>
-			</q-td>
-		</template>
-		<template v-slot:body-cell-avatar="props">
-			<q-td :props="props">
-				<q-avatar>
-					<q-img :src="props.row.photoURL ? props.row.photoURL : ''" />
-				</q-avatar>
-			</q-td>
-		</template>
-	</q-table>
+	<div>
+		<div class="row justify-end q-mb-md">
+			<q-btn color="primary" label="Add Staff" @click="addStaff"></q-btn>
+		</div>
+		<q-table title="Staff" :data="staff" :columns="columns" :pagination="pagination" :grid="$q.screen.lt.sm" :filter="filter">
+			<template v-slot:top-right>
+				<q-input borderless v-model="filter" placeholder="Search">
+					<template v-slot:append>
+						<q-icon name="search" />
+					</template>
+				</q-input>
+			</template>
+			<template v-slot:body-cell-actions="props">
+				<q-td :props="props">
+					<q-btn icon="edit" flat round dense color="primary" @click="editItem(props.row)"></q-btn>
+					<q-btn icon="delete" flat round dense color="negative" @click="deleteItem(props.row)"></q-btn>
+				</q-td>
+			</template>
+
+			<template v-slot:item="props">
+				<div class="q-pa-sm col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+					<q-card>
+						<q-card-section class="q-pa-none">
+							<q-list dense>
+	              <q-item v-for="col in props.cols.filter(col => col.name !== 'actions')" :key="col.name">
+	                <q-item-section>
+	                  <q-item-label caption>{{ col.label }}</q-item-label>
+	                </q-item-section>
+	                <q-item-section side>
+	                  <q-item-label class="text-black">{{ col.value }}</q-item-label>
+	                </q-item-section>
+	              </q-item>
+	            </q-list>
+						</q-card-section>
+						<q-card-actions align="right" v-if="admin">
+							<q-btn icon="edit" flat round dense color="primary" @click="editItem(props.row)"></q-btn>
+							<q-btn icon="delete" flat round dense color="negative" @click="deleteItem(props.row)"></q-btn>
+						</q-card-actions>
+					</q-card>
+				</div>
+			</template>
+		</q-table>
+	</div>
 </template>
 
 <script>
@@ -48,84 +75,88 @@
 				})
 
 				return array
+			},
+			admin() {
+				return this.$store.getters['auth/admin']
 			}
 		},
 		data() {
 			return {
+				filter: '',
 				columns: [
 					{
-						name: 'uid',
-						label: 'UID',
-						field: 'uid'
-					},
-					{
-						name: 'displayName',
-						label: 'Display Name',
-						field: 'displayName'
+						name: 'id',
+						label: 'ID',
+						field: 'id',
+						align: 'left',
+						sortable: true
 					},
 					{
 						name: 'name',
 						label: 'Name',
-						field: 'name'
-					},
-					{
-						name: 'avatar',
-						label: 'Avatar',
-						field: 'photoURL'
-					},
-					{
-						name: 'email',
-						label: 'Email',
-						field: 'email'
+						field: 'name',
+						align: 'center',
+						sortable: true
 					},
 					{
 						name: 'actions',
-						label: 'Actions'
+						label: 'Actions',
+						align: 'center'
 					}
-				]
+				],
+				pagination: {
+					rowsPerPage: 0
+				}
 			}
 		},
 		methods: {
-			linkUser(staff) {
-				console.log(staff)
-				const users = this.users
-				const mappedUser = users.map(x => {
-					return {
-						value: x.id,
-						label: `${x.displayName} (${x.email})`
-					}
-				})
-
+			addStaff() {
 				this.$q.dialog({
-					title: 'Link User',
-					message: 'Link the staff to a user account',
+					title: 'Add Staff',
+					message: 'Enter name.',
 					cancel: true,
-					options: {
+					persistent: true,
+					prompt: {
 						model: '',
-						type: 'radio',
-						items: mappedUser,
+						type: 'text',
 						isValid: val => !!val
 					}
-				})
-				.onOk(data => {
-					// data here is key so i can get user from the array
-					const user = this.users.filter(user => user.id === data)
-					if (user.length) {
-						const { displayName, email, photoURL, role, uid } = user[0]
-						const payload = {
-							id: staff.id,
-							user: {
-								displayName: displayName, 
-								email: email, 
-								photoURL: photoURL, 
-								role: role, 
-								uid: uid
-							}
-						}
-						this.handleLink(payload)
-					} else {
-						console.error('No user')
+				}).onOk(data => this.$store.dispatch('staff/add', data))
+			},
+			deleteItem(staff) {
+				this.$q.dialog({
+					title: 'Delete Staff',
+					message: `Are you sure you want to delete <strong>${staff.name}?</strong> Type <strong>Yes</strong> to confirm.`,
+					cancel: true,
+					persistent: true,
+					html: true,
+					prompt: {
+						type: 'text',
+						model: '',
+						isValid: val => (val.toLowerCase() === 'yes')
 					}
+				}).onOk(() => this.$store.dispatch('staff/deleteStaff', staff.id))
+			},
+			editItem(row) {
+				const name = row.name
+				const id = row.id
+
+				this.$q.dialog({
+					title: 'Edit Staff',
+					persisten: true,
+					cancel: true,
+					prompt: {
+						model: name,
+						type: 'text',
+						isValid: val => !!val
+					}
+				}).onOk(data => {
+					console.log('>>>>> ', data)
+					const payload = {
+						id: id, 
+						updates: data
+					}
+					this.$store.dispatch('staff/update', payload)
 				})
 			},
 			handleLink(payload) {

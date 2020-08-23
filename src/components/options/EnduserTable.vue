@@ -1,26 +1,51 @@
 <template>
 	<div>
+		<div class="row justify-end q-mb-md">
+			<q-btn label="Add Enduser" @click="addEnduser" color="primary" />
+		</div>
 		<q-table title="Endusers" :data="endusers" :filter="filterEnduser" :columns="columnsEndusers" row-key="id" :grid="$q.screen.lt.sm">
 			<template v-slot:top-right>
-		        <q-input borderless dense debounce="300" v-model="filterEnduser" placeholder="Search">
-		          	<template v-slot:append>
-		            	<q-icon name="search" />
-		          	</template>
-		        </q-input>
-		        <q-btn color="primary" class="q-ml-md" label="Add row" @click="addEnduser" />
-		    </template>
-		    <template v-slot:body-cell-actions="props">
-		    	<q-td :props="props">
-		    		<div>
-				        <q-btn color="primary" round icon="edit" @click.stop="editEnduser(props.row)" dense flat />
-				        <q-btn color="negative" round icon="delete" @click.stop="deleteEnduser(props.row)" dense flat />
-				    </div>
-		    	</q-td>
-		    </template>
+        <q-input borderless dense debounce="300" v-model="filterEnduser" placeholder="Search">
+          	<template v-slot:append>
+            	<q-icon name="search" />
+          	</template>
+        </q-input>
+	    </template>
+	    <template v-slot:body-cell-actions="props">
+	    	<q-td :props="props">
+	    		<div>
+		        <q-btn color="primary" round icon="edit" @click.stop="editEnduser(props.row)" dense flat />
+		        <q-btn color="negative" round icon="delete" @click.stop="deleteEnduser(props.row)" dense flat />
+			    </div>
+	    	</q-td>
+	    </template>
+
+	    <template v-slot:item="props">
+	    	<div class="q-pa-sm col-xs-12 col-sm-6 col-md-4 col-lg-3 grid-style-transition">
+					<q-card>
+						<q-card-section class="q-pa-none">
+							<q-list dense>
+	              <q-item v-for="col in props.cols.filter(col => col.name !== 'actions')" :key="col.name">
+	                <q-item-section>
+	                  <q-item-label caption>{{ col.label }}</q-item-label>
+	                </q-item-section>
+	                <q-item-section side>
+	                  <q-item-label class="text-black">{{ col.value }}</q-item-label>
+	                </q-item-section>
+	              </q-item>
+	            </q-list>
+						</q-card-section>
+						<q-card-actions align="right" v-if="admin">
+							<q-btn color="primary" round icon="edit" @click.stop="editEnduser(props.row)" dense flat />
+		       	 	<q-btn color="negative" round icon="delete" @click.stop="deleteEnduser(props.row)" dense flat />
+						</q-card-actions>
+					</q-card>
+				</div>
+	    </template>
 		</q-table>
 
 		<q-dialog v-model="addEnduserDialog" persistent>
-	      <q-card style="min-width: 400px;">
+	      <q-card style="width: 400px; max-width: 80wh;">
 	        <q-card-section class="row justify-between">
 	          <div class="text-h6">Add Enduser</div>
 	          <q-space/>
@@ -59,6 +84,9 @@ export default {
 
 			return arrayEndusers
 		},
+		admin() {
+			return this.$store.getters['auth/admin']
+		}
 	},
 	data() {
 		return {

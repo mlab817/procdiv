@@ -77,16 +77,11 @@ const actions = {
 		dispatch('fbDelete', id)
 	},
 	fbDelete: ({}, id) => {
-		const ref = firebaseDb.ref('documents/' + payload.id)
+		const doc = firebaseFs.collection('documents').doc(id)
 
-		ref.remove(error => {
-			if (error) {
-				showErrorMessage()
-			}
-			else {
-				showSuccessMessage()
-			}
-		})
+		doc.delete()
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
 	},
 	fsReadData: ({ commit }) => {
 		const docs = firebaseFs.collection('documents')
