@@ -46,35 +46,6 @@
       </div>
     </div>
 
-    <!-- <q-toolbar>
-      <q-toolbar-title>
-        Ongoing Assignments
-      </q-toolbar-title>
-    </q-toolbar>
-
-    <div class="row q-col-gutter-md">
-      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-        <q-card square flat bordered>
-          <q-card-section>
-            <div class="text-h6">By Staff</div>
-          </q-card-section>
-          <q-card-section>
-            <pie-chart :data="groupedAssignments" legend="right" />
-          </q-card-section>
-        </q-card>
-      </div>
-      <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 col-xs-12">
-        <q-card square flat bordered>
-          <q-card-section>
-            <div class="text-h6">By Date Assigned</div>
-          </q-card-section>
-          <q-card-section>
-            <bar-chart :data="groupedByDate" />
-          </q-card-section> 
-        </q-card>
-      </div>
-    </div> -->
-
   </q-page>
 </template>
 
@@ -89,82 +60,8 @@ export default {
   // name: 'PageName',
   data() {
   	return {
-      filterDialog: true,
-      chartConfig: {
-        theme: 'classic',
-        backgroundColor: '#111',
-        graphset: [
-          {
-            type: 'null',
-            backgroundColor: 'none',
-            width: '100%',
-            height: '100%',
-            x: '0px',
-            y: '0px',
-            widgets: [
-              {
-                type: 'dashboard_datetime',
-                id: 'dash1',
-                backgroundColor1: '#55154D',
-                backgroundColor2: '#44043C',
-                title: 'NEW YORK',
-                width: '230px',
-                height: '230px',
-                x: '10px',
-                y: '13px',
-              },
-              {
-                type: 'dashboard_metric',
-                id: 'dash2',
-                value: 813.74,
-                backgroundColor1: '#67001F',
-                backgroundColor2: '#56000E',
-                percent: +11.52,
-                title: 'VIRAL COEFFICIENT',
-                width: '230px',
-                height: '230px',
-                x: '248px',
-                y: '13px',
-              },
-              {
-                type: 'dashboard_accounts',
-                id: 'dash3',
-                width: '230px',
-                height: '230px',
-                x: '486px',
-                y: '13px',
-              },
-              {
-                type: 'dashboard_metric',
-                id: 'dash4',
-                value: 83.18,
-                backgroundColor1: '#014358',
-                backgroundColor2: '#003247',
-                percent: -21.27,
-                title: 'RETENTION RATE (30 DAYS)',
-                width: '230px',
-                height: '230px',
-                x: '10px',
-                y: '255px',
-              },
-              {
-                type: 'dashboard_metric',
-                id: 'dash5',
-                value: '487.32',
-                backgroundColor1: '#264031',
-                backgroundColor2: '#22392b',
-                percent: 4.37,
-                title: 'AVG TIME ON SITE',
-                width: '468px',
-                height: '230px',
-                x: '248px',
-                y: '255px',
-              }
-            ]
-          }
-        ]
-      }
-  	}
+      filterDialog: true
+    }
   },
   computed: {
     linked() {

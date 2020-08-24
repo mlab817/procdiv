@@ -265,8 +265,6 @@ const getters = {
 			}
 		})
 
-		console.log(tasks)
-
 		return overdueTasks
 	}
 }
