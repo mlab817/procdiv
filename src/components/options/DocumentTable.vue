@@ -75,8 +75,13 @@
 
 				Object.keys(documents).forEach(key => {
 					const doc = documents[key]
-					array.push(doc)
+					array.push({
+						...doc,
+						id: key
+					})
 				})
+
+				console.log(array)
 
 				return array
 			},

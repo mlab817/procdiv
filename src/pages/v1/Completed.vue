@@ -82,8 +82,8 @@ export default {
   name: 'PageCompleted',
 
   components: {
-  	'sort': () => import('../components/shared/Sort.vue'),
-  	'search': () => import('../components/shared/Search.vue'),
+  	'sort': () => import('../../components/shared/Sort.vue'),
+  	'search': () => import('../../components/shared/Search.vue'),
   },
 
   computed: {

@@ -21,7 +21,7 @@
     "dotenv": "^8.2.0",
     "firebase": "^7.17.2",
     "google-api-javascript-client": "google/google-api-javascript-client",
-    "quasar": "^1.0.0",
+    "quasar": "^1.13.1",
     "underscore": "^1.10.2",
     "vue-chartkick": "^0.6.1",
     "vue-gapi": "^0.3.1",
@@ -29,7 +29,7 @@
     "zingchart-vue": "^2.0.1"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.0",
+    "@quasar/app": "^2.0.8",
     "@quasar/quasar-app-extension-qenv": "^1.0.3",
     "babel-eslint": "^10.0.1",
     "cross-env": "^7.0.2",

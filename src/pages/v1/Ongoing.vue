@@ -252,9 +252,9 @@ export default {
   name: 'PageIndex',
 
   components: {
-  	'sort': () => import('../components/shared/Sort.vue'),
-  	'search': () => import('../components/shared/Search.vue'),
-    'filter-date': () => import('../components/shared/FilterDate.vue')
+  	'sort': () => import('../../components/shared/Sort.vue'),
+  	'search': () => import('../../components/shared/Search.vue'),
+    'filter-date': () => import('../../components/shared/FilterDate.vue')
   },
 
   computed: {
