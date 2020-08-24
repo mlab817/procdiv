@@ -36,14 +36,14 @@
 	        <template v-slot:prepend>
 	          <q-icon name="event" class="cursor-pointer">
 	            <q-popup-proxy transition-show="scale" transition-hide="scale">
-	              <q-date v-model="taskToSubmit.rfqDeadline" mask="YYYY-MM-DD hh:mm A" />
+	              <q-date v-model="taskToSubmit.rfqDeadline" mask="YYYY-MM-DD hh:mm A" today-btn />
 	            </q-popup-proxy>
 	          </q-icon>
 	        </template>
 	        <template v-slot:append>
 	          <q-icon name="access_time" class="cursor-pointer">
 	            <q-popup-proxy transition-show="scale" transition-hide="scale">
-	              <q-time v-model="taskToSubmit.rfqDeadline" mask="YYYY-MM-DD hh:mm A" format12h />
+	              <q-time v-model="taskToSubmit.rfqDeadline" mask="YYYY-MM-DD hh:mm A" format12h now-btn />
 	            </q-popup-proxy>
 	          </q-icon>
 	        </template>
@@ -117,14 +117,14 @@
 	        <template v-slot:prepend>
 	          <q-icon name="event" class="cursor-pointer">
 	            <q-popup-proxy transition-show="scale" transition-hide="scale">
-	              <q-date v-model="taskToSubmit.dateDue" mask="YYYY-MM-DD hh:mm A" />
+	              <q-date v-model="taskToSubmit.dateDue" mask="YYYY-MM-DD hh:mm A" today-btn />
 	            </q-popup-proxy>
 	          </q-icon>
 	        </template>
 	        <template v-slot:append>
 	          <q-icon name="access_time" class="cursor-pointer">
 	            <q-popup-proxy transition-show="scale" transition-hide="scale">
-	              <q-time v-model="taskToSubmit.dateDue" mask="YYYY-MM-DD hh:mm A" format12h />
+	              <q-time v-model="taskToSubmit.dateDue" mask="YYYY-MM-DD hh:mm A" format12h now-btn />
 	            </q-popup-proxy>
 	          </q-icon>
 	        </template>

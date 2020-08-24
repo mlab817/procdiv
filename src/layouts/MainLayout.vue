@@ -18,7 +18,7 @@
 
         <q-space/>
 
-        <q-btn flat round icon="add_task" v-if="loggedIn" to="/add-task">
+        <q-btn flat round icon="add_task" v-if="loggedIn && admin" to="/add-task">
           <q-tooltip>Add Task</q-tooltip>
         </q-btn>
         <q-btn flat round icon="notifications" color="grey-9" @click="rightDrawerOpen = !rightDrawerOpen" v-if="loggedIn">
@@ -78,7 +78,7 @@
               <q-item-label>Assignments<q-badge floating color="negative">deprecated</q-badge></q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable tag="a" exact to="/add-task">
+          <q-item clickable tag="a" exact to="/add-task" v-if="admin">
             <q-item-section avatar>
               <q-icon name="add_task"></q-icon>
             </q-item-section>
