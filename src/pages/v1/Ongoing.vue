@@ -295,7 +295,7 @@ export default {
 
       const newArr = arr.map(a => {
         return {
-          'Date Assigned': a.dateAssigned,
+          'Date Assigned': date.formatDate(parseDate(a.dateAssigned), 'MMM DD, YYYY hh:mm A'),
           'Document': a.document,
           'Particulars': a.particulars,
           'RFQ Deadline': a.rfqDeadline,
@@ -304,7 +304,8 @@ export default {
           'Action Taken': a.actionTaken,
           'Assigned To': a.assignedTo,
           'Remarks': a.remarks,
-          'Due Date/Time': a.dateDue ? a.dateDue.toString() : ''
+          'Due Date/Time': date.formatDate(parseDate(a.dateDue), 'MMM DD, YYYY hh:mm A'),
+          'Date Completed': date.formatDate(parseDate(a.dateCompleted), 'MMM DD, YYYY hh:mm A')
         }
       })
 

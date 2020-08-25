@@ -6,7 +6,10 @@
 
     <div class="row justify-end q-mb-md">
       <div class="row">
-      	<sort />
+        <download-excel :data="completedArray">
+          <q-btn icon="archive" label="Download" color="secondary" />
+        </download-excel>
+      	<sort class="q-ml-sm" />
       	<search class="q-ml-sm" v-if="$q.screen.gt.sm" />
       </div>
     </div>
@@ -54,7 +57,7 @@
                 <q-icon name="alarm" class="text-grey-8" v-if="assignment.dueTime"></q-icon>  
               </div>
             </td>
-            <td>{{assignment.dateCompleted}}</td>
+            <td>{{ assignment.dateCompleted | formattedDate }}</td>
             <td class="text-center items-center q-gutter-sm" v-if="role ==='admin'">
               <q-btn outlined dense icon="undo" color="negative" @click="undoCompleted(key)"></q-btn>
             </td>
@@ -76,6 +79,7 @@
 </template>
 
 <script>
+import { parseDate } from 'src/functions'
 import { date } from 'quasar'
 
 export default {
@@ -97,6 +101,36 @@ export default {
 
     searchField() {
      	return this.$store.state.assignment.search
+    },
+
+    completedArray() {
+      let arr = []
+
+      Object.keys(this.completed).forEach(key => {
+        const ass = this.completed[key]
+
+        arr.push(ass)
+      })
+
+      const completedArray = arr.map(a => {
+        console.log(typeof a.dateCompleted, a.dateCompleted)
+        return {
+          'Date Assigned': a.dateAssigned ? date.formatDate(parseDate(a.dateAssigned), 'MMM DD, YYYY hh:mm A') : '',
+          'Document': a.document,
+          'Particulars': a.particulars,
+          'RFQ Deadline': a.rfqDeadline,
+          'Enduser': a.enduser,
+          'Reference No.': a.referenceNo,
+          'Action Taken': a.actionTaken,
+          'Assigned To': a.assignedTo,
+          'Remarks': a.remarks,
+          'Due Date/Time': a.dateDue ? date.formatDate(parseDate(a.dateDue), 'MMM DD, YYYY hh:mm A') : '',
+          'Date Completed': typeof a.dateCompleted === 'number' ? date.formatDate(a.dateCompleted / 1000, 'MMM DD, YYYY hh:mm A') : date.formatDate(parseDate(a.dateCompleted), 'MMM DD, YYYY hh:mm A'),
+          'Status': a.status
+        }
+      })
+
+      return completedArray
     }
 
   },
@@ -115,8 +149,7 @@ export default {
         cancel: true
       })
       .onOk(() => this.$store.dispatch('assignment/undoMarkAsCompleted', id))
-    },
-
+    }
   },
 
   filters: {
@@ -145,7 +178,15 @@ export default {
         return formatTime
       }
       return ''
-    }
+    },
+
+    formattedDate(val) {
+      if (val) {
+        return (typeof val === 'number') ? date.formatDate(val, 'MMM DD, YYYY hh:mm A') : date.formatDate(parseDate(val), 'MMM DD, YYYY hh:mm A')
+      }
+      return ''
+      
+    } 
   }
 }
 </script>

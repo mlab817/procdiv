@@ -6,7 +6,9 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/Dashboard.vue') },
       { path: 'add-task', component: () => import('pages/AddTask.vue') },
-      { path: 'assignments', component: () => import('pages/v1/Ongoing.vue') },
+      { path: 'v1/ongoing', component: () => import('pages/v1/Ongoing.vue') },
+      { path: 'v1/completed', component: () => import('pages/v1/Completed.vue') },
+      { path: 'v1/deleted', component: () => import('pages/v1/Deleted.vue') },
       { path: 'auth', component: () => import('pages/Auth.vue') },
       { path: 'for-opening', component: () => import('pages/ForOpening.vue') },
       { path: 'ongoing', component: () => import('pages/OngoingTasks.vue') },      

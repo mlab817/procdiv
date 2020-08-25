@@ -70,14 +70,45 @@
               <q-item-label>Dashboard</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable tag="a" exact to="/assignments" v-if="Object.keys(ongoing).length">
-            <q-item-section avatar>
-              <q-icon name="priority_high"></q-icon>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>Assignments<q-badge floating color="negative">deprecated</q-badge></q-item-label>
-            </q-item-section>
-          </q-item>
+          <q-expansion-item clickable tag="a" icon="priority_high" label="Assignments" :default-expand-all="$q.screen.gt.sm" :content-inset-level="1">
+            <template v-slot:header>
+              <q-item-section avatar>
+                <q-icon name="apps" />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>
+                  Assignments <q-badge color="negative">deprecated</q-badge>
+                </q-item-label>
+              </q-item-section>
+              <q-item-section>
+                
+              </q-item-section>
+            </template>
+            <q-item clickable tag="a" exact to="/v1/ongoing">
+              <q-item-section avatar>
+                <q-icon name="code"></q-icon>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Ongoing</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable tag="a" exact to="/v1/completed">
+              <q-item-section avatar>
+                <q-icon name="check"></q-icon>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Completed</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-item clickable tag="a" exact to="/v1/deleted">
+              <q-item-section avatar>
+                <q-icon name="delete"></q-icon>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>Deleted</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-expansion-item>
           <q-item clickable tag="a" exact to="/add-task" v-if="admin">
             <q-item-section avatar>
               <q-icon name="add_task"></q-icon>
