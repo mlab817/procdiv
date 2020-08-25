@@ -4,7 +4,7 @@
 			<q-card-section>
 				<div class="text-h6">Notifications</div>
 			</q-card-section>
-			<q-card-section>
+			<q-card-section class="q-pa-none">
 				<q-item v-for="(notification, key) in notifications" :key="key" clickable @click="goTo(`/${notification.details}`)">
 					<q-item-section avatar>
 						<q-avatar class="bg-primary text-white">
@@ -12,8 +12,7 @@
 						</q-avatar>
 					</q-item-section>
 					<q-item-section>
-						<q-item-label>{{notification.subject}} - </q-item-label>
-						<q-item-label>{{notification.message}}</q-item-label>
+						<q-item-label><span class="text-weight-bolder">{{notification.subject}} - </span> {{notification.message}}</q-item-label>
 						<q-item-label caption>{{notification.createdAt | timeElapsed }}</q-item-label>
 					</q-item-section>
 					<q-item-section side top>
