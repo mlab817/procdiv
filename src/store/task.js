@@ -62,6 +62,7 @@ const actions = {
 		}
 			
 	},
+
 	addTask: ({ dispatch }, payload) => {
 		const taskToAdd = {
 			...payload,
@@ -74,6 +75,7 @@ const actions = {
 
 		dispatch('fbAddTask', taskToAdd)
 	},
+
 	fbAddTask: ({ dispatch, rootGetters }, payload) => {
 		const staffId = payload.assignedTo.value
 		// must write in 3 places:
@@ -93,19 +95,23 @@ const actions = {
 					details: docRef.path,
 					read: false,
 					readAt: null,
-					createdAt: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
+					createdAt: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A'),
+					deleted: false
 				}
 				dispatch('notifyUser', notification)
 				showSuccessMessage()
 			})
 			.catch(err => showErrorMessage(err.message))
 	},
+
 	copyToTask({}, payload) {
 
 	},
+
 	updateTask: ({ dispatch }, payload) => {
 		dispatch('fbUpdateTask', payload)
 	},
+
 	fbUpdateTask: ({}, payload) => {
 		const docs = firebaseFs.collection('tasks').doc(payload.id)
 
@@ -113,9 +119,11 @@ const actions = {
 			.then(() => showSuccessMessage())
 			.catch(err => showErrorMessage(err.message))
 	},
+
 	deleteTask: ({ dispatch }, id) => {
 		dispatch('fbDeleteTask', id)
 	},
+
 	fbDeleteTask: ({}, id) => {
 		const task = firebaseFs.collection('tasks').doc(id)
 
@@ -125,6 +133,7 @@ const actions = {
 		.then(() => showSuccessMessage())
 		.catch(err => showErrorMessage(err.message))
 	},
+
 	notifyUser: ({}, payload) => {
 		const doc = firebaseFs.collection('staff').doc(payload.to).collection('notifications')
 
@@ -132,12 +141,14 @@ const actions = {
 			.then(() => console.log('User notified'))
 			.catch(err => console.log(err.message))
 	},
+
 	completeTask: ({ dispatch }, payload) => {
 		dispatch('fbCompleteTask', payload.id)
 		if (!!payload.rfqDeadline) {
 			dispatch('opening/add', payload, { root: true })
 		}
 	},
+
 	fbCompleteTask: ({}, id) => {
 		const task = firebaseFs.collection('tasks').doc(id)
 
@@ -149,9 +160,11 @@ const actions = {
 		.then(() => showSuccessMessage())
 		.catch(err => showErrorMessage(err.message))
 	},
+
 	undoCompleted: ({ dispatch }, payload) => {
 		dispatch('fbUndoCompleted', payload)
 	},
+
 	fbUndoCompleted: ({}, payload) => {
 		const task = firebaseFs.collection('tasks').doc(payload.id)
 
@@ -164,6 +177,7 @@ const actions = {
 		.then(() => showSuccessMessage())
 		.catch(err => showErrorMessage(err.message))
 	},
+
 	remindTask: ({dispatch}, payload) => {
 		dispatch('updateTask', {
 			id: payload.id,
@@ -174,6 +188,7 @@ const actions = {
 		})
 		dispatch('fbRemindTask', payload)
 	},
+
 	fbRemindTask: ({ dispatch }, payload) => {
 		// notify user
 		const notification = {

@@ -37,7 +37,7 @@
 		name: 'NotificationsList',
 		computed: {
 			notifications() {
-				return this.$store.state.notification.notifications
+				return this.$store.getters['notification/unread']
 			}
 		},
 		data() {

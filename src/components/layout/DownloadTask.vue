@@ -1,6 +1,6 @@
 <template>
 	<q-item class="text-center">
-	  <q-btn outline icon="archive" label="Download" @click="downloadTasks" />
+	  <q-btn outline icon="archive" label="Download" to="/download-tasks" />
 	</q-item>
 </template>
 
@@ -48,6 +48,11 @@
 		},
 		data() {
 			return {
+				dateAssigned: {
+					from: '',
+					to: ''
+				},
+				downloadTasksDialog: false,
 				columns: [
 					{
 						name: 'id',

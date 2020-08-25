@@ -184,8 +184,10 @@
     </q-drawer>
 
     <q-drawer v-model="rightDrawerOpen" side="right" bordered overlay>
-      <div class="q-pa-sm">
+      <div class="row q-pa-sm">
         <div class="text-h6">Notifications</div>
+        <q-space/>
+        <q-btn flat to="/notifications" label="View All" color="primary"></q-btn>
       </div>
       <notifications-list></notifications-list>
     </q-drawer>
@@ -242,7 +244,7 @@ export default {
       return this.$store.state.auth.user
     },
     notifications() {
-      return this.$store.state.notification.notifications
+      return this.$store.getters['notification/unread']
     },
     admin() {
       return this.$store.getters['auth/admin']

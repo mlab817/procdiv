@@ -15,7 +15,8 @@ export function add({ dispatch }, payload) {
 		message: payload.message ? payload.message : '',
 		subject: payload.subject ? payload.subject : '',
 		relatedDoc: payload.relatedDoc ? payload.relatedDoc : '',
-		relatedId: payload.relatedId ? payload.relatedId : ''
+		relatedId: payload.relatedId ? payload.relatedId : '',
+		deleted: false
 	}
 
 	dispatch('fbAdd', notification)
@@ -39,7 +40,8 @@ export function fbReadData({ commit, rootGetters }) {
 
 	if (docs) {
 		docs
-			.where('read','==',false)
+			//.where('read','==',false)
+			// .where('deleted','==',false)
 			.onSnapshot(querySnapshot => {
 			querySnapshot
 				.docChanges()
@@ -92,4 +94,19 @@ export function fbMarkAsRead({ rootGetters }, id) {
 	})
 	.then(() => showSuccessMessage())
 	.catch(error => showErrorMessage(error.message))
+}
+
+export function deleteNotification({ dispatch }, id) {
+	dispatch('fbDelete', id)
+}
+
+export function fbDelete({ rootGetters }, id) {
+	const path = rootGetters['auth/notificationPath']
+	const doc = path.doc(id)
+
+	return doc.update({
+		deleted: true
+	})
+	.then(() => showSuccessMessage())
+	.catch(err => showErrorMessage(err.message))
 }
