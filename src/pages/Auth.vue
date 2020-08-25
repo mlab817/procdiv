@@ -142,19 +142,34 @@ export default {
     submitForm() {
       if (this.tab === 'login') {
         // trigger login
-        const payload = {
-          email: this.email,
-          password: this.password
-        }
-        this.$store.dispatch('auth/login', payload)
+        this.$refs.login.validate().then(success => {
+          if (success) {
+            const payload = {
+              email: this.email,
+              password: this.password
+            }
+            this.$store.dispatch('auth/login', payload)
+          } else {
+            alert('Review form inputs.')
+          }
+        })
+        
       }
       if (this.tab === 'register') {
-        const payload = {
-          displayName: this.displayName,
-          email: this.email,
-          password: this.password
-        }
-        this.$store.dispatch('auth/register', payload)
+        this.$refs.register.validate().then(success => {
+          if (success) {
+            const payload = {
+              displayName: this.displayName,
+              email: this.email,
+              password: this.password
+            }
+            this.$store.dispatch('auth/register', payload)
+          } else {
+            alert('Review form inputs.')
+          }
+          
+        })
+        
       }
     },
     googleSignIn() {
