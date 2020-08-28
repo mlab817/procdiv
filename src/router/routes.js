@@ -21,6 +21,8 @@ const routes = [
       { path: 'manage-users', component: () => import('pages/ManageUsers.vue') },
       { path: 'download-tasks', component: () => import('pages/DownloadTasks.vue') },
       { path: 'notifications', component: () => import('pages/Notifications.vue') },
+      { path: 'chat/:userId', component: () => import('pages/Chat.vue') },
+      { path: 'chat', component: () => import('pages/Chat.vue') },
       { path: 'settings', component: () => import('pages/Settings.vue') },
     ]
   },

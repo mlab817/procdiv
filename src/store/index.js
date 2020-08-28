@@ -6,6 +6,7 @@ import assignment from './assignment'
 import auth from './auth'
 import document from './document'
 import enduser from './enduser'
+import message from './message'
 import notification from './notification'
 import opening from './opening'
 import pras from './pras'
@@ -31,6 +32,7 @@ export default function (/* { ssrContext } */) {
       auth,
       document,
       enduser,
+      message,
       notification,
       opening,
       pras,
