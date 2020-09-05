@@ -1,11 +1,15 @@
 <template>
   <q-page padding>
-    <q-banner class="bg-grey-3 q-mb-md" v-if="!linked">
+    <q-banner class="bg-grey-3 q-mb-md" v-if="loggedIn && !linked">
       <template v-slot:avatar>
         <q-icon name="link_off" color="red" />
       </template>
       You are not connected to any staff. You will not be able to view records in the application until then. Please wait or notify the admin.
     </q-banner>
+
+    <div class="row">
+      <zing-chart type="pie" title="Tasks by Staff" :entries="tasks" groupBy="assignedName"></zing-chart>
+    </div>
 
     <div class="row q-col-gutter-md">
       <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
@@ -55,15 +59,25 @@ import { SEED } from '../seeds'
 import { firebaseFs } from 'boot/firebase'
 import { parseDate } from 'src/functions/parse-date'
 import { date } from 'quasar'
+import ZingChart from '../components/charts/ZingChart.vue'
 
 export default {
   // name: 'PageName',
+  components: {
+    'zing-chart': ZingChart
+  },
   data() {
   	return {
       filterDialog: true
     }
   },
   computed: {
+    loggedIn() {
+      return this.$store.state.auth.loggedIn
+    },
+    tasks() {
+      return this.$store.state.task.tasks
+    },
     linked() {
       return this.$store.getters['auth/linked']
     },
@@ -260,55 +274,8 @@ export default {
     }
   },
   methods: {
-    seedEndusers() {
-      const endusers = this.seed.endusers
-
-      Object.keys(endusers).forEach(key => {
-        const ref = firebaseFs.collection('endusers').doc()
-        const enduser = endusers[key]
-
-        ref.set(enduser)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
-    },
-    seedDocuments() {
-      const documents = this.seed.documents
-
-      Object.keys(documents).forEach(key => {
-        const ref = firebaseFs.collection('documents').doc()
-        const doc = documents[key]
-
-        ref.set(doc)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
-    },
-    seedStaff() {
-      const staffs = this.seed.staff
-
-      Object.keys(staffs).forEach(key => {
-        const ref = firebaseFs.collection('staff').doc()
-        const staff = staffs[key]
-
-        ref.set(staff)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
-    },
-    seedAssignments() {
-      const assignments = this.seed.assignments
-
-      Object.keys(assignments).forEach(key => {
-        const ref = firebaseFs.collection('assignments').doc()
-        const assignment = assignments[key]
-        
-        assignment.status = (assignment.completed) ? 'completed' : 'ongoing'
-
-        ref.set(assignment)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
+    initMap() {
+      //
     }
   },
   filters: {
@@ -318,6 +285,9 @@ export default {
     getTime(val) {
       return date.formatDate(val,'hh:mm A')
     }
+  },
+  mounted() {
+    this.initMap()
   }
 }
 </script>
