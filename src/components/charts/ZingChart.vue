@@ -1,9 +1,10 @@
 <template>
-	<zingchart :data="chartConfig"></zingchart>
+	<zingchart :data="chartConfig" output="canvas"></zingchart>
 </template>
 
 <script>
 	import _ from 'lodash'
+	import { date } from 'quasar'
 
 	export default {
 		name: 'ZingChart',
@@ -29,6 +30,10 @@
 				type: String,
 				default: ''
 			},
+			groupType: {
+				type: String,
+				default: 'string'
+			},
 			legend: {
 				type: Boolean,
 				default: false
@@ -41,8 +46,15 @@
 				const groupBy = this.groupBy
 
 				const categories = this.entriesArray.reduce((acc, entry) => {
-					acc[entry[groupBy]] = acc[entry[groupBy]] || 0
-					acc[entry[groupBy]]++
+					let grouping
+					if (this.groupType === 'date') {
+						grouping = date.formatDate(entry[groupBy],'YYYY-MM-DD')
+					} else {
+						grouping = entry[groupBy]
+					}
+
+					acc[grouping] = acc[grouping] || 0
+					acc[grouping]++
 
 					return acc
 				}, {})
@@ -65,8 +77,11 @@
 					plot: {
 						layout: 'auto',
 				    animation: {
-				      effect: 'ANIMATION_FADE_IN'
-				    },
+		          effect: 'ANIMATION_EXPAND_BOTTOM',
+		          method: 'ANIMATION_REGULAR_EASE_IN',
+		          sequence: 'ANIMATION_BY_NODE',
+		          speed: 300
+		        },
 				    valueBox: {
 				      text: '%t',
 				      fontSize: 12,
@@ -74,7 +89,6 @@
 				    },
 					}
 				}
-				console.log(chartConfig)
 				return chartConfig
 			},
 			entriesArray() {

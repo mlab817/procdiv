@@ -1,5 +1,9 @@
 <template>
-  <q-page padding>
+  <q-page>
+    <q-toolbar>
+      <q-toolbar-title>Dashboard</q-toolbar-title>
+    </q-toolbar>
+
     <q-banner class="bg-grey-3 q-mb-md" v-if="loggedIn && !linked">
       <template v-slot:avatar>
         <q-icon name="link_off" color="red" />
@@ -7,46 +11,28 @@
       You are not connected to any staff. You will not be able to view records in the application until then. Please wait or notify the admin.
     </q-banner>
 
-    <div class="row justify-end q-mb-md">
-      <q-btn round color="primary" icon="filter_list" @click="filterTasksDialog = true"></q-btn>
-
-      <q-dialog v-model="filterTasksDialog">
-        <q-card style="width: 400px; max-width: 80wh;">
-          <q-card-section>
-            <div class="text-h6">Filter Tasks</div>
-          </q-card-section>
-          <q-card-section>
-            
-          </q-card-section>
-          <q-card-actions align="right">
-            <q-btn label="Cancel" v-close-popup flat color="primary" />
-            <q-btn label="Ok" color="primary"></q-btn>
-          </q-card-actions>
-        </q-card>
-      </q-dialog>
-    </div>
-
     <div class="row">
-      <div class="col">
-        <zing-chart type="pie" title="Tasks by Staff" :entries="tasks" groupBy="assignedName" legend></zing-chart>
+      <div class="col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <zing-chart type="pie" title="Tasks by Staff" :entries="tasks" groupBy="assignedName" legend></zing-chart>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <zing-chart type="pie" title="Tasks by Status" :entries="tasks" groupBy="status" legend></zing-chart>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <calendar-chart title="Tasks by Date Assigned" :entries="entries" groupBy="dateAssigned" />
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <calendar-chart title="Task By Due Date" :entries="entries" groupBy="dateDue" />
+          </div>
+        </div>
       </div>
-      <div class="col">
-        <calendar-chart type="calendar" title="Tasks by Status" :entries="entries" groupBy="dateAssigned" />
-      </div>
-    </div>
-
-    <div class="row q-col-gutter-md">
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
-        <zingchart :data="byStatus" />
-      </div>
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
-        <zingchart :data="byDateDue" />
-      </div>
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
         <q-list>
           <q-item-label header>Overdue Tasks</q-item-label>
-          <template v-for="(task, key) in overdue">
-            <q-item :key="key" clickable tag="a" :to="`/tasks/${key}`">
+          <template v-for="(task, index) in overdue">
+            <q-item :key="index" clickable tag="a" :to="`/tasks/${task.id}`">
               <q-item-section avatar>
                 <q-avatar class="bg-primary text-white">{{task.assignedName.charAt(0)}}</q-avatar>
               </q-item-section>
@@ -60,11 +46,9 @@
               </q-item-section>
             </q-item>
           </template>
-          <q-item clickable>
+          <q-item clickable to="/overdue">
             <q-item-section>
-              <q-item-label class="text-right">
-                View More
-              </q-item-label>
+              <q-item-label>View More</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -82,6 +66,7 @@ import { parseDate } from 'src/functions/parse-date'
 import { date } from 'quasar'
 import ZingChart from '../components/charts/ZingChart.vue'
 import CalendarChart from '../components/charts/CalendarChart.vue'
+import { objectToArray } from 'src/utils'
 
 export default {
   // name: 'PageName',
@@ -92,7 +77,22 @@ export default {
   data() {
   	return {
       filterDialog: true,
-      filterTasksDialog: true
+      filterTasksDialog: true,
+      statuses: [
+        {
+          value: 'ongoing',
+          label: 'Ongoing'
+        },{
+          value: 'completed',
+          label: 'Completed'
+        },{
+          value: 'deleted',
+          label: 'Deleted'
+        }
+      ],
+      filter: {
+        statuses: []
+      }
     }
   },
   computed: {
@@ -110,57 +110,6 @@ export default {
 
   		return _.countBy(assignments, 'assignedTo')
   	},
-    pieConfig() {
-      const tasks = this.$store.state.task.tasks
-      let groupedTask = []
-      let pieConfig = {}
-
-      const countTasks = _.countBy(tasks, 'assignedName')
-
-      Object.keys(countTasks).forEach(key => {
-        let values = []
-        values.push(countTasks[key])
-        groupedTask.push({
-          text: key,
-          values: values
-        })
-      })
-
-      pieConfig.type = 'pie'
-      pieConfig.backgroundColor = '#2B313B'
-      pieConfig.title = {
-        text: 'Tasks by Staff',
-        align: 'left',
-        fontColor: '#fff',
-        fontFamily: 'Open Sans',
-        fontSize: '25px',
-        offsetX: '10px',
-      }
-      pieConfig.plot = {
-        tooltip: {
-          text: '%npv%',
-          padding: '5 10',
-          fontFamily: 'Open Sans',
-          fontSize: '18px'
-        },
-        valueBox: {
-          text: '%t\n%npv%',
-          fontFamily: 'Open Sans',
-          placement: 'out'
-        },
-        animation: {
-          effect: 'ANIMATION_EXPAND_VERTICAL',
-          method: 'ANIMATION_REGULAR_EASE_OUT',
-          sequence: 'ANIMATION_BY_PLOT',
-          speed: 500
-        },
-        borderColor: '#2B313B',
-        borderWidth: '5px'
-      }
-      pieConfig.series = groupedTask
-
-      return pieConfig
-    },
     byDateDue() {
       const tasks = Object.assign({}, this.$store.state.task.tasks)
       let groupedTask = []
@@ -294,16 +243,19 @@ export default {
       return this.$store.getters['task/ongoing']
     },
     overdue() {
-      return this.$store.getters['task/overdue']
+      const overdueTasks = this.$store.getters['task/overdue']
+
+      return Object.keys(overdueTasks).map(key => {
+        return {
+          ...overdueTasks[key],
+          id: key
+        }
+      }).slice(0, 5)
     },
     entries() {
       const tasks = this.tasks
-      return Object.keys(tasks).map(key => {
-        return {
-          ...tasks[key],
-          id: key
-        }
-      })
+
+      return objectToArray(tasks)
     }
   },
   methods: {

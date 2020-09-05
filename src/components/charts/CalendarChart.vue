@@ -7,24 +7,32 @@
 
 	export default {
 		name: 'CalendarChart',
-		props: ['entries'],
+		props: ['entries','groupBy','title'],
 		computed: {
 			chartConfig() {
 				const config = {
 					type: 'bar',
 					title: {
-						text: 'Tasks by Date Assigned'
+						text: this.title
 					},
 					series: [
 						{values: this.values }
-					]
+					],
+					plot: {
+						animation: {
+		          effect: 'ANIMATION_EXPAND_BOTTOM',
+		          method: 'ANIMATION_REGULAR_EASE_IN',
+		          sequence: 'ANIMATION_BY_NODE',
+		          speed: 300
+		        },
+					}
 				}
 				console.log(config)
 				return config
 			},
 			values() {
 				const grouped = this.entries.reduce((acc, entry) => {
-					const dateAssigned = date.formatDate(entry.dateAssigned,'YYYY-MM-DD')
+					const dateAssigned = date.formatDate(entry[this.groupBy],'YYYY-MM-DD') || 'N/A'
 					acc[dateAssigned] = acc[dateAssigned] || 0
 					acc[dateAssigned]++
 					return acc

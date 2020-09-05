@@ -23,6 +23,7 @@ const routes = [
       { path: 'notifications', component: () => import('pages/Notifications.vue') },
       { path: 'chat/:userId', component: () => import('pages/Chat.vue') },
       { path: 'chat', component: () => import('pages/Chat.vue') },
+      { path: 'overdue', component: () => import('pages/Overdue.vue') },
       { path: 'settings', component: () => import('pages/Settings.vue') },
     ]
   },
