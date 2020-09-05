@@ -7,14 +7,35 @@
       You are not connected to any staff. You will not be able to view records in the application until then. Please wait or notify the admin.
     </q-banner>
 
+    <div class="row justify-end q-mb-md">
+      <q-btn round color="primary" icon="filter_list" @click="filterTasksDialog = true"></q-btn>
+
+      <q-dialog v-model="filterTasksDialog">
+        <q-card style="width: 400px; max-width: 80wh;">
+          <q-card-section>
+            <div class="text-h6">Filter Tasks</div>
+          </q-card-section>
+          <q-card-section>
+            
+          </q-card-section>
+          <q-card-actions align="right">
+            <q-btn label="Cancel" v-close-popup flat color="primary" />
+            <q-btn label="Ok" color="primary"></q-btn>
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+    </div>
+
     <div class="row">
-      <zing-chart type="pie" title="Tasks by Staff" :entries="tasks" groupBy="assignedName"></zing-chart>
+      <div class="col">
+        <zing-chart type="pie" title="Tasks by Staff" :entries="tasks" groupBy="assignedName" legend></zing-chart>
+      </div>
+      <div class="col">
+        <calendar-chart type="calendar" title="Tasks by Status" :entries="entries" groupBy="dateAssigned" />
+      </div>
     </div>
 
     <div class="row q-col-gutter-md">
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
-        <zingchart :data="pieConfig" />
-      </div>
       <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
         <zingchart :data="byStatus" />
       </div>
@@ -60,15 +81,18 @@ import { firebaseFs } from 'boot/firebase'
 import { parseDate } from 'src/functions/parse-date'
 import { date } from 'quasar'
 import ZingChart from '../components/charts/ZingChart.vue'
+import CalendarChart from '../components/charts/CalendarChart.vue'
 
 export default {
   // name: 'PageName',
   components: {
-    'zing-chart': ZingChart
+    'zing-chart': ZingChart,
+    'calendar-chart': CalendarChart,
   },
   data() {
   	return {
-      filterDialog: true
+      filterDialog: true,
+      filterTasksDialog: true
     }
   },
   computed: {
@@ -271,6 +295,15 @@ export default {
     },
     overdue() {
       return this.$store.getters['task/overdue']
+    },
+    entries() {
+      const tasks = this.tasks
+      return Object.keys(tasks).map(key => {
+        return {
+          ...tasks[key],
+          id: key
+        }
+      })
     }
   },
   methods: {

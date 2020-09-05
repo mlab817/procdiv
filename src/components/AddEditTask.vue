@@ -1,5 +1,5 @@
 <template>
-	<q-card>
+	<q-card style="width: 400px; max-width: 80wh;">
 		<q-card-section class="row">
 			<div class="text-h6">
 				Add/Edit Task
@@ -225,8 +225,10 @@
 								updates: this.taskToSubmit
 							}
 							this.$store.dispatch('task/updateTask', payload)
+							this.$emit('close')
 						} else {
 							this.$store.dispatch('task/addTask', this.taskToSubmit)
+							this.$emit('close')
 						}
 					} else {
 						alert('fail')

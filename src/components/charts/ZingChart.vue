@@ -16,7 +16,7 @@
 				type: String,
 				default: 'bar',
 				validator: (val) => {
-					return ['bar','line','column','pie'].indexOf(val) !== -1
+					return ['bar','line','column','pie','calendar'].indexOf(val) !== -1
 				}
 			},
 			entries: {
@@ -28,6 +28,10 @@
 			groupBy: {
 				type: String,
 				default: ''
+			},
+			legend: {
+				type: Boolean,
+				default: false
 			}
 		},
 		computed: {
@@ -56,7 +60,7 @@
 					title: {
 						text: this.title
 					},
-					legend: {},
+					legend: this.legend ? {} : null,
 					series: this.values.map(o => o),
 					plot: {
 						layout: 'auto',

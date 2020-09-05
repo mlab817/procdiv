@@ -13,29 +13,33 @@
         />
 
         <q-toolbar-title>
-          Purchasing v2.1
+          Purchasing v{{version}}
         </q-toolbar-title>
 
         <q-space/>
 
-        <q-btn flat round icon="add_task" v-if="loggedIn && admin" to="/add-task">
+        <q-btn flat round icon="add_task" v-if="loggedIn && admin" @click="addTaskDialog = true">
           <q-tooltip>Add Task</q-tooltip>
         </q-btn>
-        <q-btn flat round icon="message" v-if="loggedIn" to="/chat">
-          <q-tooltip>Add Task</q-tooltip>
-        </q-btn>
+
         <q-btn flat round icon="notifications" color="grey-9" @click="rightDrawerOpen = !rightDrawerOpen" v-if="loggedIn">
           <q-badge color="red" floating>
             {{Object.keys(notifications).length}}
           </q-badge>
           <q-tooltip>Notifications</q-tooltip>
         </q-btn>
+        
         <q-btn flat stretch icon="person" label="Login" to="/auth" v-if="!loggedIn"></q-btn>
+        
         <q-btn flat stretch icon-right="exit_to_app" :label="$q.screen.lt.sm ? void 0 : 'Logout'" v-else @click="confirmLogout">
           
         </q-btn>
       </q-toolbar>
     </q-header>
+
+    <q-dialog v-model="addTaskDialog">
+      <add-edit-task @close="addTaskDialog = false" />
+    </q-dialog>
 
     <q-drawer
       v-model="leftDrawerOpen"
@@ -240,7 +244,8 @@ export default {
   name: 'MainLayout',
   components: {
     'notifications-list': () => import('../components/layout/NotificationsList.vue'),
-    'download-task': () => import('../components/layout/DownloadTask.vue')
+    'download-task': () => import('../components/layout/DownloadTask.vue'),
+    'add-edit-task': () => import('../components/AddEditTask.vue')
   },
   computed: {
     user() {
@@ -264,7 +269,9 @@ export default {
       leftDrawerOpen: false,
       essentialLinks: linksData,
       rightDrawerOpen: false,
-      hover: null
+      hover: null,
+      version: '2.2',
+      addTaskDialog: false
     }
   },
   methods: {
