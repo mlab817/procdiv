@@ -1,5 +1,5 @@
 <template>
-  <q-page>
+  <q-page padding>
     <q-toolbar>
       <q-toolbar-title>Dashboard</q-toolbar-title>
     </q-toolbar>
