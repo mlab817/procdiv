@@ -9,6 +9,12 @@
 				</q-input>
 			</template>
 			
+			<template v-slot:body-cell-overdue="props">
+				<q-td :props="props" :class="overdue(props.row.rfqDeadline, props.row.dateOpened) ? 'bg-red-1' : ''">
+					<q-icon v-if="overdue(props.row.rfqDeadline, props.row.dateOpened)" name="priority_high" color="negative"></q-icon>
+				</q-td>
+			</template>
+			
 			<template v-slot:body-cell-task="props">
 				<q-td :props="props">
 					<q-btn flat round dense color="primary" icon="launch" :to="`/tasks/${props.row.taskId}`" v-if="props.row.taskId"></q-btn>
@@ -84,6 +90,11 @@
 			return {
 				filter: '',
 				columns: [
+					{
+						name: 'overdue',
+						label: 'Overdue',
+						align: 'center'
+					},
 					{
 						name: 'assignedTo',
 						label: 'Assigned To',
@@ -167,6 +178,9 @@
 						isValid: val => (val.toLowerCase() === 'yes')
 					}
 				}).onOk(() => this.$store.dispatch('opening/delete', id))
+			},
+			overdue(rfqDeadline, dateOpened) {
+				return (!dateOpened && date.getDateDiff(rfqDeadline, new Date(), 'seconds') < 0)
 			}
 		}
 	}

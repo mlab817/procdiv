@@ -13,7 +13,7 @@
         />
 
         <q-toolbar-title>
-          Purchasing v2.1
+          Purchasing v2.1.1
         </q-toolbar-title>
 
         <q-space/>
