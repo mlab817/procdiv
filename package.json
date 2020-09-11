@@ -8,25 +8,31 @@
   "scripts": {
     "lint": "eslint --ext .js,.vue ./",
     "test": "echo \"No test specified\" && exit 0",
-    "deploy": "quasar build -m pwa && firebase deploy --only hosting"
+    "dev": "cross-env QENV=development quasar dev",
+    "staging": "cross-env QENV=development quasar build -m pwa && firebase deploy -P staging --only hosting",
+    "prod": "cross-env QENV=production quasar build -m pwa && firebase deploy -P default --only hosting"
   },
   "dependencies": {
-    "@quasar/extras": "^1.0.0",
+    "@quasar/extras": "^1.9.4",
     "axios": "^0.19.2",
     "chart.js": "^2.9.3",
     "copy-webpack-plugin": "^6.0.3",
     "core-js": "^3.6.5",
+    "dotenv": "^8.2.0",
     "firebase": "^7.17.2",
     "google-api-javascript-client": "google/google-api-javascript-client",
-    "quasar": "^1.0.0",
+    "quasar": "^1.13.1",
     "underscore": "^1.10.2",
     "vue-chartkick": "^0.6.1",
     "vue-gapi": "^0.3.1",
-    "vue-json-excel": "^0.2.98"
+    "vue-json-excel": "^0.2.98",
+    "zingchart-vue": "^2.0.1"
   },
   "devDependencies": {
-    "@quasar/app": "^2.0.0",
+    "@quasar/app": "^2.0.8",
+    "@quasar/quasar-app-extension-qenv": "^1.0.3",
     "babel-eslint": "^10.0.1",
+    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-prettier": "^6.9.0",
     "eslint-loader": "^3.0.3",

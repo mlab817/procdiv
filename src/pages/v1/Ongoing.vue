@@ -1,17 +1,28 @@
 <template>
   <q-page padding>
+    <q-banner class="bg-red-1 q-mb-md">
+      <template v-slot:avatar>
+        <q-icon name="warning" color="negative" />
+      </template>
+      <p class="text-weight-bold text-h6">Deprecation Notice </p>
+      <p><strong>Assignments</strong> have been replaced by <strong>Tasks</strong>. This feature will only be available until all assignments have been completed.</p>
+      <template v-slot:action>
+        <q-btn flat color="negative" label="Go to Tasks" to="/ongoing" />
+      </template>
+    </q-banner>
+
   	<div class="row q-my-sm" v-if="$q.screen.lt.md">
   		<search class="col" />
   	</div>
 
     <div class="row justify-between q-mb-sm">
     	<div class="row items-stretch">
-    		<q-btn icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment">
+    		<q-btn disabled class="q-mr-sm" icon="add" :label="$q.screen.gt.sm ? 'New': void 0" color="primary" v-ripple @click="showAddAssignment" v-if="role === 'admin'">
           <q-tooltip>Add new assignment</q-tooltip>  
         </q-btn>
         
         <download-excel :data="ongoingArray">
-          <q-btn icon="get_app" :label="$q.screen.gt.sm ? 'Download': void 0" class="q-ml-sm btn-download" color="secondary">
+          <q-btn icon="get_app" :label="$q.screen.gt.sm ? 'Download': void 0" class="btn-download" color="secondary">
             <q-tooltip>Download ongoing assignments</q-tooltip>
           </q-btn>
         </download-excel>
@@ -50,6 +61,24 @@
 
             <q-input v-model="particulars" outlined label="Particulars" stack-label></q-input>
 
+            <q-input v-model="rfqDeadline" outlined label="RFQ Deadline" stack-label clearable>
+
+              <template v-slot:prepend>
+                <q-icon name="event" class="cursor-pointer">
+                  <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-date v-model="rfqDeadline" mask="YYYY-MM-DD hh:mm A" />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+              <template v-slot:append>
+                <q-icon name="access_time" class="cursor-pointer">
+                  <q-popup-proxy transition-show="scale" transition-hide="scale">
+                    <q-time v-model="rfqDeadline" mask="YYYY-MM-DD hh:mm A" format12h />
+                  </q-popup-proxy>
+                </q-icon>
+              </template>
+            </q-input>
+
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
               <q-select v-model="enduser" use-input @filter="filterEndusers" :options="enduserOptions" outlined label="Enduser" stack-label class="col" emit-value map-options></q-select>
               <div>
@@ -62,7 +91,7 @@
             <q-input v-model="actionTaken" outlined label="Action Taken" stack-label></q-input>
 
             <div class="row items-center q-pt-sm q-pl-sm q-col-gutter-sm">
-              <q-select v-model="assignedTo" :options="staff" outlined label="Assigned To" stack-label class="col" emit-value map-options></q-select>
+              <q-select v-model="assignedTo" :options="staff" outlined label="Assigned To" stack-label class="col" option-label="displayName" option-value="id"></q-select>
               <div>
                 <q-btn flat round icon="edit" @click="addStaff" color="primary"></q-btn>
               </div>
@@ -133,51 +162,69 @@
           <th>Action Taken</th>
           <th>Assigned To</th>
           <th>Remarks</th>
+          <th>RFQ Deadline</th>
           <th>Due Date/Time</th>
-          <th>Actions</th>
+          <th v-if="role === 'admin'">Actions</th>
         </tr>
       </thead>
       <tbody>
         <template v-if="Object.keys(ongoing).length">
           <tr v-for="(assignment, key) in ongoing" :key="key" :class="overdue(assignment) ? 'bg-red-2': ''">
-            <td>{{assignment.dateAssigned | showDate }}</td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.document, searchField)"></td>
+            <td>
+              <q-item-label>
+                {{assignment.dateAssigned | showDate }}
+              </q-item-label>
+              <q-item-label caption>
+                {{assignment.dateAssigned | showTime }}
+              </q-item-label>
+            </td>
+            <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.document, searchField)" @click="setSearch(assignment.document)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.particulars, searchField)"></td>
-            <td class="text-center" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)"></td>
+            <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.enduser, searchField)" @click="setSearch(assignment.enduser)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.referenceNo, searchField)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.actionTaken, searchField)"></td>
             <td class="text-center cursor-pointer" v-html="$options.filters.searchHighlight(assignment.assignedTo, searchField)" @click="setSearch(assignment.assignedTo)"></td>
             <td class="text-center" v-html="$options.filters.searchHighlight(assignment.remarks, searchField)"></td>
             <td class="text-right">
-              <div class="row justify-end items-center no-wrap">
-                {{assignment.dateDue | showDate }}    
+              <div class="row justify-end items-center no-wrap" v-if="assignment.rfqDeadline">
+                {{assignment.rfqDeadline | showDate}}    
                 <q-icon name="event" class="text-grey-8" v-if="assignment.dateDue"></q-icon>
               </div>
-              <div class="row justify-end items-center no-wrap">
-                {{assignment.dateDue | showTime }}  
+              <div class="row justify-end items-center no-wrap" v-if="assignment.rfqDeadline">
+                {{assignment.rfqDeadline | showTime}}  
                 <q-icon name="alarm" class="text-grey-8" v-if="assignment.dateDue"></q-icon>  
               </div>
             </td>
-            <td class="text-center items-center">
-              <div class="row q-gutter-sm no-wrap">
+            <td class="text-right">
+              <div class="row justify-end items-center no-wrap">
+                {{assignment.dateDue | showDate}}    
+                <q-icon name="event" class="text-grey-8" v-if="assignment.dateDue"></q-icon>
+              </div>
+              <div class="row justify-end items-center no-wrap">
+                {{assignment.dateDue | showTime}}  
+                <q-icon name="alarm" class="text-grey-8" v-if="assignment.dateDue"></q-icon>  
+              </div>
+            </td>
+            <td class="text-center items-center" v-if="role === 'admin'">
+              <div class="row justify-center q-gutter-sm no-wrap">
                 <q-btn 
                   outlined 
                   dense 
                   icon="done_outline" 
                   color="positive" 
-                  @click="confirmCompleted(assignment)" />
+                  @click="confirmCompleted(assignment, key)" />
                 <q-btn 
                   outlined 
                   dense 
                   icon="edit" 
                   color="primary" 
-                  @click="editAssignment(assignment)" />
+                  @click="editAssignment(assignment, key)" />
                 <q-btn 
                   outlined 
                   dense 
                   icon="delete" 
                   color="negative" 
-                  @click="confirmDelete(assignment)" />
+                  @click="confirmDelete(key)" />
               </div>
             </td>
           </tr>
@@ -199,24 +246,30 @@
 
 <script>
 import { uid, date } from 'quasar'
+import { parseDate } from 'src/functions/parse-date'
 
 export default {
   name: 'PageIndex',
 
   components: {
-  	'sort': () => import('../components/shared/Sort.vue'),
-  	'search': () => import('../components/shared/Search.vue'),
-    'filter-date': () => import('../components/shared/FilterDate.vue')
+  	'sort': () => import('../../components/shared/Sort.vue'),
+  	'search': () => import('../../components/shared/Search.vue'),
+    'filter-date': () => import('../../components/shared/FilterDate.vue')
   },
 
   computed: {
+    role() {
+      return this.$store.getters['auth/role']
+    },
+
     ongoing() {
       return this.$store.getters['assignment/ongoing']
     },
 
     staff() {
       // return this.$store.state.staff.staff
-      return this.$store.getters['staff/options']
+      // return this.$store.getters['staff/options']
+      return this.$store.getters['user/options']
     },
 
     endusers() {
@@ -242,15 +295,17 @@ export default {
 
       const newArr = arr.map(a => {
         return {
-          'Date Assigned': a.dateAssigned,
+          'Date Assigned': date.formatDate(parseDate(a.dateAssigned), 'MMM DD, YYYY hh:mm A'),
           'Document': a.document,
           'Particulars': a.particulars,
+          'RFQ Deadline': a.rfqDeadline,
           'Enduser': a.enduser,
           'Reference No.': a.referenceNo,
           'Action Taken': a.actionTaken,
           'Assigned To': a.assignedTo,
           'Remarks': a.remarks,
-          'Due Date/Time': a.dateDue ? a.dateDue.toString() : ''
+          'Due Date/Time': date.formatDate(parseDate(a.dateDue), 'MMM DD, YYYY hh:mm A'),
+          'Date Completed': date.formatDate(parseDate(a.dateCompleted), 'MMM DD, YYYY hh:mm A')
         }
       })
 
@@ -262,6 +317,7 @@ export default {
     return {
       addAssignmentDialog: false,
       document: '',
+      rfqDeadline: '',
       particulars: '',
       enduser: '',
       referenceNo: '',
@@ -281,6 +337,8 @@ export default {
   },
 
   methods: {
+    parseDate,
+
     setSearch(search) {
       this.$store.dispatch('assignment/setSearch', search)
     },
@@ -304,7 +362,9 @@ export default {
       this.toolbarTitle = 'Add Assignment'
       this.id = ''
       this.document = ''
+      this.rfqDeadline = date.formatDate(new Date(), 'YYYY-MM-DD') + ' 12:00 PM'
       this.particulars = ''
+      this.rfqDeadline = date.formatDate(Date.now(), 'YYYY-MM-DD') + ' 12:00 PM'
       this.enduser = ''
       this.referenceNo = ''
       this.actionTaken = ''
@@ -316,18 +376,18 @@ export default {
     },
 
     addAssignment() {      
-      const now = Date.now()
-
       const payload = {
         document: this.document,
+        rfqDeadline: this.rfqDeadline,
         particulars: this.particulars,
+        rfqDeadline: this.rfqDeadline,
         enduser: this.enduser,
         referenceNo: this.referenceNo,
         actionTaken: this.actionTaken,
         assignedTo: this.assignedTo,
         remarks: this.remarks,
         dateDue: this.dateDue,
-        dateAssigned: date.formatDate(now, 'YYYY-MM-DD hh:mm A')
+        dateAssigned: date.formatDate(Date.now(), 'YYYY-MM-DD hh:mm A')
       }
 
       this.$store.dispatch('assignment/add', payload)
@@ -345,12 +405,14 @@ export default {
       }
     },
 
-    editAssignment(assignment) {
+    editAssignment(assignment, key) {
       this.toolbarTitle = 'Edit Assignment'
 
-      this.id = assignment.id
+      this.id = key
       this.document = assignment.document ? assignment.document : ''
+      this.rfqDeadline = assignment.rfqDeadline ? assignment.rfqDeadline : ''
       this.particulars = assignment.particulars ? assignment.particulars : ''
+      this.rfqDeadline = assignment.rfqDeadline ? assignment.rfqDeadline : ''
       this.enduser = assignment.enduser ? assignment.enduser : ''
       this.referenceNo = assignment.referenceNo ? assignment.referenceNo : ''
       this.actionTaken = assignment.actionTaken ? assignment.actionTaken : ''
@@ -367,13 +429,15 @@ export default {
         id: this.id,
         updates: {
           document: this.document,
+          rfqDeadline: this.rfqDeadline,
           particulars: this.particulars,
+          rfqDeadline: this.rfqDeadline,
           enduser: this.enduser,
           referenceNo: this.referenceNo,
           actionTaken: this.actionTaken,
           assignedTo: this.assignedTo,
           remarks: this.remarks,
-          dateDue: this.dateDue,
+          dateDue: this.dateDue, // convert data to valid date
           dateAssigned: this.dateAssigned
         }   
       }
@@ -384,22 +448,25 @@ export default {
 
     },
 
-    confirmDelete(assignment) {
+    confirmDelete(id) {
       this.$q.dialog({
         title: 'Confirm Delete',
         message: 'Are you sure you want to delete this assignment?',
         cancel: true
       })
-      .onOk(() => this.$store.dispatch('assignment/deleteAssignment', assignment.id))
+      .onOk(() => this.$store.dispatch('assignment/deleteAssignment', id))
     },
 
-    confirmCompleted(assignment) {
+    confirmCompleted(assignment, key) {
       this.$q.dialog({
         title: 'Confirm Completed',
         message: 'Mark the assignment as completed',
         cancel: true
       })
-      .onOk(() => this.$store.dispatch('assignment/markAsCompleted', assignment.id))
+      .onOk(() => this.$store.dispatch('assignment/markAsCompleted', {
+        id: key,
+        assignment: assignment
+      }))
     },
 
     addStaff() {
@@ -439,7 +506,7 @@ export default {
 
     overdue(assignment) {
       const now = Date.now()
-      const dateDue = assignment.dateDue
+      const dateDue = parseDate(assignment.dateDue)
 
       const diff = date.getDateDiff(dateDue, now, 'seconds')
 
@@ -460,7 +527,9 @@ export default {
 
     showDate(val) {
       if (val) {
-        const formatDate = date.formatDate(val, 'MMM D, YYYY')
+        const parsedDate = parseDate(val)
+        const formatDate = date.formatDate(parsedDate, 'MMM D, YYYY')
+
         return formatDate
       }
       return ''
@@ -468,11 +537,15 @@ export default {
 
     showTime(val) {
       if (val) {
-        const formatTime = date.formatDate(val, 'hh:mm A')
+        const parsedDate = parseDate(val)
+        const formatTime = date.formatDate(parsedDate, 'hh:mm A')
         return formatTime
       }
       return ''
     }
+  },
+  created() {
+    console.log(this.$store.getters['assignment/forOpening'])
   }
 }
 </script>

@@ -7,9 +7,9 @@ export function showSuccessMessage() {
 	})
 }
 
-export function showErrorMessage() {
+export function showErrorMessage(message) {
 	Notify.create({
 		type: 'negative',
-		message: 'Error'
+		message: message ? message: 'Error'
 	})
 }

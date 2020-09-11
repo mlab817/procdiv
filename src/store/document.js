@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { firebaseDb } from 'boot/firebase'
+import { firebaseDb, firebaseFs } from 'boot/firebase'
 import {
 	showErrorMessage,
 	showSuccessMessage
@@ -21,10 +21,10 @@ const mutations = {
 		Vue.set(state.documents, payload.id, payload.document)
 	},
 	UPDATE_DOCUMENT: (state, payload) => {
-		Vue.set(state.assignments, payload.id, payload.updates)
+		Vue.set(state.documents, payload.id, payload.updates)
 	},
-	DELETE_DOCUMENT: (state, payload) => {
-		Vue.delete(state.assignments, id)
+	DELETE_DOCUMENT: (state, id) => {
+		Vue.delete(state.documents, id)
 	}
 }
 
@@ -33,104 +33,97 @@ const actions = {
 		const id = uid()
 		const doc = {
 			id: id, 
-			name: payload
+			doc: {
+				name: payload
+			}
 		}
 
-		dispatch('fbAdd', doc)
+		// dispatch('fbAdd', doc)
+		dispatch('fsAdd', doc)
 	},
-	fbAdd: ({}, payload) => {
-		const ref = firebaseDb.ref('documents/' + payload.id)
+	fsAdd: ({}, payload) => {
+		const ref = firebaseFs.collection('documents').doc()
 
-		ref.set(payload, error => {
-			if (error) {
-				showErrorMessage()
-			} else {
-				showSuccessMessage()
-			}
-		})
+		ref.set(payload.doc)
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
 	},
 	update: ({ dispatch }, payload) => {
 		dispatch('fbUpdate', payload)
-	},
-	fbUpdate: ({}, payload) => {
-		const ref = firebaseDb.ref('documents/' + payload.id)
-
-		ref.update(payload.updates, error => {
-			if (error) {
-				showErrorMessage()
-			} else {
-				showSuccessMessage()
-			}
-		})
 	},
 	delete: ({ dispatch }, id) => {
 		dispatch('fbDelete', id)
 	},
 	fbDelete: ({}, id) => {
-		const ref = firebaseDb.ref('documents/' + payload.id)
+		const doc = firebaseFs.collection('documents').doc(id)
 
-		ref.remove(error => {
-			if (error) {
-				showErrorMessage()
-			}
-			else {
-				showSuccessMessage()
-			}
-		})
+		doc.delete()
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
 	},
-	fbReadData: ({ commit }) => {
-		const documents = firebaseDb.ref('documents')
+	fsReadData: ({ commit }) => {
+		const docs = firebaseFs.collection('documents')
 
-		documents.once('value', snapshot => {
-			commit('SET_DOWNLOADED', true)
-		}, error => {
-			this.$router.replace('/auth')
-		})
-
-		documents.on('child_added', snapshot => {
-			const doc = snapshot.val()
-			const key = snapshot.key
-
-			const payload = {
-				id: key, 
-				document: doc
-			}
-
-			commit('ADD_DOCUMENT', payload)
-		})
-
-		documents.on('child_changed', snapshot => {
-			const doc = snapshot.val()
-			const key = snapshot.key
-
-			const payload = {
-				id: key, 
-				updates: doc
-			}
-
-			commit('UPDATE_DOCUMENT', payload)
-		})
-
-		documents.on('child_removed', snapshot => {
-			const id = snapshot.key
-
-			commit('DELETE_DOCUMENT', id)
+		docs.onSnapshot(querySnapshot => {
+			querySnapshot.docChanges().forEach(change => {
+				if (change.type == 'added') {
+					const id = change.doc.id
+					const data = change.doc.data()
+					commit('ADD_DOCUMENT', {
+						id: id,
+						document: data
+					})
+				}
+				if (change.type == 'modified') {
+					const id = change.doc.id
+					const updates = change.doc.data()
+					commit('UPDATE_DOCUMENT', {
+						id: id,
+						updates: updates
+					})
+				}
+				if (change.type == 'removed') {
+					console.log('removed id: ', change.doc.id)
+					const id = change.doc.id
+					commit('DELETE_DOCUMENT', id)
+				}
+			})
 		})
 	}
 }
 
 const getters = {
-	options: (state) => {
+	options: (state, getters) => {
 		let options = []
+		const sortedDocuments = getters.sorted
 
-		Object.keys(state.documents).forEach(key => {
+		Object.keys(sortedDocuments).forEach(key => {
 			options.push({
-				value: state.documents[key].name,
-				label: state.documents[key].name
+				value: sortedDocuments[key].name,
+				label: sortedDocuments[key].name
 			})
 		})
 
 		return options
+	},
+	sorted: (state) => {
+		const documents = state.documents
+		let sorted = {}, keysOrdered = Object.keys(documents)
+		
+		keysOrdered.sort((a, b) => {
+			let aProp = documents[a].name.toLowerCase(),
+				bProp = documents[b].name.toLowerCase()
+
+			if (aProp > bProp) return 1
+			else if (aProp < bProp) return -1
+			else return 0
+		})
+
+		keysOrdered.forEach((key) => {
+			sorted[key] = documents[key]
+		})
+
+		return sorted
 	}
 }
 

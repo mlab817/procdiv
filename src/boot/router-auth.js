@@ -9,6 +9,9 @@ export default async ({ router }) => {
   	if (!loggedIn && to.path !== '/auth') {
   		next('/auth')
   	}
+  	else if (loggedIn && to.path === '/auth') {
+  		next('/')
+  	}
   	else {
 	    next()
   	}

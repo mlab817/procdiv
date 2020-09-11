@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import { firebaseDb } from 'boot/firebase'
+import { firebaseDb, firebaseFs } from 'boot/firebase'
 import { 
 	showErrorMessage,
 	showSuccessMessage
@@ -14,6 +14,44 @@ const state = () => {
 }
 
 const actions = {
+	fsReadData: ({ commit }) => {
+		const docs = firebaseFs.collection('endusers')
+
+		docs.onSnapshot(querySnapshot => {
+			querySnapshot
+				.docChanges()
+				.forEach(change => {
+
+					if (change.type === 'added') {
+						// console.log('firestore added', change.doc.id)
+						const payload = {
+							id: change.doc.id,
+							enduser: change.doc.data()
+						}
+
+						commit('ADD_ENDUSER', payload)
+					}
+
+					if (change.type === 'modified') {
+						// console.log('firestore modified', change.doc.id)
+						const payload = {
+							id: change.doc.id,
+							updates: change.doc.data()
+						}
+
+						commit('UPDATE_ENDUSER', payload)
+					}
+
+					if (change.type === 'removed') {
+						// console.log('firestore removed', change.doc.id)
+						const id = change.doc.id
+
+						commit('DELETE_ENDUSER', id)
+					}
+					
+				})
+		})
+	},
 	fbReadData: ({ commit }) => {
 		const endusers = firebaseDb.ref('endusers')
 
@@ -62,7 +100,8 @@ const actions = {
 			}
 		}
 
-		dispatch('fbAdd', enduser)
+		// dispatch('fbAdd', enduser)
+		dispatch('fsAdd', enduser)
 	},
 	fbAdd: ({}, payload) => {
 		const ref = firebaseDb.ref('endusers/' + payload.id)
@@ -74,6 +113,38 @@ const actions = {
 				showSuccessMessage()
 			}
 		})
+	},
+	fsAdd: ({}, payload) => {
+		const ref = firebaseFs.collection('endusers').doc()
+
+		ref.set(payload.enduser)
+			.then(() => showSuccessMessage)
+			.catch(err => showErrorMessage(err.message))
+	},
+	update: ({ dispatch }, payload) => {
+		const enduser = {
+			id: payload.id,
+			updates: payload
+		}
+
+		dispatch('fsUpdate', enduser)
+	},
+	fsUpdate: ({}, payload) => {
+		const ref = firebaseFs.collection('endusers').doc(payload.id)
+
+		ref.set(payload.updates)
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
+	},
+	delete: ({ dispatch }, id) => {
+		dispatch('fsDelete', id)
+	},
+	fsDelete: ({}, id) => {
+		const ref = firebaseFs.collection('endusers').doc(id)
+
+		ref.delete()
+			.then(() => showSuccessMessage())
+			.catch(err => showErrorMessage(err.message))
 	}
 }
 
@@ -93,9 +164,9 @@ const mutations = {
 }
 
 const getters = {
-	options: (state) => {
+	options: (state, getters) => {
 		let arr = []
-		const endusers = state.endusers
+		const endusers = getters.sorted
 
 		Object.keys(endusers).forEach(key => {
 			const enduser = endusers[key]
@@ -103,6 +174,25 @@ const getters = {
 		})
 
 		return arr
+	},
+	sorted: (state) => {
+		const endusers = state.endusers
+		let sorted = {}, keysOrdered = Object.keys(endusers)
+
+		keysOrdered.sort((a, b) => {
+			let aProp = endusers[a].label.toLowerCase(),
+				bProp = endusers[b].label.toLowerCase()
+
+			if (aProp > bProp) return 1
+			else if (aProp < bProp) return -1
+			else return 0
+		})
+
+		keysOrdered.forEach(key => {
+			sorted[key] = endusers[key]
+		})
+
+		return sorted
 	}
 }
 

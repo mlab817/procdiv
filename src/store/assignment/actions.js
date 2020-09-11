@@ -1,4 +1,5 @@
-import { firebaseDb } from 'boot/firebase'
+import Vue from 'vue'
+import { firebaseDb, firebaseFs } from 'boot/firebase'
 import { uid, date, Loading } from 'quasar'
 import { showSuccessMessage, showErrorMessage } from 'src/functions/show-messages'
 
@@ -8,7 +9,8 @@ export function add({ dispatch }, payload) {
 		id: id,
 		assignment: payload
 	}
-	dispatch('fbAdd', assignment)
+	// dispatch('fbAdd', assignment)
+	dispatch('fsAdd', assignment)
 }
 
 export function fbAdd({}, payload) {
@@ -24,8 +26,32 @@ export function fbAdd({}, payload) {
 	})
 }
 
+export function fsAdd({ dispatch }, payload) {
+	const docRef = firebaseFs.collection('assignments')
+
+	docRef.add(payload.assignment)
+		.then((docRef) => {
+			showSuccessMessage()
+			const { referenceNo, document, assignedTo } = payload.assignment
+			const message = `${referenceNo}: ${document}`
+
+			const notification = {
+				from: this.state.auth.user.displayName,
+				to: assignedTo.id,
+				subject: 'New Assignment',
+				message: message,
+				relatedDoc: 'assignments',
+				relatedId: docRef.id
+			}
+
+			dispatch('notification/add', notification, { root: true })
+		})
+		.catch(err => showErrorMessage(err.message))
+}
+
 export function update({ dispatch }, payload) {
-	dispatch('fbUpdate', payload)
+	// dispatch('fbUpdate', payload)
+	dispatch('fsUpdate', payload)
 }
 
 export function fbUpdate({}, payload) {
@@ -41,32 +67,27 @@ export function fbUpdate({}, payload) {
 	})
 }
 
-export function deleteAssignment({ dispatch }, id) {
-	dispatch('fbDelete', id)
+export function fsUpdate({}, payload) {
+	console.log('fsUpdate')
+
+	const ref = firebaseFs.collection('assignments').doc(payload.id)
+
+	ref.update(payload.updates)
+		.then(() => showSuccessMessage())
+		.catch(error => showErrorMessage(error.message))
 }
 
-export function fbMoveToDelete({ state }, payload) {
-	const ref = firebaseDb.ref('deleted/' + payload.id)
-
-	ref.set(payload.assignment, error => {
-		if (error) {
-			showErrorMessage()
-		} else {
-			showSuccessMessage()
-		}
-	})
+export function deleteAssignment({ dispatch }, id) {
+	dispatch('fbDelete', id)
+	dispatch('fsDelete', id)
 }
 
 export function fbDelete({ state, dispatch }, id) {
-	const assignment = state.assignments[id]
-
-	dispatch('fbMoveToDelete', {
-		id: id,
-		assignment: assignment
-	})
-
+	console.log(id)
 	const ref = firebaseDb.ref('assignments/' + id)
-	ref.remove(error => {
+	ref.update({
+		status: 'deleted'
+	}, error => {
 		if (error) {
 			showErrorMessage()
 		}
@@ -76,43 +97,90 @@ export function fbDelete({ state, dispatch }, id) {
 	})
 }
 
-export function markAsCompleted({ dispatch }, id) {
-	dispatch('fbMarkAsCompleted', id)
+export function fsDelete({ state, dispatch }, id) {
+	console.log(id)
+	const ref = firebaseFs.collection('assignments').doc(id)
+
+	ref.update({ status: 'deleted' })
+		.then(() => showSuccessMessage)
+		.catch(err => showErrorMessage(err.message))
 }
 
-export function fbMarkAsCompleted({}, id) {
-	const ref = firebaseDb.ref('assignments/' + id)
+export function permaDelete({ dispatch }, id) {
+	dispatch('fsPermaDelete', id)
+}
+
+export function fsPermaDelete({}, id) {
+	const ref = firebaseFs.collection('assignments').doc(id)
+
+	ref.delete()
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
+export function undoDelete({ dispatch }, id) {
+	dispatch('fsUndoDelete', id)
+}
+
+export function fsUndoDelete({}, id) {
+	console.log(id)
+	const ref = firebaseFs.collection('assignments').doc(id)
 
 	ref.update({
-		dateCompleted: date.formatDate(Date.now(), 'YYYY-MM-DD hh:ss A'),
-		completed: true
-	}, error => {
-		if (error) {
-			showErrorMessage()
-		} else {
-			showSuccessMessage()
-		}
+		status: 'ongoing'
 	})
+	.then(() => showSuccessMessage())
+	.catch(err => showErrorMessage(err.message))
+}
+
+export function markAsCompleted({ dispatch }, payload) {
+	dispatch('fsMarkAsCompleted', payload.id)
+	if (payload.assignment.document === 'PRAS/ PR for preparation of RFQ') {
+		dispatch('fbMarkAsForOpening', payload.assignment)
+	}
+}
+
+export function fbMarkAsForOpening({}, payload) {
+	// create a new document that has status for opening
+	const doc = firebaseFs.collection('assignments').doc()
+	const newObj = Object.assign({}, payload)
+	Vue.set(newObj, 'status', 'for opening')
+	Vue.set(newObj, 'document', 'Waiting for opening')
+
+	console.log(newObj)
+
+	doc.set(newObj)
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
+export function fsMarkAsCompleted({}, id) {
+	const ref = firebaseFs.collection('assignments').doc(id)
+	const dateCompleted = date.formatDate(Date.now(), 'YYYY-MM-DD hh:mm A')
+
+	ref.update({
+		status: 'completed',
+		dateCompleted: dateCompleted
+	})
+	.then(() => showSuccessMessage)
+	.catch(err => showErrorMessage(err.message))
 }
 
 // payload is id here
 export function undoMarkAsCompleted({ dispatch }, id) {
-	dispatch('fbUndoMarkAsCompleted', id)
+	// dispatch('fbUndoMarkAsCompleted', id)
+	dispatch('fsUndoMarkAsCompleted', id)
 }
 
-export function fbUndoMarkAsCompleted({}, id) {
-	const ref = firebaseDb.ref('assignments/' + id)
+export function fsUndoMarkAsCompleted({}, id) {
+	const ref = firebaseFs.collection('assignments').doc(id)
 
 	ref.update({
 		dateCompleted: '',
-		completed: false
-	}, error => {
-		if (error) {
-			showErrorMessage()
-		} else {
-			showSuccessMessage()
-		}
+		status: 'ongoing'
 	})
+	.then(() => showSuccessMessage())
+	.catch(err => showErrorMessage(err.message))
 }
 
 export function setSortBy({ commit }, payload) {
@@ -128,48 +196,54 @@ export function setSearch({ commit }, payload) {
 }
 
 export function filterByDate({ commit }, payload) {
-		commit('SET_START', payload.start)
-		commit('SET_END', payload.end)
+	commit('SET_START', payload.start)
+	commit('SET_END', payload.end)
 }
 
-export function fbReadData({ commit }) {
-	const assignments = firebaseDb.ref('assignments')
+export function fsReadData({ commit, rootGetters }) {
+	const role = rootGetters['auth/role']
+	const uid = rootGetters['auth/uid']
+	console.log(role,uid)
 
-	// initial check for data
-	assignments.once('value', snapshot => {
-		commit('SET_DOWNLOADED', true)
-	}, error => {
-		this.$router.replace('/auth')
-	})
+	let docs
+	if (role === 'user') {
+		docs = firebaseFs.collection('assignments').where('assignedTo','==',uid)
+	} else {
+		docs = firebaseFs.collection('assignments')
+	}
 
-	// child added
-	assignments.on('child_added', snapshot => {
-		const assignment = snapshot.val()
-		assignment.id = snapshot.key
+	docs.onSnapshot(querySnapshot => {
+		querySnapshot
+			.docChanges()
+			.forEach(change => {
 
-		const payload = {
-			id: snapshot.key,
-			assignment: assignment
-		}
-		commit('ADD_ASSIGNMENT', payload)
-	})
+				if (change.type === 'added') {
+					// console.log('firestore added', change.doc.data())
+					const payload = {
+						id: change.doc.id,
+						assignment: change.doc.data()
+					}
 
-	// child changed
-	assignments.on('child_changed', snapshot => {
-		console.log('child changed')
-		const assignment = snapshot.val()
-		assignment.id = snapshot.key
+					commit('ADD_ASSIGNMENT', payload)
+				}
 
-		const payload = {
-			id: snapshot.key,
-			updates: assignment
-		}
-		commit('UPDATE_ASSIGNMENT', payload)
-	})
+				if (change.type === 'modified') {
+					// console.log('firestore modified', change.doc.data())
+					const payload = {
+						id: change.doc.id,
+						updates: change.doc.data()
+					}
 
-	// child removed
-	assignments.on('child_removed', snapshot => {
-		const assignmentId = snapshot.key
-		commit('DELETE_ASSIGNMENT', assignmentId)
+					commit('UPDATE_ASSIGNMENT', payload)
+				}
+
+				if (change.type === 'removed') {
+					// console.log('firestore removed', change.doc.data())
+					const id = change.doc.id
+
+					commit('DELETE_ASSIGNMENT', id)
+				}
+				
+			})
 	})
 }

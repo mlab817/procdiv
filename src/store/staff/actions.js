@@ -1,4 +1,4 @@
-import { firebaseDb } from 'boot/firebase'
+import { firebaseDb, firebaseFs } from 'boot/firebase'
 import { uid } from 'quasar'
 import {
 	showErrorMessage,
@@ -13,7 +13,8 @@ export function add({ dispatch }, payload) {
 			name: payload
 		}
 	}
-	dispatch('fbAdd', staff)
+	// dispatch('fbAdd', staff)
+	dispatch('fsAdd', staff)
 }
 
 export function fbAdd({}, payload) {
@@ -29,44 +30,77 @@ export function fbAdd({}, payload) {
 	})
 }
 
-export function fbReadData({ commit }) {
-	const staff = firebaseDb.ref('staff')
+export function fsAdd({}, payload) {
+	const ref = firebaseFs.collection('staff').doc()
 
-	// initial check for data
-	staff.once('value', snapshot => {
-		commit('SET_DOWNLOADED', true)
-	}, error => {
-		this.$router.replace('/auth')
+	ref.set(payload.staff)
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
+export function fsReadData({ commit }) {
+	console.log('reading data for staff')
+	const docs = firebaseFs.collection('staff')
+
+	docs.onSnapshot(querySnapshot => {
+		querySnapshot
+			.docChanges()
+			.forEach(change => {
+
+				if (change.type === 'added') {
+					// console.log('firestore added', change.doc.id)
+					const payload = {
+						id: change.doc.id,
+						staff: change.doc.data()
+					}
+
+					commit('ADD_STAFF', payload)
+				}
+
+				if (change.type === 'modified') {
+					// console.log('firestore modified', change.doc.id)
+					const payload = {
+						id: change.doc.id,
+						data: change.doc.data()
+					}
+
+					commit('UPDATE_STAFF', payload)
+				}
+
+				if (change.type === 'removed') {
+					// console.log('firestore removed', change.doc.id)
+					const id = change.doc.id
+
+					commit('DELETE_STAFF', id)
+				}
+				
+			})
 	})
+}
 
-	// child added
-	staff.on('child_added', snapshot => {
-		const staff = snapshot.val()
-		staff.id = snapshot.key
+export function deleteStaff({ dispatch }, id) {
+	dispatch('fbDelete', id)
+}
 
-		const payload = {
-			id: snapshot.key,
-			staff: staff
-		}
-		commit('ADD_STAFF', payload)
+export function fbDelete({}, id) {
+	const staff = firebaseFs.collection('staff').doc(id)
+
+	staff.delete()
+		.then(() => showSuccessMessage())
+		.catch(err => showErrorMessage(err.message))
+}
+
+export function update({ dispatch }, payload) {
+	dispatch('fbUpdate', payload)
+}
+
+export function fbUpdate({}, payload) {
+	// payload { id, updates }
+	const staff = firebaseFs.collection('staff').doc(payload.id)
+
+	staff.update({
+		name: payload.updates
 	})
-
-	// child changed
-	staff.on('child_changed', snapshot => {
-		console.log('child changed')
-		const staff = snapshot.val()
-		staff.id = snapshot.key
-
-		const payload = {
-			id: snapshot.key,
-			updates: staff
-		}
-		commit('UPDATE_STAFF', payload)
-	})
-
-	// child removed
-	staff.on('child_removed', snapshot => {
-		const staffId = snapshot.key
-		commit('DELETE_STAFF', staffId)
-	})
+	.then(() => showSuccessMessage())
+	.catch(err => showErrorMessage(err.message))
 }

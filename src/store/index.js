@@ -4,10 +4,14 @@ import Vuex from 'vuex'
 // import example from './module-example'
 import assignment from './assignment'
 import auth from './auth'
-import deleted from './deleted'
 import document from './document'
 import enduser from './enduser'
+import notification from './notification'
+import opening from './opening'
+import pras from './pras'
 import staff from './staff'
+import task from './task'
+import user from './user'
 
 Vue.use(Vuex)
 
@@ -25,10 +29,14 @@ export default function (/* { ssrContext } */) {
     modules: {
       assignment,
       auth,
-      deleted,
       document,
       enduser,
-      staff
+      notification,
+      opening,
+      pras,
+      staff,
+      task,
+      user
     },
 
     // enable strict mode (adds overhead!)

@@ -1,5 +1,6 @@
 {
   "projects": {
-    "default": "pms-tasker"
+    "default": "pms-tasker",
+    "staging": "proc-staging"
   }
 }
