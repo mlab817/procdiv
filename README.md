@@ -1,5 +1,18 @@
 # Quasar App (proc)
 
+v2.2
+
+Assignments
+- Removed assignments feature
+
+For Opening
+- Elevated For Opening as a major feature
+- Added another field "result" for tracking result of opening
+- Added download with customization in For Opening
+
+Miscellaneous
+- Created reusable function for wrapCsvValue
+
 A Quasar Framework app
 
 ## Install the dependencies
