@@ -222,7 +222,7 @@
 					{
 						name: 'referenceNo',
 						label: 'Reference Number',
-						field: row => row.referenceNo
+						field: 'referenceNo'
 					},
 					{
 						name: 'actionTaken',

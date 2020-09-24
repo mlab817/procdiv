@@ -41,7 +41,7 @@
     "firebase-admin": "^9.0.0",
     "firebase-functions": "^3.9.0",
     "googleapis": "34",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.20",
     "workbox-webpack-plugin": "^5.0.0"
   },
   "browserslist": [

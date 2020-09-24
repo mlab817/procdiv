@@ -91,6 +91,7 @@ export function handleAuthStateChanged({ commit, dispatch, getters }) {
 		  	dispatch('notification/fbReadData', null, { root: true })
 		  	dispatch('task/fbReadData', null, { root: true })
 		  	dispatch('opening/fbReadData', null, { root: true })
+		  	dispatch('message/fbReadData', null, { root: true })
 		  	if (getters['admin']) {
 		  		console.log('admin triggered')
 		  		dispatch('staff/fsReadData', null, { root: true })
