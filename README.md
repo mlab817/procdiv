@@ -13,6 +13,10 @@ For Opening
 Miscellaneous
 - Created reusable function for wrapCsvValue
 
+Next
+- Download customization for tasks (in tasks table)
+- Filter by Column Value
+
 A Quasar Framework app
 
 ## Install the dependencies
