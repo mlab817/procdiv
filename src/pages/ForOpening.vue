@@ -134,7 +134,7 @@
 
 				filteredOpenings = openings.filter(o => {
 					console.log(o)
-					return (filterProperty(o.assignedName, filters.assignedName) && 
+					return (filterProperty(o.assignedName, filters.assignedName) &&
 							filterProperty(o.enduser, filters.enduser) &&
 							filterProperty(o.document, filters.document) &&
 							filterProperty(o.referenceNo, filters.referenceNo) &&
@@ -143,7 +143,7 @@
 							filterProperty(o.result, filters.result)
 						)
 				})
-				
+
 				return filteredOpenings
 			}
 		},
@@ -236,7 +236,7 @@
 				const prop = property && property.toLowerCase()
 				const filt = filter && filter.toLowerCase()
 
-				/* 	
+				/*
 				 *  if filter is empty return true, nothing is being filtered
 				 *	if prop is empty while filter is not empty return false
 				 *	otherwise return true
@@ -293,29 +293,6 @@
 			},
 			overdue(rfqDeadline, dateOpened) {
 				return (!dateOpened && date.getDateDiff(rfqDeadline, new Date(), 'seconds') < 0)
-			},
-			setFilterByStatus() {
-				const options = [
-					{
-						label: 'TWG for Evaluation',
-						value: 'TWG for Evaluation'
-					},
-					{
-						label: 'Failed',
-						value: 'Failed'
-					}
-				]
-				this.$q.dialog({
-					title: 'Filter By Result',
-					options: {
-						type: 'checkbox',
-						model: this.filterByResult,
-						items: options
-					},
-					cancel: true
-				}).onOk(data => {
-					this.filterByResult = data
-				})
 			},
 			customExport() {
 				const items = [

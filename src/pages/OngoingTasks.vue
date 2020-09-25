@@ -4,68 +4,48 @@
 			<q-btn icon="add_task" class="q-ml-sm" label="Add Task" color="primary" @click="addTask" v-if="admin" />
 		</div>
 
-		<!-- :grid="$q.screen.lt.sm" -->
+		<q-table
+			:data="filteredTasks"
+			:columns="columns"
+			:filter="filter"
+			wrap-cells
+			:grid="$q.screen.lt.sm"
+			row-key="id"
+			separator="cell"
+			:pagination="pagination"
+			:rows-per-page-options="[10,15,25,50,100,0]">
 
-		<q-table 
-				:title="`Ongoing (${tasks.length})`" 
-				:data="tasks" 
-				:columns="columns" 
-				:filter="filter" 
-				wrap-cells 
-				:grid="$q.screen.lt.sm" 
-				row-key="id" 
-				separator="cell" 
-				:pagination="pagination"
-				:rows-per-page-options="[10,15,25,50,100,0]">
+			<template v-slot:top-left>
+				<div class="text-h6">Ongoing Tasks</div>
+			</template>
+
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>
 						<q-icon name="search" />
 					</template>
 				</q-input>
+
+				<q-btn icon="event" color="primary" flat round class="q-ml-md">
+					<q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+						<q-date title="Date Due" v-model="filters.dateDue" range>
+							<div class="row items-center justify-end">
+								<q-btn label="Reset" @click="resetDate" color="primary" flat />
+								<q-btn v-close-popup label="Close" color="primary" flat />
+							</div>
+						</q-date>
+					</q-popup-proxy>
+				</q-btn>
+
 				<q-btn flat round icon="archive" color="primary" class="q-ml-md" @click="downloadTasks"></q-btn>
 			</template>
 
 			<template v-slot:top-row>
 				<q-tr>
-					<q-td></q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search assigned date" input-class="text-center"></q-input>
+					<q-td colspan="100%">
+						<span v-if="filters.dateDue.from && filters.dateDue.to">From {{filters.dateDue.from}} to {{filters.dateDue.to}}</span>
+						<span v-else>No filters</span>
 					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search documents" input-class="text-center"></q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search particulars" input-class="text-center"></q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search enduser" input-class="text-center"></q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search reference no." input-class="text-center"></q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search action taken" input-class="text-center"></q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search assigned staff" input-class="text-center"></q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search RFQ deadline" input-class="text-center"></q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search due date" input-class="text-center">
-							<template v-slot:append>
-								<q-btn icon="event" flat round>
-									
-								</q-btn>
-							</template>
-						</q-input>
-					</q-td>
-					<q-td>
-						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search remarks" input-class="text-center"></q-input>
-					</q-td>
-					<q-td></q-td>
 				</q-tr>
 			</template>
 
@@ -201,11 +181,6 @@
 			</div>
 		</q-dialog>
 
-		<table-component 
-			title="Ongoing Tasks"
-			:data="tasks"
-			:columns="columns"></table-component>
-
 	</q-page>
 </template>
 
@@ -225,6 +200,32 @@
 			},
 			admin() {
 				return this.$store.getters['auth/admin']
+			},
+			columnNames() {
+				const columnNames = this.columns.map(c => c.name)
+				console.log(columnNames)
+				return columnNames
+			},
+			dateRange() {
+				return `${this.filters.dateDue.from} - ${this.filters.dateDue.to}`
+			},
+			filteredTasks() {
+				const from = this.filters.dateDue.from ? this.filters.dateDue.from : ''
+				const to = this.filters.dateDue.to ? this.filters.dateDue.to : ''
+				let filteredTasks = []
+
+				const tasks = this.tasks
+
+				if (from && to) {
+					filteredTasks = tasks.filter(t => {
+						console.log(t)
+						return (date.isBetweenDates(t.dateDue, from, to, { inclusiveFrom: true, inclusiveTo: true }))
+					})
+				} else {
+					filteredTasks = tasks
+				}
+
+				return filteredTasks
 			}
 		},
 		data() {
@@ -244,7 +245,11 @@
 				},
 				filter: '',
 				filters: {
-					dateAssigned: ''
+					dateAssigned: '',
+					dateDue: {
+						from: '',
+						to: ''
+					}
 				},
 				columns: [
 					{
@@ -400,7 +405,11 @@
 				.onOk(() => this.$store.dispatch('task/remindTask', row))
 			},
 			downloadTasks() {
-				exportTable(this.tasks, this.columns, 'ongoing tasks.csv')
+				exportTable(this.filteredTasks, this.columns, 'ongoing tasks.csv')
+			},
+			resetDate() {
+				this.filters.dateDue.from = ''
+				this.filters.dateDue.to = ''
 			}
 		},
 		filters: {
