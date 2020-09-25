@@ -8,6 +8,7 @@
 			:columns="columns"
 			row-key="id"
 			separator="cell"
+			:pagination="pagination"
 			:filter="filter"
 			:grid="$q.screen.lt.sm">
 			<template v-slot:top-right>
@@ -111,6 +112,9 @@
 			return {
 				filter: '',
 				filterByResult: [],
+				pagination: {
+					rowsPerPage: 10
+				},
 				selectedColumns: ['assignedTo','enduser','document','referenceNo','rfqDeadline','dateOpened','result'],
 				columns: [
 					{
