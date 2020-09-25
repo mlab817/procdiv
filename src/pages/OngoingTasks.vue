@@ -23,17 +23,55 @@
 						<q-icon name="search" />
 					</template>
 				</q-input>
+				<q-btn flat round icon="archive" color="primary" class="q-ml-md" @click="downloadTasks"></q-btn>
+			</template>
+
+			<template v-slot:top-row>
+				<q-tr>
+					<q-td></q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search assigned date" input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search documents" input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search particulars" input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search enduser" input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search reference no." input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search action taken" input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search assigned staff" input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search RFQ deadline" input-class="text-center"></q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search due date" input-class="text-center">
+							<template v-slot:append>
+								<q-btn icon="event" flat round>
+									
+								</q-btn>
+							</template>
+						</q-input>
+					</q-td>
+					<q-td>
+						<q-input v-model="filters.dateAssigned" dense borderless placeholder="Search remarks" input-class="text-center"></q-input>
+					</q-td>
+					<q-td></q-td>
+				</q-tr>
 			</template>
 
 			<template v-slot:body-cell-overdue="props">
 				<q-td :props="props">
-					<q-icon name="priority_high" color="red" v-if="overdue(props.row.dateDue)" />
-				</q-td>
-			</template>
-
-			<template v-slot:body-cell-dateDue="props">
-				<q-td :props="props">
-					{{ props.row.dateDue }}
+					<q-icon name="priority_high" color="red" v-if="props.row.overdue" />
 				</q-td>
 			</template>
 
@@ -103,13 +141,13 @@
 								<q-item>
 									<q-item-section>
 										<q-item-label caption>RFQ Deadline</q-item-label>
-										<q-item-label>{{ props.row.rfqDeadline | formatDate }}</q-item-label>
+										<q-item-label>{{ props.row.rfqDeadline }}</q-item-label>
 									</q-item-section>
 								</q-item>
 								<q-item>
 									<q-item-section>
 										<q-item-label caption>Due Date/Time</q-item-label>
-										<q-item-label>{{ props.row.dateDue | formatDate }}</q-item-label>
+										<q-item-label>{{ props.row.dateDue }}</q-item-label>
 									</q-item-section>
 								</q-item>
 								<q-item>
@@ -163,20 +201,26 @@
 			</div>
 		</q-dialog>
 
+		<table-component 
+			title="Ongoing Tasks"
+			:data="tasks"
+			:columns="columns"></table-component>
+
 	</q-page>
 </template>
 
 <script>
-	import { parseDate } from 'src/functions'
+	import { parseDate, exportTable } from 'src/functions'
 	import { date } from 'quasar'
 
 	export default {
 		components: {
-			'add-edit-task': () => import('../components/AddEditTask.vue')
+			'add-edit-task': () => import('../components/AddEditTask.vue'),
 		},
 		name: 'PageTasks',
 		computed: {
 			tasks() {
+				// define additional data here instead
 				return this.$store.getters['task/ongoing']
 			},
 			admin() {
@@ -199,15 +243,20 @@
 					dateDue: ''
 				},
 				filter: '',
+				filters: {
+					dateAssigned: ''
+				},
 				columns: [
 					{
 						name: 'overdue',
-						label: ''
+						label: 'Overdue',
+						field: 'overdue',
+						align: 'center'
 					},
 					{
 						name: 'dateAssigned',
 						label: 'Date Assigned',
-						field: row => date.formatDate(parseDate(row.dateAssigned),'MMM D, YYYY'),
+						field: row => date.formatDate(parseDate(row.dateAssigned),'MMM D, YYYY hh:mm A'),
 						sortable: true,
 						align: 'center'
 					},
@@ -263,7 +312,7 @@
 					{
 						name: 'dateDue',
 						label: 'Due Date/Time',
-						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY') : ''),
+						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY hh:mm A') : ''),
 						sortable: true,
 						align: 'center'
 					},
@@ -349,6 +398,9 @@
 					cancel: true
 				})
 				.onOk(() => this.$store.dispatch('task/remindTask', row))
+			},
+			downloadTasks() {
+				exportTable(this.tasks, this.columns, 'ongoing tasks.csv')
 			}
 		},
 		filters: {

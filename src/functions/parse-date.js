@@ -3,7 +3,8 @@
  */
 export const parseDate = (date) => {
 	if (date) {
-	    return date.replace(/-/g,'/')
+	    const formatted = date.replace(/-/g,'/')
+	    return new Date(formatted)
 	}
 	return ''
 }

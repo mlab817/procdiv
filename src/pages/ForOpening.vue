@@ -1,7 +1,8 @@
 <template>
 	<q-page padding>
+
 		<q-table
-			:title="`For Opening (${openings.length})`"
+			:title="`For Opening (${arrayOpenings.length})`"
 			flat
 			bordered
 			:data="filteredOpenings"
@@ -17,9 +18,37 @@
 						<q-icon name="search" />
 					</template>
 				</q-input>
-				<q-btn @click="customExport" icon="archive" flat round class="q-ml-md"></q-btn>
-				<q-btn @click="setFilterByStatus" icon="filter_alt" flat round class="q-ml-md"></q-btn>
+				<q-btn @click="customExport" color="primary" icon="archive" flat round class="q-ml-md"></q-btn>
 			</template>
+
+			<template v-slot:top-row>
+        <q-tr class="bg-grey-1">
+          <q-td></q-td>
+          <q-td>
+            <q-input v-model="filters.assignedName" dense borderless placeholder="Search Assigned" input-class="text-center"></q-input>
+          </q-td>
+          <q-td>
+            <q-input v-model="filters.enduser" dense borderless placeholder="Search Enduser" input-class="text-center"></q-input>
+          </q-td>
+          <q-td>
+            <q-input v-model="filters.document" dense borderless placeholder="Search Document" input-class="text-center"></q-input>
+          </q-td>
+          <q-td>
+            <q-input v-model="filters.referenceNo" dense borderless placeholder="Search Reference No." input-class="text-center"></q-input>
+          </q-td>
+          <q-td>
+            <q-input v-model="filters.rfqDeadline" dense borderless placeholder="Search RFQ Deadline" input-class="text-center"></q-input>
+          </q-td>
+          <q-td>
+            <q-input v-model="filters.dateOpened" dense borderless placeholder="Search Date Opened" input-class="text-center"></q-input>
+          </q-td>
+          <q-td>
+            <q-input v-model="filters.result" dense borderless placeholder="Search Result" input-class="text-center"></q-input>
+          </q-td>
+          <q-td></q-td>
+          <q-td></q-td>
+        </q-tr>
+      </template>
 
 			<template v-slot:body-cell-overdue="props">
 				<q-td :props="props" :class="overdue(props.row.rfqDeadline, props.row.dateOpened) ? 'bg-red-1' : ''">
@@ -66,6 +95,10 @@
 					</q-card>
 				</div>
 			</template>
+
+			<template v-slot:bottom>
+				<div>Filters will be applied in exported file.</div>
+			</template>
 		</q-table>
 	</q-page>
 </template>
@@ -77,7 +110,10 @@
 	export default {
 		name: 'ForOpening',
 		computed: {
-    	openings() {
+			admin() {
+    		return this.$store.getters['auth/admin']
+    	},
+    	arrayOpenings() {
     		const openings = this.$store.state.opening.openings
 
 				return Object.entries(openings).map(([key, value]) => {
@@ -89,22 +125,25 @@
 					return !o.deleted
 				})
     	},
-    	admin() {
-    		return this.$store.getters['auth/admin']
-    	},
 			filteredOpenings() {
-				const openings = this.openings,
-					filterByResult = this.filterByResult
+				const openings = this.arrayOpenings,
+					filterByResult = this.filterByResult,
+					filters = this.filters,
+					filterProperty = this.filterProperty
 				let filteredOpenings = []
 
-				if (!filterByResult.length) {
-					filteredOpenings = openings
-    		} else {
-					filteredOpenings = openings.filter(o => {
-						return (o.result && filterByResult.includes(o.result))
-					})
-				}
-
+				filteredOpenings = openings.filter(o => {
+					console.log(o)
+					return (filterProperty(o.assignedName, filters.assignedName) && 
+							filterProperty(o.enduser, filters.enduser) &&
+							filterProperty(o.document, filters.document) &&
+							filterProperty(o.referenceNo, filters.referenceNo) &&
+							filterProperty(o.rfqDeadline, filters.rfqDeadline) &&
+							filterProperty(o.dateOpened, filters.dateOpened) &&
+							filterProperty(o.result, filters.result)
+						)
+				})
+				
 				return filteredOpenings
 			}
 		},
@@ -112,10 +151,19 @@
 			return {
 				filter: '',
 				filterByResult: [],
-				pagination: {
-					rowsPerPage: 10
+				filters: {
+					assignedName: '',
+					enduser: '',
+					document: '',
+					referenceNo: '',
+					rfqDeadline: '',
+					dateOpened: '',
+					result: '',
 				},
-				selectedColumns: ['assignedTo','enduser','document','referenceNo','rfqDeadline','dateOpened','result'],
+				pagination: {
+					rowsPerPage: 0
+				},
+				selectedColumns: ['assignedName','enduser','document','referenceNo','rfqDeadline','dateOpened','result'],
 				columns: [
 					{
 						name: 'overdue',
@@ -123,7 +171,7 @@
 						align: 'center'
 					},
 					{
-						name: 'assignedTo',
+						name: 'assignedName',
 						label: 'Assigned To',
 						field: 'assignedName',
 						align: 'center',
@@ -184,6 +232,18 @@
 			}
 		},
 		methods: {
+			filterProperty(property, filter) {
+				const prop = property && property.toLowerCase()
+				const filt = filter && filter.toLowerCase()
+
+				/* 	
+				 *  if filter is empty return true, nothing is being filtered
+				 *	if prop is empty while filter is not empty return false
+				 *	otherwise return true
+				*/
+
+				return filt ? (prop ? prop.includes(filt) : false) : true
+			},
 			openItem(id) {
 				const options = [
 					{
@@ -259,7 +319,7 @@
 			},
 			customExport() {
 				const items = [
-					'assignedTo',
+					'assignedName',
 					'enduser',
 					'document',
 					'referenceNo',
