@@ -230,7 +230,7 @@ export default {
       essentialLinks: linksData,
       rightDrawerOpen: false,
       hover: null,
-      version: '2.2',
+      version: '2.2.1',
       addTaskDialog: false
     }
   },
