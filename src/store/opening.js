@@ -17,11 +17,11 @@ const actions = {
 		let docs
 
 		if (!admin && !staffId) {
-			return 
+			return
 		} else {
 			if (admin) {
 				docs = firebaseFs.collection('openings')
-			} 
+			}
 			else {
 				docs = firebaseFs.collection('openings').where('assignedId','==',staffId)
 			}
@@ -79,13 +79,15 @@ const actions = {
 			.then(() => showSuccessMessage())
 			.catch(err => showErrorMessage(err.message))
 	},
-	open: ({ dispatch }, id) => {
-		dispatch('fbOpen', id)
+	open: ({ dispatch }, payload) => {
+		// payload contains { result, id }
+		dispatch('fbOpen', payload)
 	},
-	fbOpen: ({}, id) => {
-		const doc = firebaseFs.collection('openings').doc(id)
+	fbOpen: ({}, payload) => {
+		const doc = firebaseFs.collection('openings').doc(payload.id)
 
 		doc.update({
+			result: payload.result,
 			opened: true,
 			dateOpened: date.formatDate(new Date(), 'YYYY-MM-DD hh:mm A')
 		})

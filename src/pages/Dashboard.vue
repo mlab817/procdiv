@@ -1,27 +1,38 @@
 <template>
   <q-page padding>
-    <q-banner class="bg-grey-3 q-mb-md" v-if="!linked">
+    <q-toolbar>
+      <q-toolbar-title>Dashboard</q-toolbar-title>
+    </q-toolbar>
+
+    <q-banner class="bg-grey-3 q-mb-md" v-if="loggedIn && !linked">
       <template v-slot:avatar>
         <q-icon name="link_off" color="red" />
       </template>
       You are not connected to any staff. You will not be able to view records in the application until then. Please wait or notify the admin.
     </q-banner>
 
-    <div class="row q-col-gutter-md">
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
-        <zingchart :data="pieConfig" />
+    <div class="row">
+      <div class="col-xl-8 col-lg-8 col-md-6 col-sm-12 col-xs-12">
+        <div class="row">
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <zing-chart type="pie" title="Tasks by Staff" :entries="tasks" groupBy="assignedName" legend></zing-chart>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <zing-chart type="pie" title="Tasks by Status" :entries="tasks" groupBy="status" legend></zing-chart>
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <calendar-chart title="Tasks by Date Assigned" :entries="entries" groupBy="dateAssigned" />
+          </div>
+          <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-xs-12">
+            <calendar-chart title="Task By Due Date" :entries="entries" groupBy="dateDue" />
+          </div>
+        </div>
       </div>
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
-        <zingchart :data="byStatus" />
-      </div>
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
-        <zingchart :data="byDateDue" />
-      </div>
-      <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12 col-xs-12">
+      <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12 col-xs-12">
         <q-list>
           <q-item-label header>Overdue Tasks</q-item-label>
-          <template v-for="(task, key) in overdue">
-            <q-item :key="key" clickable tag="a" :to="`/tasks/${key}`">
+          <template v-for="(task, index) in overdue">
+            <q-item :key="index" clickable tag="a" :to="`/tasks/${task.id}`">
               <q-item-section avatar>
                 <q-avatar class="bg-primary text-white">{{task.assignedName.charAt(0)}}</q-avatar>
               </q-item-section>
@@ -35,11 +46,9 @@
               </q-item-section>
             </q-item>
           </template>
-          <q-item clickable>
+          <q-item clickable to="/overdue">
             <q-item-section>
-              <q-item-label class="text-right">
-                View More
-              </q-item-label>
+              <q-item-label>View More</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
@@ -55,15 +64,44 @@ import { SEED } from '../seeds'
 import { firebaseFs } from 'boot/firebase'
 import { parseDate } from 'src/functions/parse-date'
 import { date } from 'quasar'
+import ZingChart from '../components/charts/ZingChart.vue'
+import CalendarChart from '../components/charts/CalendarChart.vue'
+import { objectToArray } from 'src/utils'
 
 export default {
   // name: 'PageName',
+  components: {
+    'zing-chart': ZingChart,
+    'calendar-chart': CalendarChart,
+  },
   data() {
   	return {
-      filterDialog: true
+      filterDialog: true,
+      filterTasksDialog: true,
+      statuses: [
+        {
+          value: 'ongoing',
+          label: 'Ongoing'
+        },{
+          value: 'completed',
+          label: 'Completed'
+        },{
+          value: 'deleted',
+          label: 'Deleted'
+        }
+      ],
+      filter: {
+        statuses: []
+      }
     }
   },
   computed: {
+    loggedIn() {
+      return this.$store.state.auth.loggedIn
+    },
+    tasks() {
+      return this.$store.state.task.tasks
+    },
     linked() {
       return this.$store.getters['auth/linked']
     },
@@ -72,57 +110,6 @@ export default {
 
   		return _.countBy(assignments, 'assignedTo')
   	},
-    pieConfig() {
-      const tasks = this.$store.state.task.tasks
-      let groupedTask = []
-      let pieConfig = {}
-
-      const countTasks = _.countBy(tasks, 'assignedName')
-
-      Object.keys(countTasks).forEach(key => {
-        let values = []
-        values.push(countTasks[key])
-        groupedTask.push({
-          text: key,
-          values: values
-        })
-      })
-
-      pieConfig.type = 'pie'
-      pieConfig.backgroundColor = '#2B313B'
-      pieConfig.title = {
-        text: 'Tasks by Staff',
-        align: 'left',
-        fontColor: '#fff',
-        fontFamily: 'Open Sans',
-        fontSize: '25px',
-        offsetX: '10px',
-      }
-      pieConfig.plot = {
-        tooltip: {
-          text: '%npv%',
-          padding: '5 10',
-          fontFamily: 'Open Sans',
-          fontSize: '18px'
-        },
-        valueBox: {
-          text: '%t\n%npv%',
-          fontFamily: 'Open Sans',
-          placement: 'out'
-        },
-        animation: {
-          effect: 'ANIMATION_EXPAND_VERTICAL',
-          method: 'ANIMATION_REGULAR_EASE_OUT',
-          sequence: 'ANIMATION_BY_PLOT',
-          speed: 500
-        },
-        borderColor: '#2B313B',
-        borderWidth: '5px'
-      }
-      pieConfig.series = groupedTask
-
-      return pieConfig
-    },
     byDateDue() {
       const tasks = Object.assign({}, this.$store.state.task.tasks)
       let groupedTask = []
@@ -256,59 +243,24 @@ export default {
       return this.$store.getters['task/ongoing']
     },
     overdue() {
-      return this.$store.getters['task/overdue']
+      const overdueTasks = this.$store.getters['task/overdue']
+
+      return Object.keys(overdueTasks).map(key => {
+        return {
+          ...overdueTasks[key],
+          id: key
+        }
+      }).slice(0, 5)
+    },
+    entries() {
+      const tasks = this.tasks
+
+      return objectToArray(tasks)
     }
   },
   methods: {
-    seedEndusers() {
-      const endusers = this.seed.endusers
-
-      Object.keys(endusers).forEach(key => {
-        const ref = firebaseFs.collection('endusers').doc()
-        const enduser = endusers[key]
-
-        ref.set(enduser)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
-    },
-    seedDocuments() {
-      const documents = this.seed.documents
-
-      Object.keys(documents).forEach(key => {
-        const ref = firebaseFs.collection('documents').doc()
-        const doc = documents[key]
-
-        ref.set(doc)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
-    },
-    seedStaff() {
-      const staffs = this.seed.staff
-
-      Object.keys(staffs).forEach(key => {
-        const ref = firebaseFs.collection('staff').doc()
-        const staff = staffs[key]
-
-        ref.set(staff)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
-    },
-    seedAssignments() {
-      const assignments = this.seed.assignments
-
-      Object.keys(assignments).forEach(key => {
-        const ref = firebaseFs.collection('assignments').doc()
-        const assignment = assignments[key]
-        
-        assignment.status = (assignment.completed) ? 'completed' : 'ongoing'
-
-        ref.set(assignment)
-          .then(() => console.log('success'))
-          .catch(err => console.error(err))
-      })
+    initMap() {
+      //
     }
   },
   filters: {
@@ -318,6 +270,9 @@ export default {
     getTime(val) {
       return date.formatDate(val,'hh:mm A')
     }
+  },
+  mounted() {
+    this.initMap()
   }
 }
 </script>

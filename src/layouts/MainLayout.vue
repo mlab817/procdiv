@@ -13,26 +13,33 @@
         />
 
         <q-toolbar-title>
-          Purchasing v2.1.1
+          Purchasing v{{version}}
         </q-toolbar-title>
 
         <q-space/>
 
-        <q-btn flat round icon="add_task" v-if="loggedIn && admin" to="/add-task">
+        <q-btn flat round icon="add_task" v-if="loggedIn && admin" @click="addTaskDialog = true">
           <q-tooltip>Add Task</q-tooltip>
         </q-btn>
+
         <q-btn flat round icon="notifications" color="grey-9" @click="rightDrawerOpen = !rightDrawerOpen" v-if="loggedIn">
           <q-badge color="red" floating>
             {{Object.keys(notifications).length}}
           </q-badge>
           <q-tooltip>Notifications</q-tooltip>
         </q-btn>
+
         <q-btn flat stretch icon="person" label="Login" to="/auth" v-if="!loggedIn"></q-btn>
+
         <q-btn flat stretch icon-right="exit_to_app" :label="$q.screen.lt.sm ? void 0 : 'Logout'" v-else @click="confirmLogout">
-          
+
         </q-btn>
       </q-toolbar>
     </q-header>
+
+    <q-dialog v-model="addTaskDialog">
+      <add-edit-task @close="addTaskDialog = false" />
+    </q-dialog>
 
     <q-drawer
       v-model="leftDrawerOpen"
@@ -43,7 +50,7 @@
       v-if="loggedIn"
       show-if-above
     >
-      
+
       <q-img class="absolute-top" style="height: 200px" src="https://cdn.quasar.dev/img/material.png">
         <div class="absolute-bottom bg-transparent">
           <q-avatar size="56px" class="q-mb-sm">
@@ -70,45 +77,6 @@
               <q-item-label>Dashboard</q-item-label>
             </q-item-section>
           </q-item>
-          <q-expansion-item clickable tag="a" icon="priority_high" label="Assignments" :default-expand-all="$q.screen.gt.sm" :content-inset-level="1">
-            <template v-slot:header>
-              <q-item-section avatar>
-                <q-icon name="apps" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>
-                  Assignments <q-badge color="negative">deprecated</q-badge>
-                </q-item-label>
-              </q-item-section>
-              <q-item-section>
-                
-              </q-item-section>
-            </template>
-            <q-item clickable tag="a" exact to="/v1/ongoing">
-              <q-item-section avatar>
-                <q-icon name="code"></q-icon>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Ongoing</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable tag="a" exact to="/v1/completed">
-              <q-item-section avatar>
-                <q-icon name="check"></q-icon>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Completed</q-item-label>
-              </q-item-section>
-            </q-item>
-            <q-item clickable tag="a" exact to="/v1/deleted">
-              <q-item-section avatar>
-                <q-icon name="delete"></q-icon>
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>Deleted</q-item-label>
-              </q-item-section>
-            </q-item>
-          </q-expansion-item>
           <q-item clickable tag="a" exact to="/add-task" v-if="admin">
             <q-item-section avatar>
               <q-icon name="add_task"></q-icon>
@@ -142,16 +110,15 @@
                 <q-item-label>Trash</q-item-label>
               </q-item-section>
             </q-item>
-            <q-separator color="grey-3" />
-            <q-item clickable tag="a" exact to="/for-opening">
-              <q-item-section avatar>
-                <q-icon name="drafts" />
-              </q-item-section>
-              <q-item-section>
-                <q-item-label>For Opening</q-item-label>
-              </q-item-section>
-            </q-item>
           </q-expansion-item>
+					<q-item clickable tag="a" exact to="/for-opening">
+						<q-item-section avatar>
+							<q-icon name="drafts" />
+						</q-item-section>
+						<q-item-section>
+							<q-item-label>For Opening</q-item-label>
+						</q-item-section>
+					</q-item>
           <q-item clickable tag="a" to="/manage-users" exact v-if="admin">
             <q-item-section avatar>
               <q-icon name="supervisor_account" />
@@ -237,7 +204,8 @@ export default {
   name: 'MainLayout',
   components: {
     'notifications-list': () => import('../components/layout/NotificationsList.vue'),
-    'download-task': () => import('../components/layout/DownloadTask.vue')
+    'download-task': () => import('../components/layout/DownloadTask.vue'),
+    'add-edit-task': () => import('../components/AddEditTask.vue')
   },
   computed: {
     user() {
@@ -261,7 +229,9 @@ export default {
       leftDrawerOpen: false,
       essentialLinks: linksData,
       rightDrawerOpen: false,
-      hover: null
+      hover: null,
+      version: '2.2',
+      addTaskDialog: false
     }
   },
   methods: {
@@ -286,7 +256,7 @@ export default {
       display: none;
     }
   }
-  
+
   .q-drawer {
     .q-router-link--exact-active {
       color: white !important;
