@@ -38,7 +38,7 @@
     </q-header>
 
     <q-dialog v-model="addTaskDialog">
-      <add-edit-task @close="addTaskDialog = false" />
+      <add-edit-task @close="addTaskDialog = false" :task="taskToSubmit" />
     </q-dialog>
 
     <q-drawer
@@ -230,8 +230,22 @@ export default {
       essentialLinks: linksData,
       rightDrawerOpen: false,
       hover: null,
-      version: '2.2.1',
-      addTaskDialog: false
+      version: '2.2.2',
+      addTaskDialog: false,
+      taskToSubmit: {
+        id: null,
+        document: '',
+        particulars: '',
+        rfqDeadline: '',
+        enduser: '',
+        referenceNo: '',
+        actionTaken: '',
+        assignedTo: '',
+        remarks: '',
+        dateDue: '',
+        abc: 0,
+        forOpening: false
+      }
     }
   },
   methods: {

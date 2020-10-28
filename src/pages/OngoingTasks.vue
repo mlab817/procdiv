@@ -55,6 +55,12 @@
 				</q-td>
 			</template>
 
+			<template v-slot:body-cell-forOpening="props">
+				<q-td :props="props">
+					<q-icon :name="props.row.forOpening ? 'check_box' : 'check_box_outline_blank' " v-if="props.row.forOpening" size="sm" color="green" />
+				</q-td>
+			</template>
+
 			<template v-slot:body-cell-actions="props" v-if="admin">
 				<q-td :props="props">
 					<div>
@@ -236,12 +242,14 @@
 					document: '',
 					particulars: '',
 					rfqDeadline: '',
+					abc: 0,
 					enduser: '',
 					referenceNo: '',
 					actionTaken: '',
 					assignedTo: '',
 					remarks: '',
-					dateDue: ''
+					dateDue: '',
+					forOpening: false
 				},
 				filter: '',
 				filters: {
@@ -263,6 +271,7 @@
 						label: 'Date Assigned',
 						field: row => date.formatDate(parseDate(row.dateAssigned),'MMM D, YYYY hh:mm A'),
 						sortable: true,
+						sort: (a, b) =>  new Date(parseDate(a)) - new Date(parseDate(b)),
 						align: 'center'
 					},
 					{
@@ -312,12 +321,20 @@
 						label: 'RFQ Deadline',
 						field: row => (row.rfqDeadline ? date.formatDate(parseDate(row.rfqDeadline),'MMM D, YYYY hh:mm A') : ''),
 						sortable: true,
+						sort: (a, b) =>  new Date(parseDate(a)) - new Date(parseDate(b)),
+						align: 'center'
+					},
+					{
+						name: 'forOpening',
+						label: 'For Opening',
+						field: row => row.forOpening || false,
 						align: 'center'
 					},
 					{
 						name: 'dateDue',
 						label: 'Due Date/Time',
 						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY hh:mm A') : ''),
+						sort: (a, b) => new Date(parseDate(a)) - new Date(parseDate(b)),
 						sortable: true,
 						align: 'center'
 					},
@@ -348,12 +365,14 @@
 					document: '',
 					particulars: '',
 					rfqDeadline: '',
+					abc: 0,
 					enduser: '',
 					referenceNo: '',
 					actionTaken: '',
 					assignedTo: '',
 					remarks: '',
-					dateDue: ''
+					dateDue: '',
+					forOpening: false
 				}
 
 				this.addTaskDialog = true

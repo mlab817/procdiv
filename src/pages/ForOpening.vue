@@ -203,12 +203,14 @@
 						label: 'RFQ Deadline',
 						field: row => date.formatDate(parseDate(row.rfqDeadline), 'MMM DD, YYYY hh:mm A'),
 						align: 'center',
+						sort: (a, b) => new Date(parseDate(a)) - new Date(parseDate(b)),
 						sortable: true
 					},
 					{
 						name: 'dateOpened',
 						label: 'Date Opened',
 						field: row => date.formatDate(parseDate(row.dateOpened), 'MMM DD, YYYY hh:mm A'),
+						sort: (a, b) => new Date(parseDate(a)) - new Date(parseDate(b)),
 						align: 'center',
 						sortable: true
 					},

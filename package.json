@@ -19,7 +19,7 @@
     "copy-webpack-plugin": "^6.0.3",
     "core-js": "^3.6.5",
     "dotenv": "^8.2.0",
-    "firebase": "^7.17.2",
+    "firebase": "^8.0.0",
     "google-api-javascript-client": "google/google-api-javascript-client",
     "quasar": "^1.13.1",
     "underscore": "^1.10.2",
