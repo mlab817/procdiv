@@ -76,6 +76,7 @@ const actions = {
 
 		doc
 			.set(payload)
+			.then(() => this.$q.loading.hide())
 			.then(() => showSuccessMessage())
 			.catch(err => showErrorMessage(err.message))
 	},

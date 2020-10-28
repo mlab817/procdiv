@@ -17,7 +17,7 @@ const actions = {
 		const staffId = rootGetters['auth/staffId']
 
 		if (!admin && !staffId) {
-			return 
+			return
 		} else {
 			let docs
 
@@ -37,7 +37,7 @@ const actions = {
 
 							if (type === 'added') {
 								const payload = {
-									id: doc.id, 
+									id: doc.id,
 									data: doc.data()
 								}
 
@@ -60,7 +60,7 @@ const actions = {
 						})
 				})
 		}
-			
+
 	},
 
 	addTask: ({ dispatch }, payload) => {
@@ -145,6 +145,9 @@ const actions = {
 	completeTask: ({ dispatch }, payload) => {
 		dispatch('fbCompleteTask', payload.id)
 		if (!!payload.rfqDeadline) {
+			this.$q.loading.show({
+				message: 'Adding to for Opening...'
+			})
 			dispatch('opening/add', payload, { root: true })
 		}
 	},
@@ -220,19 +223,19 @@ const mutations = {
 const getters = {
 	ongoing: (state) => {
 		let tasks = state.tasks, ongoingTasks = []
-		
+
 		const now = new Date()
 
 		const filteredKeys = Object.keys(tasks).forEach(key => {
 			const task = tasks[key]
 			const due = now > parseDate(task.dateDue)
-			
+
 			if (!task.completed && task.status === 'ongoing' && !task.deleted) {
 				ongoingTasks.push({
 					...task,
 					overdue: due,
 					id: key
-				})	
+				})
 			}
 		})
 
@@ -248,7 +251,7 @@ const getters = {
 				completedTasks.push({
 					...task,
 					id: key
-				})	
+				})
 			}
 		})
 
@@ -259,12 +262,12 @@ const getters = {
 
 		const filteredKeys = Object.keys(tasks).forEach(key => {
 			const task = tasks[key]
-			
+
 			if (task.status === 'deleted') {
 				deletedTasks.push({
 					...task,
 					id: key
-				})	
+				})
 			}
 		})
 
@@ -278,7 +281,7 @@ const getters = {
 			const task = tasks[key]
 			const dateDue = task.dateDue ? new Date(parseDate(task.dateDue)) : ''
 			const today = new Date()
-			
+
 			if (dateDue && today > dateDue && !task.completed) {
 				overdueTasks[key] = task
 			}

@@ -22,7 +22,8 @@
 					actionTaken: '',
 					assignedTo: '',
 					remarks: '',
-					dateDue: ''
+					dateDue: '',
+					abc: 0
 				}
 			}
 		}
