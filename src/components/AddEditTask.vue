@@ -72,7 +72,7 @@
 						v-model="taskToSubmit.abc"
 						outlined
 						:dense="dense"
-						label="Approved Budget Cost (ABC)"
+						label="Approved Budget for the Contract (ABC)"
 						stack-label
 						class="col"
 						hide-bottom-space
