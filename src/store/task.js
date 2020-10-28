@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { firebaseFs, firebaseAuth } from 'boot/firebase'
 import { showErrorMessage, showSuccessMessage } from 'src/functions'
-import { date } from 'quasar'
+import { date, Loading } from 'quasar'
 import { parseDate } from 'src/functions'
 
 const state = () => {
@@ -102,6 +102,7 @@ const actions = {
 				showSuccessMessage()
 			})
 			.catch(err => showErrorMessage(err.message))
+			.finally(() => Loading.hide())
 	},
 
 	copyToTask({}, payload) {
@@ -118,6 +119,7 @@ const actions = {
 		docs.update(payload.updates)
 			.then(() => showSuccessMessage())
 			.catch(err => showErrorMessage(err.message))
+			.finally(() => Loading.hide())
 	},
 
 	deleteTask: ({ dispatch }, id) => {
@@ -144,8 +146,8 @@ const actions = {
 
 	completeTask: ({ dispatch }, payload) => {
 		dispatch('fbCompleteTask', payload.id)
-		if (!!payload.rfqDeadline) {
-			this.$q.loading.show({
+		if (!!parseDate(payload.rfqDeadline) || payload.forOpening) {
+			Loading.show({
 				message: 'Adding to for Opening...'
 			})
 			dispatch('opening/add', payload, { root: true })

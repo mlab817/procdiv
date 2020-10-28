@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import { firebaseFs } from 'boot/firebase'
 import { showSuccessMessage, showErrorMessage } from 'src/functions'
-import { date } from 'quasar'
+import { date, Loading } from 'quasar'
 
 const state = () => {
 	return {
@@ -58,12 +58,12 @@ const actions = {
 	add: ({ dispatch }, payload) => {
 		console.log('add opening: ', payload)
 		const opening = {
-			assignedId: payload.assignedId,
-			assignedName: payload.assignedName,
-			enduser: payload.enduser,
-			particulars: payload.particulars,
-			referenceNo: payload.referenceNo,
-			rfqDeadline: payload.rfqDeadline,
+			assignedId: payload.assignedId || null,
+			assignedName: payload.assignedName || null,
+			enduser: payload.enduser || null,
+			particulars: payload.particulars || null,
+			referenceNo: payload.referenceNo || null,
+			rfqDeadline: payload.rfqDeadline || null,
 			taskId: payload.id
 		}
 		opening.dateOpened = ''
@@ -76,7 +76,7 @@ const actions = {
 
 		doc
 			.set(payload)
-			.then(() => this.$q.loading.hide())
+			.then(() => Loading.hide())
 			.then(() => showSuccessMessage())
 			.catch(err => showErrorMessage(err.message))
 	},

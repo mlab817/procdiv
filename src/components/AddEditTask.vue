@@ -74,6 +74,7 @@
 						:dense="dense"
 						label="Approved Budget Cost (ABC)"
 						stack-label
+						class="col"
 						hide-bottom-space
 						lazy-rules />
 				</div>
@@ -140,6 +141,8 @@
 	          </q-icon>
 	        </template>
 	      </q-input>
+
+				<q-checkbox label="Add to For Opening after completion" v-model="taskToSubmit.forOpening" />
 	    </q-form>
 		</q-card-section>
 		<q-card-actions align="right">
@@ -215,7 +218,20 @@
 		data() {
 			return {
 				help: false,
-				taskToSubmit: {},
+				taskToSubmit: {
+					id: null,
+					document: '',
+					particulars: '',
+					rfqDeadline: '',
+					enduser: '',
+					referenceNo: '',
+					actionTaken: '',
+					assignedTo: '',
+					remarks: '',
+					dateDue: '',
+					abc: 0,
+					forOpening: false
+				},
 				required: [val => !!val || '* Required'],
 				enduserOptions: [],
 				addEnduserDialog: false,
@@ -229,6 +245,7 @@
 			submitForm() {
 				this.$refs.myForm.validate().then(success => {
 					if (success) {
+						this.$q.loading.show()
 						const taskToSubmit = this.taskToSubmit
 						if (!!taskToSubmit.id) {
 							const payload = {
@@ -241,10 +258,7 @@
 							this.$store.dispatch('task/addTask', this.taskToSubmit)
 							this.$emit('close')
 						}
-					} else {
-						alert('fail')
 					}
-					this.$emit('close')
 				})
 			},
 			filterEndusers(val, update, abort) {
