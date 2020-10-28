@@ -64,6 +64,7 @@
 						name: 'dateAssigned',
 						label: 'Date Assigned',
 						field: row => date.formatDate(parseDate(row.dateAssigned),'MMM D, YYYY'),
+						sort: (a, b) =>  new Date(parseDate(a)) - new Date(parseDate(b)),
 						sortable: true,
 						align: 'center'
 					},
@@ -113,6 +114,7 @@
 						name: 'rfqDeadline',
 						label: 'RFQ Deadline',
 						field: row => (row.rfqDeadline ? date.formatDate(parseDate(row.rfqDeadline),'MMM D, YYYY') : ''),
+						sort: (a, b) =>  new Date(parseDate(a)) - new Date(parseDate(b)),
 						sortable: true,
 						align: 'center'
 					},
@@ -120,6 +122,7 @@
 						name: 'dateDue',
 						label: 'Due Date/Time',
 						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY') : ''),
+						sort: (a, b) =>  new Date(parseDate(a)) - new Date(parseDate(b)),
 						sortable: true,
 						align: 'center'
 					},
