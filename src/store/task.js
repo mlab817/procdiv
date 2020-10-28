@@ -220,13 +220,17 @@ const mutations = {
 const getters = {
 	ongoing: (state) => {
 		let tasks = state.tasks, ongoingTasks = []
+		
+		const now = new Date()
 
 		const filteredKeys = Object.keys(tasks).forEach(key => {
 			const task = tasks[key]
+			const due = now > parseDate(task.dateDue)
 			
 			if (!task.completed && task.status === 'ongoing' && !task.deleted) {
 				ongoingTasks.push({
 					...task,
+					overdue: due,
 					id: key
 				})	
 			}

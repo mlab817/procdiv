@@ -7,6 +7,13 @@
 						<q-icon name="search" />
 					</template>
 				</q-input>
+				<q-btn 
+					flat 
+					round 
+					icon="archive" 
+					color="primary" 
+					class="q-ml-md" 
+					@click="downloadTasks"></q-btn>
 			</template>
 			
 			<template v-slot:body-cell-actions="props" v-if="admin">
@@ -46,7 +53,7 @@
 
 <script>
 	import { date } from 'quasar'
-	import { parseDate } from 'src/functions'
+	import { parseDate, exportTable } from 'src/functions'
 
 	export default {
 		name: 'CompletedTasks',
@@ -117,14 +124,14 @@
 					{
 						name: 'rfqDeadline',
 						label: 'RFQ Deadline',
-						field: row => (row.rfqDeadline ? date.formatDate(parseDate(row.rfqDeadline),'MMM D, YYYY') : ''),
+						field: row => (row.rfqDeadline ? date.formatDate(parseDate(row.rfqDeadline),'MMM D, YYYY hh:mm A') : ''),
 						sortable: true,
 						align: 'center'
 					},
 					{
 						name: 'dateDue',
 						label: 'Due Date/Time',
-						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY') : ''),
+						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY hh:mm A') : ''),
 						sortable: true,
 						align: 'center'
 					},
@@ -165,6 +172,9 @@
 			},
 			handleUndoCompleted(payload) {
 				this.$store.dispatch('task/undoCompleted', payload)
+			},
+			downloadTasks() {
+				exportTable(this.tasks, this.columns, 'complete tasks.csv')
 			}
 		}
 	}

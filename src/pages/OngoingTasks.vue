@@ -4,36 +4,54 @@
 			<q-btn icon="add_task" class="q-ml-sm" label="Add Task" color="primary" @click="addTask" v-if="admin" />
 		</div>
 
-		<!-- :grid="$q.screen.lt.sm" -->
+		<q-table
+			:data="filteredTasks"
+			:columns="columns"
+			:filter="filter"
+			wrap-cells
+			:grid="$q.screen.lt.sm"
+			row-key="id"
+			separator="cell"
+			:pagination="pagination"
+			:rows-per-page-options="[10,15,25,50,100,0]">
 
-		<q-table 
-				:title="`Ongoing (${tasks.length})`" 
-				:data="tasks" 
-				:columns="columns" 
-				:filter="filter" 
-				wrap-cells 
-				:grid="$q.screen.lt.sm" 
-				row-key="id" 
-				separator="cell" 
-				:pagination="pagination"
-				:rows-per-page-options="[10,15,25,50,100,0]">
+			<template v-slot:top-left>
+				<div class="text-h6">Ongoing Tasks</div>
+			</template>
+
 			<template v-slot:top-right>
 				<q-input borderless v-model="filter" placeholder="Search">
 					<template v-slot:append>
 						<q-icon name="search" />
 					</template>
 				</q-input>
+
+				<q-btn icon="event" color="primary" flat round class="q-ml-md">
+					<q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale">
+						<q-date title="Date Due" v-model="filters.dateDue" range>
+							<div class="row items-center justify-end">
+								<q-btn label="Reset" @click="resetDate" color="primary" flat />
+								<q-btn v-close-popup label="Close" color="primary" flat />
+							</div>
+						</q-date>
+					</q-popup-proxy>
+				</q-btn>
+
+				<q-btn flat round icon="archive" color="primary" class="q-ml-md" @click="downloadTasks"></q-btn>
+			</template>
+
+			<template v-slot:top-row>
+				<q-tr>
+					<q-td colspan="100%">
+						<span v-if="filters.dateDue.from && filters.dateDue.to">From {{filters.dateDue.from}} to {{filters.dateDue.to}}</span>
+						<span v-else>No filters</span>
+					</q-td>
+				</q-tr>
 			</template>
 
 			<template v-slot:body-cell-overdue="props">
 				<q-td :props="props">
-					<q-icon name="priority_high" color="red" v-if="overdue(props.row.dateDue)" />
-				</q-td>
-			</template>
-
-			<template v-slot:body-cell-dateDue="props">
-				<q-td :props="props">
-					{{ props.row.dateDue }}
+					<q-icon name="priority_high" color="red" v-if="props.row.overdue" />
 				</q-td>
 			</template>
 
@@ -103,13 +121,13 @@
 								<q-item>
 									<q-item-section>
 										<q-item-label caption>RFQ Deadline</q-item-label>
-										<q-item-label>{{ props.row.rfqDeadline | formatDate }}</q-item-label>
+										<q-item-label>{{ props.row.rfqDeadline }}</q-item-label>
 									</q-item-section>
 								</q-item>
 								<q-item>
 									<q-item-section>
 										<q-item-label caption>Due Date/Time</q-item-label>
-										<q-item-label>{{ props.row.dateDue | formatDate }}</q-item-label>
+										<q-item-label>{{ props.row.dateDue }}</q-item-label>
 									</q-item-section>
 								</q-item>
 								<q-item>
@@ -167,20 +185,47 @@
 </template>
 
 <script>
-	import { parseDate } from 'src/functions'
+	import { parseDate, exportTable } from 'src/functions'
 	import { date } from 'quasar'
 
 	export default {
 		components: {
-			'add-edit-task': () => import('../components/AddEditTask.vue')
+			'add-edit-task': () => import('../components/AddEditTask.vue'),
 		},
 		name: 'PageTasks',
 		computed: {
 			tasks() {
+				// define additional data here instead
 				return this.$store.getters['task/ongoing']
 			},
 			admin() {
 				return this.$store.getters['auth/admin']
+			},
+			columnNames() {
+				const columnNames = this.columns.map(c => c.name)
+				console.log(columnNames)
+				return columnNames
+			},
+			dateRange() {
+				return `${this.filters.dateDue.from} - ${this.filters.dateDue.to}`
+			},
+			filteredTasks() {
+				const from = this.filters.dateDue.from ? this.filters.dateDue.from : ''
+				const to = this.filters.dateDue.to ? this.filters.dateDue.to : ''
+				let filteredTasks = []
+
+				const tasks = this.tasks
+
+				if (from && to) {
+					filteredTasks = tasks.filter(t => {
+						console.log(t)
+						return (date.isBetweenDates(t.dateDue, from, to, { inclusiveFrom: true, inclusiveTo: true }))
+					})
+				} else {
+					filteredTasks = tasks
+				}
+
+				return filteredTasks
 			}
 		},
 		data() {
@@ -199,15 +244,24 @@
 					dateDue: ''
 				},
 				filter: '',
+				filters: {
+					dateAssigned: '',
+					dateDue: {
+						from: '',
+						to: ''
+					}
+				},
 				columns: [
 					{
 						name: 'overdue',
-						label: ''
+						label: 'Overdue',
+						field: 'overdue',
+						align: 'center'
 					},
 					{
 						name: 'dateAssigned',
 						label: 'Date Assigned',
-						field: row => date.formatDate(parseDate(row.dateAssigned),'MMM D, YYYY'),
+						field: row => date.formatDate(parseDate(row.dateAssigned),'MMM D, YYYY hh:mm A'),
 						sortable: true,
 						align: 'center'
 					},
@@ -263,7 +317,7 @@
 					{
 						name: 'dateDue',
 						label: 'Due Date/Time',
-						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY') : ''),
+						field: row => (row.dateDue ?  date.formatDate(parseDate(row.dateDue),'MMM D, YYYY hh:mm A') : ''),
 						sortable: true,
 						align: 'center'
 					},
@@ -349,6 +403,13 @@
 					cancel: true
 				})
 				.onOk(() => this.$store.dispatch('task/remindTask', row))
+			},
+			downloadTasks() {
+				exportTable(this.filteredTasks, this.columns, 'ongoing tasks.csv')
+			},
+			resetDate() {
+				this.filters.dateDue.from = ''
+				this.filters.dateDue.to = ''
 			}
 		},
 		filters: {

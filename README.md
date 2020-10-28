@@ -1,5 +1,16 @@
 # Quasar App (proc)
 
+v2.2.1
+
+For Opening
+- Added a row to filter openings per column
+- Set show all records by default
+Add Task
+- Hide from sidebar
+Download Tasks
+- Hide from sidebar
+- Moved to tasks table
+
 v2.2
 
 Assignments

@@ -19,6 +19,7 @@
 <script>
 	import { parseDate } from 'src/functions'
 	import { date } from 'quasar'
+
 	export default {
 		name: 'PageOverdue',
 		computed: {
@@ -27,6 +28,7 @@
 			},
 			overdueTasks() {
 				const overdue = this.overdue
+
 				return Object.keys(overdue).map(key => {
 					return {
 						...overdue[key],

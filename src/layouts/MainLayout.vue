@@ -77,14 +77,14 @@
               <q-item-label>Dashboard</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item clickable tag="a" exact to="/add-task" v-if="admin">
+          <!-- <q-item clickable tag="a" exact to="/add-task" v-if="admin">
             <q-item-section avatar>
               <q-icon name="add_task"></q-icon>
             </q-item-section>
             <q-item-section>
               <q-item-label>Add Task</q-item-label>
             </q-item-section>
-          </q-item>
+          </q-item> -->
           <q-expansion-item label="Tasks" icon="folder" :default-expand-all="$q.screen.gt.sm" :content-inset-level="1">
             <q-item clickable tag="a" to="/ongoing">
               <q-item-section avatar>
@@ -143,9 +143,9 @@
               <q-item-label>Settings</q-item-label>
             </q-item-section>
           </q-item> -->
-          <q-item>
+          <!-- <q-item>
             <download-task></download-task>
-          </q-item>
+          </q-item> -->
         </q-list>
       </q-scroll-area>
     </q-drawer>
@@ -204,7 +204,7 @@ export default {
   name: 'MainLayout',
   components: {
     'notifications-list': () => import('../components/layout/NotificationsList.vue'),
-    'download-task': () => import('../components/layout/DownloadTask.vue'),
+    // 'download-task': () => import('../components/layout/DownloadTask.vue'),
     'add-edit-task': () => import('../components/AddEditTask.vue')
   },
   computed: {
