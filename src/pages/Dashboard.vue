@@ -1,8 +1,14 @@
 <template>
-  <q-page padding>
+  <q-page class="q-pa-sm q-gutter-sm">
     <q-toolbar>
       <q-toolbar-title>Dashboard</q-toolbar-title>
     </q-toolbar>
+
+		<overview></overview>
+
+		<div class="row">
+			<todo-list></todo-list>
+		</div>
 
     <q-banner class="bg-grey-3 q-mb-md" v-if="loggedIn && !linked">
       <template v-slot:avatar>
@@ -64,16 +70,13 @@ import { SEED } from '../seeds'
 import { firebaseFs } from 'boot/firebase'
 import { parseDate } from 'src/functions/parse-date'
 import { date } from 'quasar'
-import ZingChart from '../components/charts/ZingChart.vue'
-import CalendarChart from '../components/charts/CalendarChart.vue'
 import { objectToArray } from 'src/utils'
+import Overview from '../components/dashboard/Overview'
+import TodoList from '../components/dashboard/TodoList'
 
 export default {
-  // name: 'PageName',
-  components: {
-    'zing-chart': ZingChart,
-    'calendar-chart': CalendarChart,
-  },
+	components: {TodoList, Overview},
+	// name: 'PageName',
   data() {
   	return {
       filterDialog: true,
@@ -82,10 +85,12 @@ export default {
         {
           value: 'ongoing',
           label: 'Ongoing'
-        },{
+        },
+				{
           value: 'completed',
           label: 'Completed'
-        },{
+        },
+				{
           value: 'deleted',
           label: 'Deleted'
         }

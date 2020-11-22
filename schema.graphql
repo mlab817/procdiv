@@ -1,0 +1,375 @@
+type Query {
+  actions: [Action]
+  action(id: ID!): Action
+  endusers: [Enduser]
+  enduser(id: ID!): Enduser
+  notifications: [Notification]
+  unreadNotifications: [Notification]
+  procurement_requests: [ProcurementRequest]
+  procurement_request(id: ID!): ProcurementRequest
+  request_types: [RequestType]
+  request_type(id: ID!): RequestType
+  rfqs: [Rfq]
+  rfq(id: ID!): Rfq
+  statuses: [Status]
+  status(id: ID!): Status
+  tasks: [Task]
+  ongoingTasks: [Task]
+  completedTasks: [Task]
+  myTasks: [Task]
+  task(id: ID!): Task
+  users(
+    # Limits number of fetched elements.
+    first: Int = 10
+
+    # The offset from which elements are returned.
+    page: Int
+  ): UserPaginator
+  user(id: ID): User
+}
+
+type Action {
+  id: ID
+  name: String
+  slug: String
+  created_at: String
+  updated_at: String
+}
+
+type Enduser {
+  id: ID
+  name: String
+  acronym: String
+  slug: String
+  procurement_coordinator: String
+  created_at: String
+  updated_at: String
+}
+
+type Notification {
+  id: String
+  type: String
+  notifiable: User
+  notifiable_id: ID
+  notifiable_type: String
+  data: NotificationData
+  read_at: String
+  created_at: String
+  updated_at: String
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+}
+
+type NotificationData {
+  type: String
+  from: String
+  title: String
+  body: String
+  actionUrl: String
+  actionText: String
+}
+
+type ProcurementRequest {
+  id: ID
+  number: String
+  details: String
+  abc: Float
+  enduser_id: ID
+  enduser: Enduser
+  created_at: String
+  updated_at: String
+}
+
+type RequestType {
+  id: ID
+  name: String
+  slug: String
+  procurement_requests: [ProcurementRequest]
+}
+
+type Rfq {
+  id: ID
+  number: String
+  name: String
+  created_at: String
+  updated_at: String
+  procurement_requests: [ProcurementRequest]
+}
+
+type Status {
+  id: ID
+  name: String
+  slug: String
+  created_at: String
+  updated_at: String
+  tasks: [Task]
+}
+
+type Task {
+  id: ID
+  action_id: ID
+  action: Action
+  user_id: ID
+  user: User
+  completed: Boolean
+  enduser_id: ID
+  enduser: Enduser
+  details: String
+  remarks: String
+  status_id: ID
+  status: Status
+  completed_at: String
+  creator: User
+  updater: User
+  deleter: User
+  created_at: String
+  updated_at: String
+  deleted_at: String
+  procurement_requests: [ProcurementRequest]
+}
+
+# A paginated list of User items.
+type UserPaginator {
+  # Pagination information about the list of items.
+  paginatorInfo: PaginatorInfo!
+
+  # A list of User items.
+  data: [User!]!
+}
+
+# Pagination information about the corresponding list of items.
+type PaginatorInfo {
+  # Total count of available items in the page.
+  count: Int!
+
+  # Current pagination page.
+  currentPage: Int!
+
+  # Index of first item in the current page.
+  firstItem: Int
+
+  # If collection has more pages.
+  hasMorePages: Boolean!
+
+  # Index of last item in the current page.
+  lastItem: Int
+
+  # Last page number of the collection.
+  lastPage: Int!
+
+  # Number of items per page in the collection.
+  perPage: Int!
+
+  # Total items available in the collection.
+  total: Int!
+}
+
+type Mutation {
+  createRfq(input: CreateRfqInput!): Rfq
+  updateRfq(input: UpdateRfqInput!): Rfq
+  deleteRfq(id: ID!): Rfq
+  createTask(input: CreateTaskInput!): Task
+  updateTask(input: UpdateTaskInput!): Task
+  deleteTask(id: ID!): Task
+  completeTask(id: ID!): Task
+  cancelTask(id: ID!): Task
+  login(input: LoginInput): AuthPayload!
+  refreshToken(input: RefreshTokenInput): RefreshTokenPayload!
+  logout: LogoutResponse!
+  forgotPassword(input: ForgotPasswordInput!): ForgotPasswordResponse!
+  updateForgottenPassword(
+    input: NewPasswordWithCodeInput
+  ): ForgotPasswordResponse!
+  register(input: RegisterInput): RegisterResponse!
+  socialLogin(input: SocialLoginInput!): AuthPayload!
+  verifyEmail(input: VerifyEmailInput!): AuthPayload!
+  updatePassword(input: UpdatePassword!): UpdatePasswordResponse!
+}
+
+input CreateRfqInput {
+  name: String
+  number: String
+  procurement_requests: CreateProcurementRequestsBelongsToMany
+}
+
+input CreateProcurementRequestsBelongsToMany {
+  sync: [ID]
+}
+
+input UpdateRfqInput {
+  id: ID!
+  name: String
+  number: String
+  procurement_requests: UpdateProcurementRequestsBelongsToMany
+}
+
+input UpdateProcurementRequestsBelongsToMany {
+  sync: [ID]
+}
+
+input CreateTaskInput {
+  action_id: ID
+  user_id: ID
+  details: String
+  remarks: String
+  procurement_requests: CreateProcurementRequestsBelongsToMany
+}
+
+input UpdateTaskInput {
+  id: ID!
+  action_id: ID
+  user_id: ID
+  details: String
+  remarks: String
+  status_id: ID
+  procurement_requests: UpdateProcurementRequestsBelongsToMany
+}
+
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+type AuthPayload {
+  access_token: String
+  refresh_token: String
+  expires_in: Int
+  token_type: String
+  user: User
+}
+
+input RefreshTokenInput {
+  refresh_token: String
+}
+
+type RefreshTokenPayload {
+  access_token: String!
+  refresh_token: String!
+  expires_in: Int!
+  token_type: String!
+}
+
+type LogoutResponse {
+  status: String!
+  message: String
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+type ForgotPasswordResponse {
+  status: String!
+  message: String
+}
+
+input NewPasswordWithCodeInput {
+  email: String!
+  token: String!
+  password: String!
+  password_confirmation: String!
+}
+
+input RegisterInput {
+  name: String!
+  email: String!
+  password: String!
+  password_confirmation: String!
+}
+
+type RegisterResponse {
+  tokens: AuthPayload
+  status: RegisterStatuses!
+}
+
+enum RegisterStatuses {
+  MUST_VERIFY_EMAIL
+  SUCCESS
+}
+
+input SocialLoginInput {
+  provider: String!
+  token: String!
+}
+
+input VerifyEmailInput {
+  token: String!
+}
+
+input UpdatePassword {
+  old_password: String!
+  password: String!
+  password_confirmation: String!
+}
+
+type UpdatePasswordResponse {
+  status: String!
+  message: String
+}
+
+# A date string with format `Y-m-d`, e.g. `2011-05-23`.
+scalar Date
+
+# A datetime string with format `Y-m-d H:i:s`, e.g. `2018-05-23 13:43:32`.
+scalar DateTime
+
+# Pagination information about the corresponding list of items.
+type PageInfo {
+  # When paginating forwards, are there more items?
+  hasNextPage: Boolean!
+
+  # When paginating backwards, are there more items?
+  hasPreviousPage: Boolean!
+
+  # When paginating backwards, the cursor to continue.
+  startCursor: String
+
+  # When paginating forwards, the cursor to continue.
+  endCursor: String
+
+  # Total number of node in connection.
+  total: Int
+
+  # Count of nodes in current request.
+  count: Int
+
+  # Current page of request.
+  currentPage: Int
+
+  # Last page in connection.
+  lastPage: Int
+}
+
+# The available directions for ordering a list of records.
+enum SortOrder {
+  # Sort records in ascending order.
+  ASC
+
+  # Sort records in descending order.
+  DESC
+}
+
+# Allows ordering a list of records.
+input OrderByClause {
+  # The column that is used for ordering.
+  field: String!
+
+  # The direction that is used for ordering.
+  order: SortOrder!
+}
+
+# Specify if you want to include or exclude trashed results from a query.
+enum Trashed {
+  # Only return trashed results.
+  ONLY
+
+  # Return both trashed and non-trashed results.
+  WITH
+
+  # Only return non-trashed results.
+  WITHOUT
+}

@@ -11,7 +11,7 @@ const routes = [
       { path: 'v1/deleted', component: () => import('pages/v1/Deleted.vue') },
       { path: 'auth', component: () => import('pages/Auth.vue') },
       { path: 'for-opening', component: () => import('pages/ForOpening.vue') },
-      { path: 'ongoing', component: () => import('pages/OngoingTasks.vue') },      
+      { path: 'ongoing', component: () => import('pages/OngoingTasks.vue') },
       { path: 'completed', component: () => import('pages/CompletedTasks.vue') },
       { path: 'deleted', component: () => import('pages/v1/Deleted.vue') },
       { path: 'options', component: () => import('pages/Options.vue') },
@@ -25,6 +25,7 @@ const routes = [
       { path: 'chat', component: () => import('pages/Chat.vue') },
       { path: 'overdue', component: () => import('pages/Overdue.vue') },
       { path: 'settings', component: () => import('pages/Settings.vue') },
+	    { path: 'taskboard', component: () => import('pages/Taskboard.vue') }
     ]
   },
 
